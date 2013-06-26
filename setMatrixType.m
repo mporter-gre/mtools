@@ -1,0 +1,33 @@
+function matrixOut = setMatrixType(matrixIn, typeString)
+%int8, uint8, int16, uint16, int32, uint32, int64, uint64, single, double,
+%logical
+
+switch typeString
+    case 'int8'
+        matrixOut = int8(matrixIn);    
+    case 'uint8'
+        matrixOut = uint8(matrixIn);
+    case 'int16'
+        matrixOut = int16(matrixIn);
+    case 'uint16'
+        matrixOut = uint16(matrixIn);
+    case 'int32'
+        matrixOut = int32(matrixIn);
+    case 'uint32'
+        matrixOut = uint32(matrixIn);
+    case 'int64'
+        matrixOut = int64(matrixIn);
+    case 'uint64'
+        matrixOut = uint64(matrixIn);
+    case 'single'
+        matrixOut = single(matrixIn);
+    case 'float'
+        matrixOut = single(matrixIn);
+    case 'double'
+        matrixOut = double(matrixIn);
+    case 'logical'
+        matrixOut = logical(matrixIn);     
+end
+
+
+clear matrixIn;

@@ -1,0 +1,27 @@
+function getImageNamesFromImages(handles, 'ImageSegmentation');
+
+images = getappdata(handles.(parentFigureName), images);
+
+numImages = images.size;
+if numImages == 0
+    set(handles.imagesSelect, 'Value', 1);
+    set(handles.imagesSelect, 'String', 'No images in this dataset');
+    return;
+end
+imageNameId{numImages,2} = [];
+imageNameList{numImages} = [];
+
+imageIter = images.iterator;
+counter = 1;
+while imageIter.hasNext
+    imageNameId{counter,1} = char(images.get(counter-1).getName.getValue.getBytes');
+    imageNameId{counter,2} = num2str(images.get(counter-1).getId.getValue);
+    counter = counter + 1;
+    imageIter.next;
+end
+
+imageNameId = sortrows(imageNameId);
+for thisImage = 1:numImages
+    imageNameList{thisImage} = imageNameId{thisImage, 1};
+    imageIdList(thisImage) = str2double(imageNameId{thisImage, 2});
+end

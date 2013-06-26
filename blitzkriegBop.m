@@ -1,0 +1,14 @@
+function [client, session, gateway] = blitzkriegBop
+%Connect to omero server using Blitz. Change the server to connect to in
+%'iceconfig' file which is in the Matlab path. Username and password are
+%top secret, of course.
+%Do [client, session, gateway] = blitzkriegBop;
+%mage = 134.36.65.50
+%nightshade = 134.36.65.51
+
+%client = omero.client(java.lang.String('C:\Documents and Settings\Michael\My Documents\MATLAB\iceconfig'));
+client = omero.client('134.36.65.51', 4063);
+session = client.createSession('mike', 'Homer'); %Obviously top secret.
+gateway = session.createGateway();
+
+end

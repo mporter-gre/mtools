@@ -1,0 +1,27 @@
+function setNewImageChannelNames(image, pixels, channelList, session)
+
+pixelsId = pixels.get(0).getId.getValue;
+for thisChannel = 1:length(channelList)
+    channel = ome.model.core.Channel;
+    logicalChannel = ome.model.core.LogicalChannel;
+    channel.setLogicalChannel(logicalChannel);
+    logicalChannel.setEmissionWave(java.lang.Integer(thisChannel-1));
+    channelInfo = ome.model.stats.StatsInfo();
+    channelInfo.setGlobalMin(java.lang.Double(0));
+    channelInfo.setGlobalMax(java.lang.Double(1));
+    channel.setStatsInfo(channelInfo);
+    pixels.get(0).addChannel(channel);
+end
+image.addPixels(pixels);
+iUpdate = session.getUpdateService;
+iUpdate.saveObject(image);
+
+for thisChannel = 1:length(channelList)
+    pixServiceDescription = session.getPixelsService.retrievePixDescription(pixelsId).getChannel(thisChannel-1).getLogicalChannel();
+    thisChannelName = omero.rtypes.rstring(channelList{thisChannel});
+    pixServiceDescription.setName(thisChannelName);
+    iUpdate = session.getUpdateService();
+    iUpdate.saveObject(pixServiceDescription);
+end
+
+end

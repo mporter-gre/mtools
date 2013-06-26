@@ -1,0 +1,19 @@
+function imageOut = setImageLevels(imageIn)
+
+
+fig = figure('Visible','off','Position',[400,200,800,600]);
+imgBox1 = uicontrol('Style', 'figure'
+
+
+
+
+
+
+
+
+
+
+
+
+
+end

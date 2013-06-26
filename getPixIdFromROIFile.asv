@@ -1,0 +1,81 @@
+function [pixId imageName] = getPixIdFromROIFile(imageName, omeroUser, omeroServer)
+%Pass in a filename and return the matching pixelsId as read from the
+%roiFileMap.xml system file.
+%
+%Author Michael Porter
+%Copyright 2009 University of Dundee. All rights reserved
+
+%[imageName, remain] = strtok(imageName, '.');
+
+%On Windows systems...
+if ispc;
+    sysUserHome = getenv('userprofile');
+    sysUser = getenv('username');
+    mapPath = [sysUserHome '\omero\roiFileMap.xml'];
+    mapStruct = xml2struct(mapPath);
+
+    for thisServer = 1:length(mapStruct.children)
+        if strcmp(mapStruct.children(thisServer).name, '#text')
+            continue;
+        end
+        if strcmpi(mapStruct.children(thisServer).attributes(1).value, omeroServer)
+            for thisUser = 1:length(mapStruct.children(thisServer).children)
+                if strcmp(mapStruct.children(thisServer).children(thisUser).name, '#text')
+                    continue;
+                end
+                if strcmpi(mapStruct.children(thisServer).children(thisUser).attributes(1).value, omeroUser)
+                    for thisImage = 1:length(mapStruct.children(thisServer).children(thisUser).children)
+                        if strcmp(mapStruct.children(thisServer).children(thisUser).children(thisImage).name, '#text')
+                            continue;
+                        end
+                        for thisFile = 1:length(mapStruct.children(thisServer).children(thisUser).children(thisImage).children)
+                            if strcmp(mapStruct.children(thisServer).children(thisUser).children(thisImage).children(thisFile).name
+                        partName = mapStruct.children(thisServer).children(thisUser).children(thisImage).children.attributes(1).value;
+                        %                     while ~isempty(partName)
+                        %                         [nameProc, partName] = strtok(partName, '\');
+                        %                     end
+                        %[imageNameFromStruct, remain] = strtok(nameProc, '.');
+                        if strcmp(partName, imageName)
+                            pixId = mapStruct.children(thisServer).children(thisUser).children(thisImage).attributes(1).value;
+                            return;
+                        else
+                            pixId = [];
+                        end
+                    end
+                end
+            end
+        end
+    end
+    clear mapStruct;
+else
+    %On Mac and Unix systems...
+    sysUser = getenv('HOME');
+    mapPath = [sysUser, '/omero/roiFileMap.xml'];
+    mapStruct = xml2struct(mapPath);
+
+    for thisServer = 1:length(mapStruct.children)
+        if strcmpi(mapStruct.children(thisServer).attributes(1).value, omeroServer)
+            for thisUser = 1:length(mapStruct.children(thisServer).children)
+                if strcmpi(mapStruct.children(thisServer).children(thisUser).attributes(1).value, omeroUser)
+                    for thisImage = 1:length(mapStruct.children(thisServer).children(thisUser).children)
+                        [nameProc, partName] = strtok(mapStruct.children(thisServer).children(thisUser).children(thisImage).children.attributes(1).value, '/');
+                        while ~isempty(partName)
+                            [nameProc, partName] = strtok(partName, '/');
+                        end
+                        [imageNameFromStruct, remain] = strtok(nameProc, '.');
+                        if strcmp(imageNameFromStruct, imageName)
+                            pixId = mapStruct.children(thisServer).children(thisUser).children(thisImage).attributes(1).value;
+                            return;
+                        end
+                    end
+                end
+            end
+        end
+    end
+    clear mapStruct;
+end
+
+
+
+
+end

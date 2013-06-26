@@ -1,0 +1,68 @@
+function selectROIFilesForFRAPAnalysis(credentials, conditions)
+%Analyse batches of FRAP movies and save the data into an Excel
+%spreadsheet, or .csv file if Excel is not installed on the client machine.
+%User will be asked to point to ROI files that relate to the movies on the
+%Omero server. 4 ROIs must be drawn for each movie and lebelled
+%specifically: 'FRAP' is the spot that is bleached; 'WHOLE' is the whole
+%cell; 'REF' is another spot that you would like to measure - this is not
+%used for the analysis; 'BASE' is the background outside the cell. All 4
+%ROIs must be the same number of timepoints in length.
+%
+%Author Michael Porter
+%Copyright 2009 University of Dundee. All rights reserved
+
+% infobox = helpdlg('You are going to be asked for your server name, username and password, for some information about your experimental conditions and to select the ROI files for each condition you have. After processing has completed you will be asked where to save the results spreadsheet.', 'Information');
+% uiwait(infobox);
+% default = {'nightshade.openmicroscopy.org.uk'};
+% server = inputdlg('What server do you want to connect to?', 'Which Server?', 1, default);
+% username = inputdlg('What is your username?');
+% password = inputdlg('What is your password?');
+% credentials{1} = username{1};
+% credentials{2} = password{1};
+% credentials{3} = server{1};
+% numConditions = inputdlg('How many experimental conditions do you have? For example "control" and "drug1" would be 2.', 'Number of conditions');
+numConditions = length(conditions);
+currDir = pwd;
+for thisCondition = 1:numConditions
+    %conditionName{thisCondition} = inputdlg(['Give condition ', num2str(thisCondition), ' a name...']);
+    [files{thisCondition}, paths{thisCondition}] = uigetfile('*.xml', ['Choose your ROI files for condition "' conditionName{thisCondition}{1},'"'], currDir, 'MultiSelect', 'on');
+    currDir = paths{thisCondition};
+end
+
+dataOut = [];
+dataSummary = {'File Name', 'Condition', 'T1/2', 'Mobile Fraction', 'Immobile Fraction'};
+
+for thisCondition = 1:numConditions
+    if iscell(files{thisCondition})
+        numFiles{thisCondition} = length(files{thisCondition});
+        for thisFile = 1:numFiles{thisCondition}
+            [ROIIdx{thisCondition}{thisFile} roishapeIdx{thisCondition}{thisFile} indices] = FRAPMeasure(paths{thisCondition}, files{thisCondition}{thisFile}, credentials, thisFile, numFiles{thisCondition}, thisCondition, numConditions);
+            dataOut = [dataOut; {[roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.name, ' Frap analysis. T1/2 = ', num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.Thalf), 's, mobile fraction = ', num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.mobileFraction), ', immobile fraction = ', num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.immobileFraction)],'','','','','','',''}];
+            dataOut = [dataOut; {'File Name', 'Condition', 'Timestamp', 'Frap Intensities' 'Ref Intensities', 'Base Intensities', 'Whole Intensities', 'Frap Normalised Corrected';}];
+            for thisTimestamp = 1:length(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.T)
+                dataOut = [dataOut; {roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.name conditionName{thisCondition}{1} num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.timestamp(thisTimestamp))} roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.frapData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.refIdx}.refData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.baseIdx}.baseData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.wholeIdx}.wholeData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.frapNormCorr(thisTimestamp)];
+            end
+            dataOut = [dataOut; {' ',' ',' ',' ',' ',' ',' ',' '}];
+            dataSummary = [dataSummary; {roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.name, conditionName{thisCondition}{1}, num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.Thalf), num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.mobileFraction), num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.immobileFraction)}];
+        end
+    else
+        thisFile = 1;
+        numFiles = 1;
+        [ROIIdx{thisCondition}{thisFile} roishapeIdx{thisCondition}{thisFile} indices] = FRAPMeasure(paths{thisCondition}, files{thisCondition}, credentials, thisFile, numFiles, thisCondition, numConditions);
+        dataOut = [dataOut; {[roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.name, ' Frap analysis. T1/2 = ', num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.Thalf), 's, mobile fraction = ', num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.mobileFraction), ', immobile fraction = ', num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.immobileFraction)],'','','','','','',''}];
+        dataOut = [dataOut; {'File Name', 'Condition', 'Timestamp', 'Frap Intensities' 'Ref Intensities', 'Base Intensities', 'Whole Intensities', 'Frap Normalised Corrected';}];
+        for thisTimestamp = 1:length(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.T)
+            dataOut = [dataOut; {roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.name conditionName{thisCondition}{1} num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.timestamp(thisTimestamp))} roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.frapData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.refIdx}.refData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.baseIdx}.baseData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.wholeIdx}.wholeData(thisTimestamp) roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.frapNormCorr(thisTimestamp)];
+        end
+        dataOut = [dataOut; {' ',' ',' ',' ',' ',' ',' ',' '}];
+        dataSummary = [dataSummary; {roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.name, conditionName{thisCondition}{1}, num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.Thalf), num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.mobileFraction), num2str(roishapeIdx{thisCondition}{thisFile}{indices.frapIdx}.immobileFraction)}];
+    end
+end
+
+pause(1);
+[saveFile savePath] = uiputfile('*.xls','Save Results',[currDir, '/FrapAnalysisResults.xls']);
+
+xlswrite([savePath saveFile], dataOut, 'Data All Timepoints');
+xlswrite([savePath saveFile], dataSummary, 'Data Summary');
+
+end
