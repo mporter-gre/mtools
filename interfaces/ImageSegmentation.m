@@ -648,6 +648,13 @@ axes(handles.imageAxes);
 for thisROI = 1:numROI
     X = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getX.getValue);
     Y = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getY.getValue);
+    
+    if X < 1
+        X = 1;
+    end
+    if Y < 1
+        Y = 1;
+    end
     width = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getWidth.getValue);
     height = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getHeight.getValue);
     if thisROI == selectedROI
