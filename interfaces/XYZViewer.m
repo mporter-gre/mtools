@@ -206,16 +206,16 @@ end
 
 axes(handles.imageAxes);
 handles.imageHandle = imshow(renderedImage{z});
-redrawROIs(handles, 'XY');
+%redrawROIs(handles, 'XY');
 set(handles.imageHandle, 'ButtonDownFcn', {@image_ButtonDownFcn, handles});
 
 axes(handles.YZAxes);
 handles.YZHandle = imshow(YZImage);
-redrawROIs(handles, 'YZ');
+%redrawROIs(handles, 'YZ');
 
 axes(handles.XZAxes);
 handles.XZHandle = imshow(XZImage);
-redrawROIs(handles, 'XZ');
+%redrawROIs(handles, 'XZ');
 
 
 
