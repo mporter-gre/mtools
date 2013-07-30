@@ -118,6 +118,7 @@ function varargout = ImageSegmentation_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
+
 varargout{1} = get(handles.channelSelect, 'Value');
 
 
@@ -195,6 +196,7 @@ end
 
 close(hObject)
 drawnow;
+
 
 
 % --- Executes on selection change in imageSelect.

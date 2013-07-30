@@ -1,7 +1,10 @@
 function intensityMeasureLaunchpad(handles, credentials)
 
-
-[segChannel measureChannels measureAroundChannels featherSize saveMasks verifyZ groupObjects minSize selectedSegType threshold imageIds imageNames roiShapes channelLabels pixels datasetNames annulusSize gapSize] = ImageSegmentation(handles, credentials);
+try
+    [segChannel measureChannels measureAroundChannels featherSize saveMasks verifyZ groupObjects minSize selectedSegType threshold imageIds imageNames roiShapes channelLabels pixels datasetNames annulusSize gapSize] = ImageSegmentation(handles, credentials);
+catch ME
+    return;
+end
 numImages = length(roiShapes);
 progBar = waitbar(0, 'Analysing image');
 
