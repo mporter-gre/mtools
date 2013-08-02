@@ -22,7 +22,7 @@ function varargout = ImageSelector(varargin)
 
 % Edit the above text to modify the response to help ImageSelector
 
-% Last Modified by GUIDE v2.5 02-Feb-2010 12:32:37
+% Last Modified by GUIDE v2.5 02-Aug-2013 16:27:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
