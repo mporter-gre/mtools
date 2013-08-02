@@ -51,6 +51,7 @@ function ImageSelector_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to ImageSelector (see VARARGIN)
+%TestComment
 
 % Choose default command line output for ImageSelector
 handles.output = hObject;
