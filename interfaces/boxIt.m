@@ -22,7 +22,7 @@ function varargout = boxIt(varargin)
 
 % Edit the above text to modify the response to help boxit
 
-% Last Modified by GUIDE v2.5 18-Mar-2010 14:17:04
+% Last Modified by GUIDE v2.5 05-Aug-2013 17:29:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1965,3 +1965,10 @@ for thisROI = 1:numROIs
     ROIs{thisROI}.ROIId = savedROI.getId.getValue;
 end
 setappdata(handles.boxIt, 'ROIs', ROIs);
+
+
+% --- Executes on button press in nextImageButton.
+function nextImageButton_Callback(hObject, eventdata, handles)
+% hObject    handle to nextImageButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
