@@ -113,6 +113,14 @@ imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
 roiShapes = deleteElementFromCells(imageIdxNoROIs, roiShapes);
 datasetNames = deleteElementFromCells(imageIdxNoROIs, datasetNames);
 numImages = images.size;
+%Sort the ROI shapes by time point. The defaul 'byId' sorting can sometimes
+%be in non-chronalogical order.
+for thisImage = 1:numImages
+    for thisROI = 1:length(roiShapes{thisImage})
+        roiShapes{thisImage}{thisROI} = sortROIShapes(roiShapes{thisImage}{thisROI}, 'byT');
+    end
+end
+
 
 for thisImage = 1:numImages
     theImage = images.get(thisImage-1);

@@ -52,7 +52,7 @@ maxValYZ = maxMeanYZ + maxStDevYZ;
 % [val stopZ] = min(stDevs);
 % stopZ = stopZ - 3;
 % startZ = stopZ - 4;
-stopZ = 3;
+stopZ = 4;
 startZ = 1;
 chunk = 128;
 startOfChunk = 1;
@@ -94,8 +94,8 @@ for thisBand = 1:4
         thisSeg(plane>(meansYZ(thisY) + 1.1*stDevsYZ(thisY))) = 150;
         segStackYZ(thisY,:,startZ:stopZ) = thisSeg;
     end
-    startZ = startZ + 2;
-    stopZ = stopZ + 2;
+    startZ = startZ + 4;
+    stopZ = stopZ + 4;
 end
 
 %Only accept a voxel that is segmented in all 3 orientations.
