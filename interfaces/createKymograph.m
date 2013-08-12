@@ -1435,12 +1435,12 @@ switch answer,
 %         loginImageSelector;
         ImageSelector(handles, 'CreateKymograph');
         getImageParameters(handles);
+        enableDisableControls(handles, 'on');
         setTSlider(handles);
         setZSlider(handles);
         set(handles.stopZText, 'String', num2str(getappdata(handles.CreateKymograph, 'numZ')));
         defaultZ = getappdata(handles.CreateKymograph, 'defaultZ');
         getPlane(handles, defaultZ, 0)
-        enableDisableControls(handles, 'on');
         setappdata(handles.CreateKymograph, 'clearAnswer', 'Yes');
         clearAllItem_Callback([], eventdata, handles);    
         refreshDisplay(handles);
@@ -1753,22 +1753,20 @@ renderSettingsService = session.getRenderingSettingsService;
 
 imageId = getappdata(handles.CreateKymograph, 'imageId');
 imageObj = getappdata(handles.CreateKymograph, 'newImageObj');
-handles.pixels = gateway.getPixelsFromImage(imageId);
-if strcmp(class(handles.pixels), 'java.util.ArrayList');
-    handles.pixels = handles.pixels.get(0);
+pixels = gateway.getPixelsFromImage(imageId);
+if strcmp(class(pixels), 'java.util.ArrayList');
+    pixels = pixels.get(0);
 end
-handles.pixelsId = handles.pixels.getId.getValue;
-handles.numC = handles.pixels.getSizeC.getValue;
+pixelsId = pixels.getId.getValue;
 %handles.fullImage = varargin{2};
 imageName = native2unicode(imageObj.getName.getValue.getBytes');
-handles.imageName = imageName;
 set(handles.imageNameLabel, 'String', imageName);
-numT = handles.pixels.getSizeT.getValue;
-sizeX = handles.pixels.getSizeX.getValue;
-sizeY = handles.pixels.getSizeY.getValue;
-numC = handles.pixels.getSizeC.getValue;
-handles.numZ = handles.pixels.getSizeZ.getValue;
-settingsThisPixels = renderSettingsService.getRenderingSettings(handles.pixelsId);
+numT = pixels.getSizeT.getValue;
+sizeX = pixels.getSizeX.getValue;
+sizeY = pixels.getSizeY.getValue;
+numC = pixels.getSizeC.getValue;
+numZ = pixels.getSizeZ.getValue;
+settingsThisPixels = renderSettingsService.getRenderingSettings(pixelsId);
 defaultZ = settingsThisPixels.getDefaultZ.getValue;
 
 anchorPos{numT} = [];
@@ -1779,12 +1777,12 @@ setappdata(handles.CreateKymograph, 'anchorPos', anchorPos);
 setappdata(handles.CreateKymograph, 'rectPos', rectPos);
 setappdata(handles.CreateKymograph, 'alignPos', alignPos);
 setappdata(handles.CreateKymograph, 'numT', numT);
-setappdata(handles.CreateKymograph, 'numZ', handles.numZ);
+setappdata(handles.CreateKymograph, 'numZ', numZ);
 setappdata(handles.CreateKymograph, 'numC', numC);
 setappdata(handles.CreateKymograph, 'defaultZ', defaultZ);
 setappdata(handles.CreateKymograph, 'imageSize', [sizeX sizeY]);
-setappdata(handles.CreateKymograph, 'pixels', handles.pixels);
-setappdata(handles.CreateKymograph, 'pixelsId', handles.pixelsId);
+setappdata(handles.CreateKymograph, 'pixels', pixels);
+setappdata(handles.CreateKymograph, 'pixelsId', pixelsId);
 
 
 function enableDisableControls(handles, onOff)
