@@ -1986,28 +1986,25 @@ imageId = getappdata (handles.boxIt, 'imageId');
 projectId = getappdata(handles.boxIt, 'projectId');
 datasetId = getappdata(handles.boxIt, 'datasetId');
 
-%An ArrayList of images in the current dataset is retrieved from the OMERO 
-%server.
+%gets the ArrayList of images in the current dataset from the OMERO server.
 images = gateway.getImages(datasetContainer,datasetId);
 
-%The number of images in the dataset is determined and the associated
-%image IDs are loaded and sorted them from smallest to largest.
+%determines the number of images in the dataset, loads the associated
+%image IDs, and sorts them from smallest to largest.
 numImages = images.size;
 for thisImage = 0:numImages-1
     imageIds(thisImage) = images.get(thisImage).getId.getValue;
 end
 imageIds = sort(imageIds);
 
-%The position of the current image in the datset is determined.
+%determines the position of the current image in the datset.
 for thisImage = 1:numImages
     if imageId = imageIds(thisImage);
         break;
     end
 end
 
-%After making sure that the current image is not the last image in the
-%dataset, a new variable is created that stores the Image ID associated
-%with the next imge in the dataset.
+%After 
 if thisImage < numImages
     newImageId = imageIds(thisImage +1);
 else
