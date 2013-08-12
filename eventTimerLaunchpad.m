@@ -52,7 +52,7 @@ catch
     delete([savePath saveFile]); %Delete the .xls file and save again as .csv
     dotIdx = findstr(saveFile, '.');
     newSaveFile = saveFile(1:dotIdx(end));
-    newSaveFile = [newSaveFile 'csv']);
+    newSaveFile = [newSaveFile 'csv'];
     fid = fopen([savePath newSaveFile], 'w');
     for thisRow = 1:rows
         for thisCol = 1:cols
