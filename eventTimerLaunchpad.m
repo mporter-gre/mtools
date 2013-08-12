@@ -50,7 +50,10 @@ catch
         end
     end
     delete([savePath saveFile]); %Delete the .xls file and save again as .csv
-    fid = fopen([savePath saveFile], 'w');
+    dotIdx = findstr(saveFile, '.');
+    newSaveFile = saveFile(1:dotIdx(end));
+    newSaveFile = [newSaveFile 'csv']);
+    fid = fopen([savePath newSaveFile], 'w');
     for thisRow = 1:rows
         for thisCol = 1:cols
             fprintf(fid, '%s', dataOut{thisRow, thisCol});
