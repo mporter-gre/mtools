@@ -104,7 +104,7 @@ setZSlider(handles);
 guidata(hObject, handles);
 
 % UIWAIT makes labelmaker1024 wait for user response (see UIRESUME)
-uiwait(handles.labelMaker1024);
+uiwait(handles.labelMaker);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -115,7 +115,7 @@ function varargout = labelMaker1024_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = handles.output;
+%varargout{1} = handles.output;
 
 
 
@@ -718,11 +718,12 @@ else
     points{1}.Colour = colour;
 end
 
+thePointHandle = findobj(thePoint,'-depth',0);
 api = iptgetapi(thePoint);
 fcn = makeConstrainToRectFcn('impoint', [currentPoint(1) currentPoint(1)], [currentPoint(3) currentPoint(3)]);
 api.setPositionConstraintFcn(fcn);
 api.setColor(colour);
-iptaddcallback(thePoint, 'ButtonDownFcn', {@point_ButtonDownFcn, handles});
+iptaddcallback(thePointHandle, 'ButtonDownFcn', {@point_ButtonDownFcn, handles});
 showLabels = getappdata(handles.labelMaker, 'showLabelText');
 if showLabels == 1
     api.setString(label);
@@ -745,7 +746,7 @@ thePoint = get(gcf, 'CurrentObject');
 points = getappdata(handles.labelMaker, 'points');
 numPoints = length(points);
 for thisPoint = 1:numPoints
-    if points{thisPoint}.PointHandle == thePoint
+    if findobj(points{thisPoint}.PointHandle,'-depth',0) == thePoint
         colour = points{thisPoint}.Colour;
     end
 end
@@ -773,19 +774,19 @@ set(handles.deletePointButton, 'Enable', 'off');
 function deletePoint(handles)
 
 thePoint = getappdata(handles.labelMaker, 'selectedPoint');
+thePointHandle = findobj(thePoint,'-depth',0);
 locked = getappdata(handles.labelMaker, 'deleteLock');
 if isempty(thePoint) || locked == 1
     return;
 end
-api = iptgetapi(thePoint);
-api.delete();
+
 points = getappdata(handles.labelMaker, 'points');
 modifier = 0;
 if iscell(points)
     numPoints = length(points);
     newPoints = [];
     for thisPoint = 1:numPoints
-        if points{thisPoint}.PointHandle == thePoint
+        if thePointHandle == findobj(points{thisPoint}.PointHandle,'-depth',0)
             points{thisPoint} = [];
             break;
         end
@@ -806,6 +807,9 @@ if iscell(points)
 else
     newPoints = [];
 end
+
+api = iptgetapi(thePoint);
+api.delete();
 
 setappdata(handles.labelMaker, 'points', newPoints);
 setappdata(handles.labelMaker, 'selectedPoint', []);
@@ -847,11 +851,12 @@ for thisPoint = 1:numPoints
     if ismember(thisPointZ, thisZ)
         if ismember(thisPointT, thisT)
             thePoint = impoint(gca, thisPointX, thisPointY);
+            thePointHandle = findobj(thePoint,'-depth',0);
             api = iptgetapi(thePoint);
             fcn = makeConstrainToRectFcn('impoint', [thisPointX thisPointX], [thisPointY thisPointY]);
             api.setPositionConstraintFcn(fcn);
             api.setColor(colour);
-            iptaddcallback(thePoint, 'ButtonDownFcn', {@point_ButtonDownFcn, handles});
+            iptaddcallback(thePointHandle, 'ButtonDownFcn', {@point_ButtonDownFcn, handles});
             points{thisPoint}.PointHandle = thePoint;
             if showLabels == 1
                 api.setString(points{thisPoint}.label);

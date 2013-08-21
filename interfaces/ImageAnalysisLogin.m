@@ -425,9 +425,9 @@ answer = questdlg('Are your images larger than 512x512 pixels?', 'Image Size', '
 if strcmp(answer, '')
     set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
     return;
-elseif strcmp(answer, 'No')
+elseif strcmpi(answer, 'No')
     labelMaker(handles, credentials);
-else
+else strcmpi(answer, 'Yes')
     labelMaker1024(handles, credentials);
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
