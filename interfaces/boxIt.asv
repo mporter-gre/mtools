@@ -643,15 +643,18 @@ function autoDrawButton_Callback(hObject, eventdata, handles)
 
 imageSize = getappdata(handles.boxIt, 'imageSize');
 plane = getappdata(handles.boxIt, 'currentPlane');
+theZ = str2double(get(handles.zLabel, 'String'));
+if imageSize(3) ~= size(plane)
+    getPlane(handles, 0);
+    plane = getappdata(handles.boxIt, 'currentPlane');
+end
 
-segPlane = seg3D(double(plane),0,0,1);
-segProps = regionprops(segPlane, 'BoundingBox');
+segPlane = seg3D(plane,0,0,1);
+segProps = regionProps(segPlane, 'BoundingBox');
 numProps = length(segProps);
 
 for thisProp = 1:numProps
-    boundingBox = ceil(segProps(thisProp).BoundingBox);
-    setappdata(handles.boxIt, 'rect', boundingBox);
-    segmentPatch(handles);
+    boundingBox = ceil(segProps(thisProp).boundingBox);
 end
     
     
