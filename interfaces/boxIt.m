@@ -288,7 +288,7 @@ end
 
 selectROI = getappdata(handles.boxIt, 'selectROI');
 if selectROI == 1
-    currentPoint = get(gca, 'CurrentPoint');
+    currentPoint = round(get(gca, 'CurrentPoint'));
     for thisROI = 1:length(ROIs)
         thisROIXRange = int16(ROIs{thisROI}.rect(1):ROIs{thisROI}.rect(1)+ROIs{thisROI}.rect(3));
         thisROIYRange = int16(ROIs{thisROI}.rect(2):ROIs{thisROI}.rect(2)+ROIs{thisROI}.rect(4));
