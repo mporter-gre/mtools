@@ -22,7 +22,7 @@ function varargout = boxIt(varargin)
 
 % Edit the above text to modify the response to help boxit
 
-% Last Modified by GUIDE v2.5 18-Mar-2010 14:17:04
+% Last Modified by GUIDE v2.5 22-Aug-2013 11:35:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -101,6 +101,7 @@ setappdata(handles.boxIt, 'cancelledOpenImage', 0);
 setappdata(handles.boxIt, 'savePath', sysUserHome);
 setappdata(handles.boxIt, 'sysUserHome', sysUserHome);
 set(handles.imageNameLabel, 'String', 'No File Open');
+setappdata(handles.boxIt, 'autodraw', 0);
 setZControls(handles);
 
 % Update handles structure
@@ -496,6 +497,7 @@ setappdata(handles.boxIt, 'modified', 0);
 setappdata(handles.boxIt, 'askToUpdateROIMapFile', 1);
 setappdata(handles.boxIt, 'updatingROIMapFile', 0);
 set(handles.autoDrawButton, 'Enable', 'on');
+set(handles.minObjectSizeText, 'Enable', 'on');
 redrawImage(handles);
 redrawROIs(handles);
 
@@ -641,21 +643,21 @@ function autoDrawButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+setappdata(handles.boxIt, 'autodraw', 1);
 imageSize = getappdata(handles.boxIt, 'imageSize');
 plane = getappdata(handles.boxIt, 'currentPlane');
-theZ = str2double(get(handles.zLabel, 'String'));
-if imageSize(3) ~= size(plane)
-    getPlane(handles, 0);
-    plane = getappdata(handles.boxIt, 'currentPlane');
-end
+minObjectSize = str2double(get(handles.minObjectSizeText, 'String'));
 
-segPlane = seg3D(plane,0,0,1);
-segProps = regionProps(segPlane, 'BoundingBox');
+segPlane = seg3D(double(plane),0,0,minObjectSize);
+segProps = regionprops(segPlane, 'BoundingBox');
 numProps = length(segProps);
 
 for thisProp = 1:numProps
-    boundingBox = ceil(segProps(thisProp).boundingBox);
+    boundingBox = ceil(segProps(thisProp).BoundingBox);
+    setappdata(handles.boxIt, 'rect', boundingBox);
+    segmentPatch(handles);
 end
+setappdata(handles.boxIt, 'autodraw', 0);
     
     
 
@@ -1701,8 +1703,15 @@ verifyZ = get(handles.verifyZCheck, 'Value');
 thisZ = round(get(handles.zSlider, 'Value'));
 thisT = round(get(handles.tSlider, 'Value'));
 numZ = getappdata(handles.boxIt, 'numZ');
+autodraw = getappdata(handles.boxIt, 'autodraw');
+minObjectSize = str2double(get(handles.minObjectSizeText, 'String'));
 numROIs = length(ROIs);
 zInHand = size(plane, 3);
+
+if rect(3) < 2 || rect(4) < 2
+    return;
+end
+
 if zInHand < numZ
     getPlane(handles);
     plane = double(getappdata(handles.boxIt, 'currentPlane'));
@@ -1747,7 +1756,11 @@ for z = minZ:maxZ
     zCounter = zCounter + 1;
 end
 patchSize = size(patch);
-[maskStack minValue] = seg3D(patch, 0, 0, 1);
+if autodraw == 1
+    [maskStack minValue] = seg3D(patch, 0, 0, minObjectSize);
+else
+    [maskStack minValue] = seg3D(patch, 0, 0, 1);
+end
 maskStackBWL = bwlabeln(maskStack);
 if zHeight ~= 0
     masksThisZ = unique(maskStackBWL(:,:,zHeight));
@@ -1981,3 +1994,43 @@ for thisROI = 1:numROIs
     ROIs{thisROI}.ROIId = savedROI.getId.getValue;
 end
 setappdata(handles.boxIt, 'ROIs', ROIs);
+
+
+
+function minObjectSizeText_Callback(hObject, eventdata, handles)
+% hObject    handle to minObjectSizeText (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of minObjectSizeText as text
+%        str2double(get(hObject,'String')) returns contents of minObjectSizeText as a double
+
+minSizeString = get(hObject, 'String');
+minSize = str2double(minSizeString);
+
+if isnan(minSize)
+    set(hObject, 'String', '100');
+    return;
+end
+
+if minSize < 1
+    set(hObject, 'String', '1');
+    return;
+end
+
+minSize = round(minSize);
+set(hObject, 'String', minSize);
+
+
+
+% --- Executes during object creation, after setting all properties.
+function minObjectSizeText_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to minObjectSizeText (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
