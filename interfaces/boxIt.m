@@ -23,7 +23,11 @@ function varargout = boxIt(varargin)
 % Edit the above text to modify the response to help boxit
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 % Last Modified by GUIDE v2.5 23-Aug-2013 15:53:50
+=======
+% Last Modified by GUIDE v2.5 05-Aug-2013 17:29:33
+>>>>>>> c59314eecf538006a9eab6be4fafc5053ed4944a
 =======
 % Last Modified by GUIDE v2.5 05-Aug-2013 17:29:33
 >>>>>>> c59314eecf538006a9eab6be4fafc5053ed4944a
@@ -508,6 +512,7 @@ else
 end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 %As part of loading the new image, the prevImageButton is disabled when the
 %last image in any dataset is loaded.
 global gateway;
@@ -533,6 +538,8 @@ else
     set(handles.prevImageButton, 'enable', 'off')
 end
 
+=======
+>>>>>>> c59314eecf538006a9eab6be4fafc5053ed4944a
 =======
 >>>>>>> c59314eecf538006a9eab6be4fafc5053ed4944a
 
@@ -2165,6 +2172,7 @@ loadNewImage(handles);
 
 %>>>>>>> 10b1735c7986f9fb706b5af189db9435d8724522
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 % --- Executes on button press in prevImageButton.
@@ -2222,5 +2230,7 @@ setappdata(handles.boxIt, 'imageId', newImageId);
 
 %The next image in the datasetis loaded into the Box It window.
 loadNewImage(handles);
+=======
+>>>>>>> c59314eecf538006a9eab6be4fafc5053ed4944a
 =======
 >>>>>>> c59314eecf538006a9eab6be4fafc5053ed4944a
