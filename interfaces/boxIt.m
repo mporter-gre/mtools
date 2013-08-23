@@ -22,7 +22,8 @@ function varargout = boxIt(varargin)
 
 % Edit the above text to modify the response to help boxit
 
-% Last Modified by GUIDE v2.5 22-Aug-2013 11:35:25
+% Last Modified by GUIDE v2.5 05-Aug-2013 17:29:33
+
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -466,12 +467,43 @@ if newImageId == imageId
 end
 setappdata(handles.boxIt, 'theImage', newImageObj);
 setappdata(handles.boxIt, 'imageId', newImageId);
+loadNewImage(handles);
+
+%This function replaces the current Image with the newImageObj selected in
+%the previous function.
+function loadNewImage(handles)
 getMetadata(handles);
 setControls(handles);
 defaultZ = getappdata(handles.boxIt, 'defaultZ');
 getPlane(handles, defaultZ, 0);
 channel = get(handles.channelSelect, 'Value')-1;
 pixels = getappdata(handles.boxIt, 'pixels');
+%As part of loading the new image, the nextImageButton is disabled when the
+%last image in any dataset is loaded.
+global gateway;
+imageId = getappdata(handles.boxIt, 'imageId');
+dsId = getappdata(handles.boxIt, 'datasetId');
+datasetId = java.util.ArrayList;
+datasetId.add(java.lang.Long(dsId));
+datasetContainer = omero.api.ContainerClass.Dataset;
+images = gateway.getImages(datasetContainer,datasetId);
+numImages = images.size;
+for thisImage = 0:numImages-1
+    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
+end
+imageIds = sort(imageIds);
+for thisImage = 1:numImages
+    if imageId == imageIds(thisImage);
+        break;
+    end
+end
+if thisImage < numImages
+    set(handles.nextImageButton, 'enable', 'on')
+else
+    set(handles.nextImageButton, 'enable', 'off')
+end
+
+
 %Get existing ROIs
 % ROIs = getROIsFromImageId(newImageId);
 % numROI = length(ROIs);
@@ -500,6 +532,7 @@ set(handles.autoDrawButton, 'Enable', 'on');
 set(handles.minObjectSizeText, 'Enable', 'on');
 redrawImage(handles);
 redrawROIs(handles);
+
 
 
 
@@ -1997,6 +2030,7 @@ setappdata(handles.boxIt, 'ROIs', ROIs);
 
 
 
+%<<<<<<< HEAD
 function minObjectSizeText_Callback(hObject, eventdata, handles)
 % hObject    handle to minObjectSizeText (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -2034,3 +2068,67 @@ function minObjectSizeText_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+%=======
+% --- Executes on button press in nextImageButton.
+% This button enables the user to open the next image in the dataset.
+function nextImageButton_Callback(hObject, eventdata, handles)
+% hObject    handle to nextImageButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+%The gateway function enables nextImageButton to communicate with the OMERO 
+%server. This is a global variable and therefore it is declared at the
+%start.
+global gateway
+
+%Declaration of the current image ID variables: The image, project and
+%dataset IDs are stored in the application data.
+imageId = getappdata (handles.boxIt, 'imageId');
+projectId = getappdata(handles.boxIt, 'projectId');
+dsId = getappdata(handles.boxIt, 'datasetId');
+datasetId = java.util.ArrayList;
+datasetId.add(java.lang.Long(dsId));
+datasetContainer = omero.api.ContainerClass.Dataset;
+
+%An ArrayList of images in the current dataset is retrieved from the OMERO 
+%server.
+images = gateway.getImages(datasetContainer,datasetId);
+
+%The number of images in the dataset is determined and the associated
+%image IDs are loaded and sorted them from smallest to largest.
+numImages = images.size;
+for thisImage = 0:numImages-1
+    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
+end
+imageIds = sort(imageIds);
+
+%The position of the current image in the datset is determined.
+for thisImage = 1:numImages
+    if imageId == imageIds(thisImage);
+        break;
+    end
+end
+
+%After making sure that the current image is not the last image in the
+%dataset, a new variable is created that stores the image ID and  associated
+%with the next imge in the dataset.
+if thisImage < numImages
+    newImageId = imageIds(thisImage +1);
+else
+    set(hObject, 'enable', 'off')
+    warndlg('There is no "Next Image".');
+    return;
+end
+newImageObj = gateway.getImage(newImageId);
+
+%The application data of the next replace the application data of the open
+%image so that the next image becomes the current image.
+setappdata(handles.boxIt, 'theImage', newImageObj);
+setappdata(handles.boxIt, 'imageId', newImageId);
+
+%The next image in the datasetis loaded into the Box It window.
+loadNewImage(handles);
+
+
+
+%>>>>>>> 10b1735c7986f9fb706b5af189db9435d8724522
