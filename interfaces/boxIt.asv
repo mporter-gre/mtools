@@ -521,7 +521,7 @@ for thisImage = 1:numImages
         break;
     end
 end
-if thisImage > 1
+if thisImage > numImages
     set(handles.prevImageButton, 'enable', 'on')
 else
     set(handles.prevImageButton, 'enable', 'off')
@@ -2128,14 +2128,12 @@ end
 %After making sure that the current image is not the first image in the
 %dataset, a new variable is created that stores the image ID and  associated
 %with the next imge in the dataset.
-%The imageIds array is created in Matlab and indexes from 1. Therefore, the
-%first image in the dataset has the index 1.
-if thisImage > 1
-     newImageId = imageIds(thisImage -1);
-else
+if thisImage == 0
     set(hObject, 'enable', 'off')
     warndlg('There is no "Previous Image".');
     return;
+else
+    newImageId = imageIds(thisImage -1);
 end
 newImageObj = gateway.getImage(newImageId);
 
