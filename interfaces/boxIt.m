@@ -495,7 +495,7 @@ for thisImage = 1:numImages
         break;
     end
 end
-if thisImage > numImages
+if thisImage < numImages
     set(handles.nextImageButton, 'enable', 'on')
 else
     set(handles.nextImageButton, 'enable', 'off')
