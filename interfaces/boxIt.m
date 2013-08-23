@@ -527,7 +527,7 @@ else
     set(handles.prevImageButton, 'enable', 'off')
 end
 
-
+%aChange
 
 %Get existing ROIs
 % ROIs = getROIsFromImageId(newImageId);
