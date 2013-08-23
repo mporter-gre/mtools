@@ -465,12 +465,43 @@ if newImageId == imageId
 end
 setappdata(handles.boxIt, 'theImage', newImageObj);
 setappdata(handles.boxIt, 'imageId', newImageId);
+loadNewImage(handles);
+
+%This function replaces the current Image with the newImageObj selected in
+%the previous function.
+function loadNewImage(handles)
 getMetadata(handles);
 setControls(handles);
 defaultZ = getappdata(handles.boxIt, 'defaultZ');
 getPlane(handles, defaultZ, 0);
 channel = get(handles.channelSelect, 'Value')-1;
 pixels = getappdata(handles.boxIt, 'pixels');
+%As part of loading the new image, the nextImageButton is disabled when the
+%last image in any dataset is loaded.
+global gateway;
+imageId = getappdata(handles.boxIt, 'imageId');
+dsId = getappdata(handles.boxIt, 'datasetId');
+datasetId = java.util.ArrayList;
+datasetId.add(java.lang.Long(dsId));
+datasetContainer = omero.api.ContainerClass.Dataset;
+images = gateway.getImages(datasetContainer,datasetId);
+numImages = images.size;
+for thisImage = 0:numImages-1
+    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
+end
+imageIds = sort(imageIds);
+for thisImage = 1:numImages
+    if imageId == imageIds(thisImage);
+        break;
+    end
+end
+if thisImage > numImages
+    set(handles.nextImageButton, 'enable', 'on')
+else
+    set(handles.nextImageButton, 'enable', 'off')
+end
+
+
 %Get existing ROIs
 % ROIs = getROIsFromImageId(newImageId);
 % numROI = length(ROIs);
@@ -497,6 +528,7 @@ setappdata(handles.boxIt, 'askToUpdateROIMapFile', 1);
 setappdata(handles.boxIt, 'updatingROIMapFile', 0);
 redrawImage(handles);
 redrawROIs(handles);
+
 
 
 
@@ -1984,7 +2016,10 @@ global gateway
 %dataset IDs are stored in the application data.
 imageId = getappdata (handles.boxIt, 'imageId');
 projectId = getappdata(handles.boxIt, 'projectId');
-datasetId = getappdata(handles.boxIt, 'datasetId');
+dsId = getappdata(handles.boxIt, 'datasetId');
+datasetId = java.util.ArrayList;
+datasetId.add(java.lang.Long(dsId));
+datasetContainer = omero.api.ContainerClass.Dataset;
 
 %An ArrayList of images in the current dataset is retrieved from the OMERO 
 %server.
@@ -1994,37 +2029,36 @@ images = gateway.getImages(datasetContainer,datasetId);
 %image IDs are loaded and sorted them from smallest to largest.
 numImages = images.size;
 for thisImage = 0:numImages-1
-    imageIds(thisImage) = images.get(thisImage).getId.getValue;
+    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
 end
 imageIds = sort(imageIds);
 
 %The position of the current image in the datset is determined.
 for thisImage = 1:numImages
-    if imageId = imageIds(thisImage);
+    if imageId == imageIds(thisImage);
         break;
     end
 end
 
 %After making sure that the current image is not the last image in the
-%dataset, a new variable is created that stores the Image ID associated
+%dataset, a new variable is created that stores the image ID and  associated
 %with the next imge in the dataset.
 if thisImage < numImages
     newImageId = imageIds(thisImage +1);
 else
-    set (hObject; 'enable'; 'off')
-    warndlg ('There is no "Next Image".');
+    set(hObject, 'enable', 'off')
+    warndlg('There is no "Next Image".');
     return;
 end
+newImageObj = gateway.getImage(newImageId);
 
+%The application data of the next replace the application data of the open
+%image so that the next image becomes the current image.
+setappdata(handles.boxIt, 'theImage', newImageObj);
+setappdata(handles.boxIt, 'imageId', newImageId);
 
-
-%determines the position of the next image in the dataset.
-
-
-%opens the next image in the dataset.
-
-
-
+%The next image in the datasetis loaded into the Box It window.
+loadNewImage(handles);
 
 
 
