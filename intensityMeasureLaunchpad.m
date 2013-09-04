@@ -231,11 +231,16 @@ for thisImage = 1:numImages
     end
 end
 
-
-
-[saveFile savePath] = uiputfile('*.xls','Save Results','/VolumeIntensityMeasurements.xls');
-if isnumeric(saveFile) && isnumeric(savePath)
-    return;
+saveFile = 0;
+savePath = 0;
+counter = 0;
+while isnumeric(saveFile) && isnumeric(savePath)
+    [saveFile savePath] = uiputfile('*.xls','Save Results','/VolumeIntensityMeasurements.xls');
+    display(counter)
+    counter = counter + 1;
+    %if isnumeric(saveFile) && isnumeric(savePath)
+    %return;
+    %end
 end
 
 try
