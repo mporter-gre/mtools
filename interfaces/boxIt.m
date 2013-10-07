@@ -153,7 +153,9 @@ end
 
 
 
-function getPlane(handles, varargin)
+function getImagePlane(handles, varargin)
+
+global session; 
 
 numVarargs = size(varargin,2);
 if numVarargs == 2
@@ -161,6 +163,7 @@ if numVarargs == 2
     thisT = varargin{2};
 end
 pixelsId = getappdata(handles.boxIt, 'pixelsId');
+theImage = getappdata(handles.boxIt, 'theImage');
 numZ = getappdata(handles.boxIt, 'numZ');
 playing = getappdata(handles.boxIt, 'playing');
 selectedC = get(handles.channelSelect, 'Value')-1;
@@ -168,18 +171,19 @@ thisT = round(get(handles.tSlider, 'Value'))-1;
 if numVarargs == 2
     %If movie is playing and user clicks the tSlider, get the t and z.
     try
-        plane(:,:) = getPlaneFromPixelsId(pixelsId, thisZ, selectedC, thisT);
+        plane(:,:) = getPlane(session, theImage, thisZ, selectedC, thisT);
     catch
         thisZ = round(get(handles.zSlider, 'Value'))-1;
         thisT = round(get(handles.tSlider, 'Value'))-1;
-        plane(:,:) = getPlaneFromPixelsId(pixelsId, thisZ, selectedC, thisT);
+        plane = getPlane(session, theImage.getId.getValue, thisZ, selectedC, thisT);
+        %plane(:,:) = getPlaneFromPixelsId(pixelsId, thisZ, selectedC, thisT);
     end
 else
     if numZ > 5
         downloadingBar = waitbar(0,'Downloading...');
     end
     for thisZ = 1:numZ
-        plane(:,:,thisZ) = getPlaneFromPixelsId(pixelsId, thisZ-1, selectedC, thisT);
+        plane(:,:,thisZ) = getPlane(session, theImage, thisZ-1, selectedC, thisT);
         if numZ > 5
             waitbar(thisZ/numZ)
         end
@@ -473,10 +477,12 @@ loadNewImage(handles);
 %the previous function.
 function loadNewImage(handles)
 global gateway;
+global session;
+
 getMetadata(handles);
 setControls(handles);
 defaultZ = getappdata(handles.boxIt, 'defaultZ');
-getPlane(handles, defaultZ, 0);
+getImagePlane(handles, defaultZ, 0);
 channel = get(handles.channelSelect, 'Value')-1;
 pixels = getappdata(handles.boxIt, 'pixels');
 %As part of loading the new image, the nextImageButton is disabled when the
@@ -485,11 +491,11 @@ imageId = getappdata(handles.boxIt, 'imageId');
 dsId = getappdata(handles.boxIt, 'datasetId');
 datasetId = java.util.ArrayList;
 datasetId.add(java.lang.Long(dsId));
-datasetContainer = omero.api.ContainerClass.Dataset;
-images = gateway.getImages(datasetContainer,datasetId);
+%datasetContainer = omero.api.ContainerClass.Dataset;
+images = getImages(session, 'dataset', dsId); %= gateway.getImages(datasetContainer,datasetId);
 numImages = images.size;
-for thisImage = 0:numImages-1
-    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
+for thisImage = 1:numImages
+    imageIds(thisImage) = images(thisImage).getId.getValue;
 end
 imageIds = sort(imageIds);
 for thisImage = 1:numImages
@@ -512,10 +518,10 @@ dsId = getappdata(handles.boxIt, 'datasetId');
 datasetId = java.util.ArrayList;
 datasetId.add(java.lang.Long(dsId));
 datasetContainer = omero.api.ContainerClass.Dataset;
-images = gateway.getImages(datasetContainer,datasetId);
-numImages = images.size;
-for thisImage = 0:numImages-1
-    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
+images = getImages(session, 'dataset', dsId);
+numImages = length(images);
+for thisImage = 1:numImages
+    imageIds(thisImage) = images(thisImage).getId.getValue;
 end
 imageIds = sort(imageIds);
 for thisImage = 1:numImages
@@ -730,7 +736,7 @@ function channelSelect_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns channelSelect contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from channelSelect
 
-getPlane(handles);
+getImagePlane(handles);
 channel = get(hObject, 'Value')-1;
 pixels = getappdata(handles.boxIt, 'pixels');
 [channelMin channelGlobalMax channelGlobalMaxScaled] = getChannelMinMax(pixels, channel);
@@ -1141,8 +1147,7 @@ if isempty(theImage)
     return;
 end
 imageId = theImage.getId.getValue;
-pixels = gateway.getPixelsFromImage(imageId);
-pixels = pixels.get(0);
+pixels = theImage.getPrimaryPixels;
 pixelsId = pixels.getId.getValue;
 
 numC = pixels.getSizeC.getValue;

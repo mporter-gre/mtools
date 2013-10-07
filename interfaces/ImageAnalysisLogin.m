@@ -347,7 +347,7 @@ end
 %will persist and be kept alive until application close.
 try
     if ~isjava(client)
-        gatewayConnect(credentials{1}, credentials{2}, credentials{3}, credentials{4});
+        userLoginOmero(credentials{1}, credentials{2}, credentials{3}, credentials{4});
         saveHistory(credentials);
         success = true;
         selectUserDefaultGroup(credentials{1}, handles, 'ImageAnalysisLoginWindow');
@@ -356,7 +356,7 @@ try
         if strcmp(experimenter, credentials{1})
             success = true;
         else
-            gatewayDisconnect;
+            userLogoutOmero;
             success = logIn(handles);
         end
     end
