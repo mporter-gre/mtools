@@ -266,16 +266,10 @@ delete(handles.datasetChooser);
 
 function populateProjectsSelect(handles)
 
-global gateway
-% global session
-% adminService = session.getAdminService;
-% username = handles.parentHandles.credentials{1};
-% userId = adminService.lookupExperimenter(username).getId.getValue;
-% userIdList = java.util.ArrayList;
-% userIdList.add(java.lang.Long(userId));
-projects = gateway.getProjects([],0);
-projIter = projects.iterator;
-numProj = projects.size;
+global session
+
+projects = getProjects(session, [], false);
+numProj = length(projects);
 if numProj == 0
     warndlg('No projects found.');
     return;
@@ -283,12 +277,9 @@ end
 projNameId{numProj,2} = [];
 projNameList{numProj} = [];
 projIdList = [];
-counter = 1;
-while projIter.hasNext
-    projNameId{counter,1} = char(projects.get(counter-1).getName.getValue.getBytes');
-    projNameId{counter,2} = num2str(projects.get(counter-1).getId.getValue);
-    projIter.next;
-    counter = counter + 1;
+for thisProj = 1:numProj
+    projNameId{thisProj,1} = char(projects(thisProj).getName.getValue.getBytes');
+    projNameId{thisProj,2} = num2str(projects(thisProj).getId.getValue);
 end
 projNameId = sortrows(projNameId);
 for thisProj = 1:numProj
@@ -304,30 +295,22 @@ setappdata(handles.datasetChooser, 'projIdList', projIdList);
 
 function populateDatasetsList(handles)
 
-global gateway
+global session
 projId = getappdata(handles.datasetChooser, 'projectId');
-projectId = java.util.ArrayList;
-projectId.add(java.lang.Long(projId));
-project = gateway.getProjects(projectId, 0).get(0);
-numDs = project.sizeOfDatasetLinks;
+datasets = getDatasets(session, projId, false);
+numDs = length(datasets);
 if numDs == 0
     set(handles.datasetsList, 'Value', 1);
     set(handles.datasetsList, 'String', 'No datasets in this project');
     return;
 end
-dsLinks{numDs} = [];
-datasets{numDs} = [];
+
 dsNameId{numDs,2} = [];
 dsNameList{numDs} = [];
 
-dsIter = project.iterateDatasetLinks;
-counter = 1;
-while dsIter.hasNext
-    dsLinks{counter} = dsIter.next;
-    datasets{counter} = dsLinks{counter}.getChild();
-    dsNameId{counter,1} = char(datasets{counter}.getName.getValue.getBytes');
-    dsNameId{counter,2} = num2str(datasets{counter}.getId.getValue);
-    counter = counter + 1;
+for thisDs = 1:numDs
+    dsNameId{thisDs,1} = char(datasets(thisDs).getName.getValue.getBytes');
+    dsNameId{thisDs,2} = num2str(datasets(thisDs).getId.getValue);
 end
 
 dsNameId = sortrows(dsNameId);
