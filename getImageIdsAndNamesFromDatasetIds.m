@@ -1,24 +1,22 @@
 function [sortedImages imageIds imageNames sortedDatasetNames] = getImageIdsAndNamesFromDatasetIds(datasetIds)
-global gateway
+
+global session
 
 numDs = length(datasetIds);
-datasetContainer = omero.api.ContainerClass.Dataset;
-datasetIdList = java.util.ArrayList;
+datasets = getDatasets(session, datasetIds, true);
 datasetNames = {};
 images = java.util.ArrayList;
 for thisDs = 1:numDs
-    dsId = datasetIds(thisDs);
-    datasetIdList.add(java.lang.Long(dsId));
-    datasetObjList = gateway.getDatasets(datasetIdList,false);
-    datasetName = char(datasetObjList.get(0).getName.getValue.getBytes');
-    imagesThisDs = gateway.getImages(datasetContainer,datasetIdList);
-    numImages = imagesThisDs.size;
-    for thisImage = 1:numImages
+    dsId = datasets(thisDs).getId.getValue;
+    
+    datasetName = char(datasets(thisDs).getName.getValue.getBytes');
+    numImages = datasets(thisDs).sizeOfImageLinks;
+    imageIter = datasets(thisDs).iterateImageLinks;
+    while imageIter.hasNext
         datasetNames{end+1} = datasetName;
-        images.add(imagesThisDs.get(thisImage-1));
+        dsImageLink = imageIter.next;
+        images.add(dsImageLink.getChild);
     end
-    datasetIdList = java.util.ArrayList;
-%     images = [images imagesThisDs];
 end
 
 
