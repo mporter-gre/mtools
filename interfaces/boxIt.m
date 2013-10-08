@@ -447,7 +447,6 @@ function openImageItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway
 
 modified = getappdata(handles.boxIt, 'modified');
 if modified == 1
@@ -476,7 +475,6 @@ loadNewImage(handles);
 %This function replaces the current Image with the newImageObj selected in
 %the previous function.
 function loadNewImage(handles)
-global gateway;
 global session;
 
 getMetadata(handles);
@@ -493,7 +491,7 @@ datasetId = java.util.ArrayList;
 datasetId.add(java.lang.Long(dsId));
 %datasetContainer = omero.api.ContainerClass.Dataset;
 images = getImages(session, 'dataset', dsId); %= gateway.getImages(datasetContainer,datasetId);
-numImages = images.size;
+numImages = length(images);
 for thisImage = 1:numImages
     imageIds(thisImage) = images(thisImage).getId.getValue;
 end
@@ -536,18 +534,6 @@ else
 end
 
 
-%Get existing ROIs
-% ROIs = getROIsFromImageId(newImageId);
-% numROI = length(ROIs);
-% ROIsToDelete = [];
-% for thisROI = 1:numROI
-%     shapeType{thisROI} = ROIs{thisROI}.shapeType;
-%     if ~strcmpi(shapeType{thisROI}, 'rect')
-%         ROIsToDelete = [ROIsToDelete thisROI];
-%     end
-% end
-% ROIs = deleteElementFromCells(ROIsToDelete, ROIs);
-    
 [channelMin channelGlobalMax channelGlobalMaxScaled] = getChannelMinMax(pixels, channel);
 setappdata(handles.boxIt, 'channelMin', channelMin);
 setappdata(handles.boxIt, 'channelGlobalMax', channelGlobalMax);
@@ -612,61 +598,6 @@ msgbox('ROIs saved to server.', 'Saved', 'modal');
 
 
 
-
-% points = getappdata(handles.boxIt, 'points');
-% if isempty(points)
-%     warndlg('There are no points to save.', 'No points');
-%     return;
-% end
-% filePath = getappdata(handles.boxIt, 'filePath');
-% fileName = getappdata(handles.boxIt, 'fileName');
-% if isempty(fileName)
-%     [fileName filePath] = uiputfile('*.mat', 'Save labels');
-%     if fileName == 0
-%         return;
-%     end
-% end
-% labelText = getappdata(handles.boxIt, 'labelText');
-% labelColour = getappdata(handles.boxIt, 'labelColour');
-% projectId = getappdata(handles.boxIt, 'projectId');
-% datasetId = getappdata(handles.boxIt, 'datasetId');
-% imageId = getappdata(handles.boxIt, 'imageId');
-% 
-% save([filePath fileName], 'points', 'projectId', 'datasetId', 'imageId', 'labelText', 'labelColour');
-% setappdata(handles.boxIt, 'filePath', filePath);
-% setappdata(handles.boxIt, 'fileName', fileName);
-% setappdata(handles.boxIt, 'modified', 0);
-
-
-
-
-% --------------------------------------------------------------------
-function saveROIsAsItem_Callback(hObject, eventdata, handles)
-% hObject    handle to saveROIsAsItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-points = getappdata(handles.boxIt, 'points');
-if isempty(points)
-    warndlg('There are no points to save.', 'No points');
-    return;
-end
-imageId = getappdata(handles.boxIt, 'imageId');
-labelText = getappdata(handles.boxIt, 'labelText');
-labelColour = getappdata(handles.boxIt, 'labelColour');
-projectId = getappdata(handles.boxIt, 'projectId');
-datasetId = getappdata(handles.boxIt, 'datasetId');
-imageId = getappdata(handles.boxIt, 'imageId');
-
-[fileName filePath] = uiputfile('*.mat', 'Save labels');
-
-if fileName == 0
-    return;
-end
-
-save([filePath fileName], 'points', 'points', 'projectId', 'datasetId', 'imageId', 'labelText', 'labelColour');
-setappdata(handles.boxIt, 'filePath', filePath);
-setappdata(handles.boxIt, 'fileName', fileName);
 setappdata(handles.boxIt, 'modified', 0);
 
 
@@ -775,80 +706,6 @@ if strcmp(answer, 'No')
 end
 setappdata(handles.boxIt, 'ROIs', []);
 redrawImage(handles);
-
-% labelText = getappdata(handles.boxIt, 'labelText');
-% labelColour = getappdata(handles.boxIt, 'labelColour');
-% points = getappdata(handles.boxIt, 'points');
-% labelIdx = get(handles.channelSelect, 'Value');
-% labelSelectString = get(handles.channelSelect, 'String');
-% numLabels = length(labelText);
-% if strcmp(labelSelectString, 'Add a label')
-%     return;
-% end
-% answer = questdlg([{'Are you sure you want to delete this label?'} {'All points with this label will be deleted too.'}], 'Delete label?', 'Yes', 'No', 'No');
-% if strcmp(answer, 'No')
-%     return;
-% end
-% if labelIdx == numLabels
-%     if labelIdx == 1
-%         newLabelText = [];
-%         newLabelColour = [];
-%         set(handles.channelSelect, 'ForegroundColor', 'k');
-%         set(handles.channelSelect, 'String', 'Add a label');
-%     else
-%         for thisLabel = 1:numLabels-1
-%             newLabelText{thisLabel} = labelText{thisLabel};
-%             newLabelColour{thisLabel} = labelColour{thisLabel};
-%         end
-%         set(handles.channelSelect, 'Value', labelIdx-1);
-%         set(handles.channelSelect, 'ForegroundColor', newLabelColour{labelIdx-1});
-%         set(handles.channelSelect, 'String', newLabelText);
-%     end
-% else
-%     for thisLabel = 1:numLabels-1
-%         if thisLabel < labelIdx
-%             newLabelText{thisLabel} = labelText{thisLabel};
-%             newLabelColour{thisLabel} = labelColour{thisLabel};
-%         else
-%             newLabelText{thisLabel} = labelText{thisLabel+1};
-%             newLabelColour{thisLabel} = labelColour{thisLabel+1};
-%         end
-%     end
-%     if labelIdx ~= 1
-%         set(handles.channelSelect, 'Value', labelIdx-1);
-%         set(handles.channelSelect, 'ForegroundColor', newLabelColour{labelIdx-1});
-%     else
-%         set(handles.channelSelect, 'ForegroundColor', newLabelColour{1});
-%     end
-%     set(handles.channelSelect, 'String', newLabelText);
-% end
-% 
-% %Now remove all the points from the points cell structre
-% numPoints = length(points);
-% newPoints = [];
-% modifier = 0;
-% copyPoints = [];
-% for thisPoint = 1:numPoints
-%     if strcmpi(points{thisPoint}.label, labelSelectString{labelIdx});
-%         thePoint = points{thisPoint}.PointHandle;
-%         api = iptgetapi(thePoint);
-%         api.delete();
-%     else
-%         copyPoints = [copyPoints thisPoint];
-%     end
-% end
-% counter = 1;
-% for thisPoint = 1:numPoints
-%     if ismember(thisPoint, copyPoints)
-%         newPoints{counter} = points{thisPoint};
-%         counter = counter + 1;
-%     end
-% end
-% 
-% setappdata(handles.boxIt, 'points', newPoints);
-% setappdata(handles.boxIt, 'labelText', newLabelText);
-% setappdata(handles.boxIt, 'labelColour', newLabelColour);
-
 
 
 % --- Executes when user attempts to close boxIt.
@@ -990,152 +847,6 @@ refreshDisplay(handles);
 
 
 
-% --------------------------------------------------------------------
-function showLabelTextItem_Callback(hObject, eventdata, handles)
-% hObject    handle to showLabelTextItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-showLabels = getappdata(handles.boxIt, 'showLabelText');
-
-if showLabels == 0
-    setappdata(handles.boxIt, 'showLabelText', 1);
-    set(hObject, 'Checked', 'on');
-else
-    setappdata(handles.boxIt, 'showLabelText', 0);
-    set(hObject, 'Checked', 'off');
-end
-refreshDisplay(handles);
-
-
-% --------------------------------------------------------------------
-function openPointsItem_Callback(hObject, eventdata, handles)
-% hObject    handle to openPointsItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-global gateway
-
-modified = getappdata(handles.boxIt, 'modified');
-if modified == 1
-    answer = questdlg([{'The current set of points has been modified.'} {'Discard changes and open a new points file?'}], 'Discard Changes?', 'Yes', 'No', 'No');
-    if strcmp(answer, 'No')
-        return;
-    end
-end
-
-[fileName filePath] = uigetfile('*.mat', 'Open labels.');
-if fileName == 0
-    return;
-end
-vars = load([filePath fileName]);
-theImage = gateway.getImage(vars.imageId);
-setappdata(handles.boxIt, 'points', vars.points);
-setappdata(handles.boxIt, 'projectId', vars.projectId);
-setappdata(handles.boxIt, 'datasetId', vars.datasetId);
-setappdata(handles.boxIt, 'imageId', vars.imageId);
-setappdata(handles.boxIt, 'theImage', theImage);
-setappdata(handles.boxIt, 'labelText', vars.labelText)
-setappdata(handles.boxIt, 'labelColour', vars.labelColour)
-setappdata(handles.boxIt, 'filePath', filePath)
-setappdata(handles.boxIt, 'fileName', fileName)
-set(handles.channelSelect, 'String', vars.labelText);
-set(handles.channelSelect, 'Value', 1);
-getMetadata(handles);
-refreshDisplay(handles);
-
-
-
-% --------------------------------------------------------------------
-function openLabelDefsItem_Callback(hObject, eventdata, handles)
-% hObject    handle to openLabelDefsItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-labelText = getappdata(handles.boxIt, 'labelText');
-if ~isempty(labelText)
-    answer = questdlg([{'Opening a previous label file will discard the'} {'current labels and points made. Continue?'}], 'Discard labels and points?', 'Yes', 'No', 'No');
-    if strcmp(answer, 'No')
-        return;
-    end
-end
-[labelsName labelsPath] = uigetfile('*.mat', 'Load label definitions');
-if labelsName == 0
-    return;
-end
-vars = load([labelsPath labelsName]);
-if ~isfield(vars, 'labelDefFile')
-    warndlg('This does not appear to be a valid label definition file', 'File not valid');
-    return;
-end
-
-setappdata(handles.boxIt, 'labelText', vars.labelText);
-setappdata(handles.boxIt, 'labelColour', vars.labelColour);
-setappdata(handles.boxIt, 'labelsPath', labelsPath);
-setappdata(handles.boxIt, 'labelsName', labelsName);
-setappdata(handles.boxIt, 'points', []);
-set(handles.channelSelect, 'Value', 1);
-set(handles.channelSelect, 'String', vars.labelText);
-refreshDisplay(handles);
-
-
-
-
-% --------------------------------------------------------------------
-function saveLabelDefsItem_Callback(hObject, eventdata, handles)
-% hObject    handle to saveLabelDefsItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-labelsPath = getappdata(handles.boxIt, 'labelsPath');
-labelsName = getappdata(handles.boxIt, 'labelsName');
-labelText = getappdata(handles.boxIt, 'labelText');
-labelColour = getappdata(handles.boxIt, 'labelColour');
-labelDefFile = 'labelDefFile';
-
-if isempty(labelText)
-    warndlg('There are no labels to save', 'No labels');
-    return;
-end
-if isempty(labelsName)
-    [labelsName labelsPath] = uiputfile('*.mat', 'Save label definitions');
-    if labelsName == 0
-        return;
-    end
-end
-
-save([labelsPath labelsName], 'labelText', 'labelColour', 'labelDefFile')
-setappdata(handles.boxIt, 'labelsPath', labelsPath);
-setappdata(handles.boxIt, 'labelsName', labelsName);
-
-
-
-% --------------------------------------------------------------------
-function saveLabelDefsAsItem_Callback(hObject, eventdata, handles)
-% hObject    handle to saveLabelDefsAsItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-labelsPath = getappdata(handles.boxIt, 'labelsPath');
-labelsName = getappdata(handles.boxIt, 'labelsName');
-labelText = getappdata(handles.boxIt, 'labelText');
-labelColour = getappdata(handles.boxIt, 'labelColour');
-
-if isempty(labelText)
-    warndlg('There are no labels to save', 'No labels');
-    return;
-end
-
-[labelsName labelsPath] = uiputfile('*.mat', 'Save label definitions');
-if labelsName == 0
-    return;
-end
-
-save([labelsPath labelsName], 'labelText', 'labelColour')
-setappdata(handles.boxIt, 'labelsPath', labelsPath);
-setappdata(handles.boxIt, 'labelsName', labelsName);
-
-
 
 function getMetadata(handles)
 
@@ -1219,530 +930,6 @@ function analysisMenu_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --------------------------------------------------------------------
-function analysePointsItem_Callback(hObject, eventdata, handles)
-% hObject    handle to analysePointsItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-points = getappdata(handles.boxIt, 'points');
-if isempty(points)
-    warndlg('No points to analyse.', 'No points');
-    return;
-end
-imageName = getappdata(handles.boxIt, 'imageName');
-summaryByImage = pointsSummaryByImage(points, imageName);
-summaryByT = pointsSummaryByT(points, imageName, handles);
-summaryByZ = pointsSummaryByZ(points, imageName, handles);
-[fileName filePath] = uiputfile('*.xls', 'Save data');
-if fileName == 0
-    return;
-end
-try
-    xlswrite([filePath fileName], summaryByImage, 'Summary by Image');
-catch
-    [fileName remain] = strtok(fileName, '.');
-    delete([filePath fileName]);
-    manualCSV(summaryByImage, filePath, [fileName '_SummaryByImage']);
-end
-try
-    xlswrite([filePath fileName], summaryByT, 'Summary by T');
-catch
-    manualCSV(summaryByImage, filePath, [fileName '_summaryByT']);
-end
-try
-    xlswrite([filePath fileName], summaryByZ, 'Summary by Z');
-catch
-    manualCSV(summaryByImage, filePath, [fileName '_summaryByZ']);
-end
-
-
-
-
-
-% --------------------------------------------------------------------
-function batchAnalysisItem_Callback(hObject, eventdata, handles)
-% hObject    handle to batchAnalysisItem (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-global gateway;
-
-warning('off', 'MATLAB:xlswrite:AddSheet');
-setappdata(handles.boxIt, 'conditions', []);
-setappdata(handles.boxIt, 'conditionsPaths', []);
-setappdata(handles.boxIt, 'conditionsFiles', []);
-
-batchChooser(handles);
-
-conditions = getappdata(handles.boxIt, 'conditions');
-conditionsPaths = getappdata(handles.boxIt, 'conditionsPaths');
-conditionsFiles = getappdata(handles.boxIt, 'conditionsFiles');
-analyseIndividualFiles = getappdata(handles.boxIt, 'analyseIndividualFiles');
-numConditions = length(conditions);
-numSteps = 1;
-for thisCondition = 1:numConditions
-    numFilesThisCondition = length(conditionsFiles{thisCondition});
-    for thisFile = 1:numFilesThisCondition
-        numSteps = numSteps + 1;
-    end
-end
-
-
-if isempty(conditions)
-    return;
-end
-[fileName filePath] = uiputfile('*.xls', 'Save batch data');
-if fileName == 0
-    return;
-end
-waitbarHandle = waitbar(0,'Analysing...');
-thisStep = 1;
-for thisCondition = 1:numConditions
-    numFilesThisCondition = length(conditionsFiles{thisCondition});
-    for thisFile = 1:numFilesThisCondition
-        waitbar(thisStep/(numSteps+1));
-        thisStep = thisStep + 1;
-        [points{thisCondition}{thisFile} imageId{thisCondition}{thisFile}] = getPointsAndImageId([conditionsPaths{thisCondition} conditionsFiles{thisCondition}{thisFile}]);
-        if analyseIndividualFiles == 1
-            imageObj = gateway.getImage(imageId{thisCondition}{thisFile});
-            imageNameFull = char(imageObj.getName.getValue.getBytes');
-            [imageName remain] = strtok(imageNameFull, '.');
-            summaryByImage = pointsSummaryByImage(points{thisCondition}{thisFile}, imageName);
-            summaryByT = pointsSummaryByT(points{thisCondition}{thisFile}, imageName, handles);
-            summaryByZ = pointsSummaryByZ(points{thisCondition}{thisFile}, imageName, handles);
-            try
-                xlswrite([filePath fileName], summaryByImage, 'Summary by Image');
-            catch
-                [fileName remain] = strtok(fileName, '.');
-                delete([filePath fileName]);
-                manualCSV(summaryByImage, filePath, [fileName '_SummaryByImage']);
-            end
-            try
-                xlswrite([filePath fileName], summaryByT, 'Summary by T');
-            catch
-                manualCSV(summaryByImage, filePath, [fileName '_summaryByT']);
-            end
-            try
-                xlswrite([filePath fileName], summaryByZ, 'Summary by Z');
-            catch
-                manualCSV(summaryByImage, filePath, [fileName '_summaryByZ']);
-            end
-        end
-    end
-end
-
-batchSummary = batchPointsSummary(points, handles);
-batchSummaryByT = batchPointsSummaryByT(points, handles);
-batchSummaryByZ = batchPointsSummaryByZ(points, handles);
-waitbar(1);
-try
-    xlswrite([filePath fileName], batchSummary, 'Batch Summary');
-catch
-    [fileName remain] = strtok(fileName, '.');
-    manualCSV(summaryByImage, filePath, [fileName 'batchSummary']);
-end
-try
-    xlswrite([filePath fileName], batchSummaryByT, 'Batch Summary By T');
-catch
-    manualCSV(summaryByImage, filePath, [fileName 'batchSummaryByT']);
-end
-try
-    xlswrite([filePath fileName], batchSummaryByZ, 'Batch Summary By Z');
-catch
-    manualCSV(summaryByImage, filePath, [fileName 'batchSummaryByZ']);
-end
-close(waitbarHandle);
-warndlg('Analysis complete', 'Complete');
-
-
-
-
-function imageSummary = pointsSummaryByImage(points, imageName)
-
-numPoints = length(points);
-
-for thisPoint = 1:numPoints
-    labels{thisPoint} = points{thisPoint}.label;
-end
-uniqueLabels = unique(labels);
-numLabels = length(uniqueLabels);
-labelCounter(1:numLabels) = 0;
-labelLine = [];
-counterLine = [];
-totalLine = [];
-percentLine = [];
-for thisLabel = 1:numLabels
-    for thisPoint = 1:numPoints
-        if strcmp(points{thisPoint}.label, uniqueLabels{thisLabel})
-            labelCounter(thisLabel) = labelCounter(thisLabel) + 1;
-        end
-    end
-    if thisLabel == 1
-        titleLine = {imageName};
-    else
-        titleLine = [titleLine {''}];
-    end
-    labelLine = [labelLine {uniqueLabels{thisLabel}}];
-    counterLine = [counterLine {num2str(labelCounter(thisLabel))}];
-    totalLine = [totalLine labelCounter(thisLabel)];
-end
-for thisLabel = 1:numLabels
-    percentLine = [percentLine {[num2str((totalLine(thisLabel)/(sum(totalLine))*100)), '%']}];
-end
-
-imageSummary = [titleLine; labelLine; counterLine; percentLine];
-
-
-
-function summaryByT = pointsSummaryByT(points, imageName, handles)
-
-numPoints = length(points);
-numT = getappdata(handles.boxIt, 'numT');
-
-for thisPoint = 1:numPoints
-    labels{thisPoint} = points{thisPoint}.label;
-end
-uniqueLabels = unique(labels);
-numLabels = length(uniqueLabels);
-labelCounter(1:numLabels) = 0;
-labelLine = [];
-counterLine = [];
-counterBlock = [];
-tCounter(numT, numLabels) = 0;
-for thisT = 1:numT
-    for thisLabel = 1:numLabels
-        for thisPoint = 1:numPoints
-            currPoint = points{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
-            if strcmp(currPoint.label, uniqueLabels{thisLabel})
-                pointT = currPoint.Position(4);
-                if thisT == pointT
-                    tCounter(thisT, thisLabel) = tCounter(thisT, thisLabel) + 1;
-                end
-            end
-        end
-    end
-end
-
-for thisT = 1:numT
-    if thisT == 1
-        titleLine = {imageName};
-        labelLine = {''};
-    end
-    counterLine = {['T:', num2str(thisT)]};
-    
-    for thisLabel = 1:numLabels
-        if thisT == 1
-            labelLine = [labelLine {uniqueLabels{thisLabel}}];
-            titleLine = [titleLine {''}];
-        end
-        counterLine = [counterLine {num2str(tCounter(thisT, thisLabel))}];
-    end
-    counterBlock = [counterBlock; counterLine];
-end
-
-summaryByT = [titleLine; labelLine; counterBlock];
-
-
-
-function summaryByZ = pointsSummaryByZ(points, imageName, handles)
-
-numPoints = length(points);
-numZ = getappdata(handles.boxIt, 'numZ');
-
-for thisPoint = 1:numPoints
-    labels{thisPoint} = points{thisPoint}.label;
-end
-uniqueLabels = unique(labels);
-numLabels = length(uniqueLabels);
-labelCounter(1:numLabels) = 0;
-labelLine = [];
-counterLine = [];
-counterBlock = [];
-zCounter(numZ, numLabels) = 0;
-for thisZ = 1:numZ
-    for thisLabel = 1:numLabels
-        for thisPoint = 1:numPoints
-            currPoint = points{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
-            if strcmp(currPoint.label, uniqueLabels{thisLabel})
-                pointZ = currPoint.Position(3);
-                if thisZ == pointZ
-                    zCounter(thisZ, thisLabel) = zCounter(thisZ, thisLabel) + 1;
-                end
-            end
-        end
-    end
-end
-
-for thisZ = 1:numZ
-    if thisZ == 1
-        titleLine = {imageName};
-        labelLine = {''};
-    end
-    counterLine = {['Z:', num2str(thisZ)]};
-    
-    for thisLabel = 1:numLabels
-        if thisZ == 1
-            labelLine = [labelLine {uniqueLabels{thisLabel}}];
-            titleLine = [titleLine {''}];
-        end
-        counterLine = [counterLine {num2str(zCounter(thisZ, thisLabel))}];
-    end
-    counterBlock = [counterBlock; counterLine];
-end
-
-summaryByZ = [titleLine; labelLine; counterBlock];
-
-
-
-function [points imageId] = getPointsAndImageId(fileNamePath)
-
-vars = load(fileNamePath);
-points = vars.points;
-imageId = vars.imageId;
-
-
-function batchSummary = batchPointsSummary(points, handles)
-
-conditions = getappdata(handles.boxIt, 'conditions');
-if isempty(conditions)
-    return;
-end
-counter = 1;
-numConditions = length(points);
-for thisCondition = 1:numConditions
-    numFiles = length(points{thisCondition});
-    for thisFile = 1:numFiles
-        numPoints = length(points{thisCondition}{thisFile});
-
-        for thisPoint = 1:numPoints
-            labels{counter} = points{thisCondition}{thisFile}{thisPoint}.label;
-            counter = counter + 1;
-        end
-    end
-end
-uniqueLabels = unique(labels);
-numLabels = length(uniqueLabels);
-labelCounter(numLabels, numConditions) = 0;
-labelLine = [];
-counterLine = [];
-totalLine = [];
-percentLine = [];
-summaryBlock = [];
-
-for thisLabel = 1:numLabels
-    for thisCondition = 1:numConditions
-        numFiles = length(points{thisCondition});
-        for thisFile = 1:numFiles
-            numPoints = length(points{thisCondition}{thisFile});
-            for thisPoint = 1:numPoints
-                if strcmp(points{thisCondition}{thisFile}{thisPoint}.label, uniqueLabels{thisLabel})
-                    labelCounter(thisLabel, thisCondition) = labelCounter(thisLabel, thisCondition) + 1;
-                end
-            end
-        end
-    end
-end
-
-for thisLabel = 1:numLabels
-    if thisLabel == 1
-        labelLine = [{''} {uniqueLabels{thisLabel}}];
-    else
-        labelLine = [labelLine {uniqueLabels{thisLabel}}];
-    end
-end
-
-for thisCondition = 1:numConditions
-    for thisLabel = 1:numLabels
-        if thisLabel == 1
-            counterLine = {conditions{thisCondition}};
-        end
-        counterLine = [counterLine {num2str(labelCounter(thisLabel, thisCondition))}];
-    end
-    summaryBlock = [summaryBlock; counterLine];
-end
-
-batchSummary = [labelLine; summaryBlock;];
-
-
-
-function batchSummaryByT = batchPointsSummaryByT(points, handles)
-
-conditions = getappdata(handles.boxIt, 'conditions');
-if isempty(conditions)
-    return;
-end
-counter = 1;
-numConditions = length(points);
-for thisCondition = 1:numConditions
-    numFiles = length(points{thisCondition});
-    for thisFile = 1:numFiles
-        numPoints = length(points{thisCondition}{thisFile});
-        for thisPoint = 1:numPoints
-            labels{counter} = points{thisCondition}{thisFile}{thisPoint}.label;
-            counter = counter + 1;
-        end
-    end
-end
-%Get the maximum time point from all points made.
-maxT = 1;
-for thisCondition = 1:numConditions
-    numFiles = length(points{thisCondition});
-    for thisFile = 1:numFiles
-        numPoints = length(points{thisCondition}{thisFile});
-        for thisPoint = 1:numPoints
-            currPoint = points{thisCondition}{thisFile}{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
-            pointT = currPoint.Position(4);
-            if pointT > maxT
-                maxT = pointT;
-            end
-        end
-    end
-end
-
-%Gather the data before making the output cell.
-uniqueLabels = unique(labels);
-numLabels = length(uniqueLabels);
-counterBlock = [];
-for thisCondition = 1:numConditions
-    tConditionCounter{thisCondition}(maxT, numLabels) = 0;
-end
-for thisLabel = 1:numLabels
-    for thisCondition = 1:numConditions
-        tFileCounter(1:maxT, 1:numLabels) = 0;
-        numFiles = length(points{thisCondition});
-        for thisFile = 1:numFiles
-            numPoints = length(points{thisCondition}{thisFile});
-            tCounter(1:maxT, 1:numLabels) = 0;
-            for thisPoint = 1:numPoints
-                currPoint = points{thisCondition}{thisFile}{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
-                for thisT = 1:maxT
-                    if strcmp(currPoint.label, uniqueLabels{thisLabel})
-                        pointT = currPoint.Position(4);
-                        if thisT == pointT
-                            tCounter(thisT, thisLabel) = tCounter(thisT, thisLabel) + 1;
-                        end
-                    end
-                end
-                
-            end
-            tFileCounter = tFileCounter + tCounter;
-        end
-        tConditionCounter{thisCondition} = tConditionCounter{thisCondition} + tFileCounter;
-    end
-end
-
-emptyLine = [];
-for thisLabel = 1:numLabels+1
-    emptyLine = [emptyLine {''}];
-end
-
-batchSummaryByT = [];
-for thisCondition = 1:numConditions
-    counterBlock = [];
-    labelLine = {conditions{thisCondition}};
-    for thisLabel = 1:numLabels
-        labelLine = [labelLine {uniqueLabels{thisLabel}}];
-    end
-    for thisT = 1:maxT
-        counterLine = {['T:', num2str(thisT)]};
-        for thisLabel = 1:numLabels
-            counterLine = [counterLine {num2str(tConditionCounter{thisCondition}(thisT, thisLabel))}];
-        end
-        counterBlock = [counterBlock; counterLine];
-    end
-    batchSummaryByT = [batchSummaryByT; labelLine; counterBlock; emptyLine; emptyLine];
-end
-
-
-
-function batchSummaryByZ = batchPointsSummaryByZ(points, handles)
-
-conditions = getappdata(handles.boxIt, 'conditions');
-if isempty(conditions)
-    return;
-end
-counter = 1;
-numConditions = length(points);
-for thisCondition = 1:numConditions
-    numFiles = length(points{thisCondition});
-    for thisFile = 1:numFiles
-        numPoints = length(points{thisCondition}{thisFile});
-        for thisPoint = 1:numPoints
-            labels{counter} = points{thisCondition}{thisFile}{thisPoint}.label;
-            counter = counter + 1;
-        end
-    end
-end
-%Get the maximum Z section from all points made.
-maxZ = 1;
-for thisCondition = 1:numConditions
-    numFiles = length(points{thisCondition});
-    for thisFile = 1:numFiles
-        numPoints = length(points{thisCondition}{thisFile});
-        for thisPoint = 1:numPoints
-            currPoint = points{thisCondition}{thisFile}{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
-            pointZ = currPoint.Position(3);
-            if pointZ > maxZ
-                maxZ = pointZ;
-            end
-        end
-    end
-end
-
-%Gather the data before making the output cell.
-uniqueLabels = unique(labels);
-numLabels = length(uniqueLabels);
-counterBlock = [];
-for thisCondition = 1:numConditions
-    zConditionCounter{thisCondition}(maxZ, numLabels) = 0;
-end
-for thisLabel = 1:numLabels
-    for thisCondition = 1:numConditions
-        zFileCounter(1:maxZ, 1:numLabels) = 0;
-        numFiles = length(points{thisCondition});
-        for thisFile = 1:numFiles
-            numPoints = length(points{thisCondition}{thisFile});
-            zCounter(1:maxZ, 1:numLabels) = 0;
-            for thisPoint = 1:numPoints
-                currPoint = points{thisCondition}{thisFile}{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
-                for thisZ = 1:maxZ
-                    if strcmp(currPoint.label, uniqueLabels{thisLabel})
-                        pointZ = currPoint.Position(3);
-                        if thisZ == pointZ
-                            zCounter(thisZ, thisLabel) = zCounter(thisZ, thisLabel) + 1;
-                        end
-                    end
-                end
-                
-            end
-            zFileCounter = zFileCounter + zCounter;
-        end
-        zConditionCounter{thisCondition} = zConditionCounter{thisCondition} + zFileCounter;
-    end
-end
-
-emptyLine = [];
-for thisLabel = 1:numLabels+1
-    emptyLine = [emptyLine {''}];
-end
-
-batchSummaryByZ = [];
-for thisCondition = 1:numConditions
-    counterBlock = [];
-    labelLine = {conditions{thisCondition}};
-    for thisLabel = 1:numLabels
-        labelLine = [labelLine {uniqueLabels{thisLabel}}];
-    end
-    for thisZ = 1:maxZ
-        counterLine = {['Z:', num2str(thisZ)]};
-        for thisLabel = 1:numLabels
-            counterLine = [counterLine {num2str(zConditionCounter{thisCondition}(thisZ, thisLabel))}];
-        end
-        counterBlock = [counterBlock; counterLine];
-    end
-    batchSummaryByZ = [batchSummaryByZ; labelLine; counterBlock; emptyLine; emptyLine];
-end
 
 
 % --- Executes on button press in deleteROIButton.
@@ -2098,7 +1285,9 @@ function minObjectSizeText_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-%=======
+
+
+
 % --- Executes on button press in nextImageButton.
 % This button enables the user to open the next image in the dataset.
 function nextImageButton_Callback(hObject, eventdata, handles)
@@ -2109,7 +1298,7 @@ function nextImageButton_Callback(hObject, eventdata, handles)
 %The gateway function enables nextImageButton to communicate with the OMERO 
 %server. This is a global variable and therefore it is declared at the
 %start.
-global gateway
+global session
 
 %Declaration of the current image ID variables: The image, project and
 %dataset IDs are stored in the application data.
@@ -2122,13 +1311,13 @@ datasetContainer = omero.api.ContainerClass.Dataset;
 
 %An ArrayList of images in the current dataset is retrieved from the OMERO 
 %server.
-images = gateway.getImages(datasetContainer,datasetId);
+images = getImages(session, 'dataset', dsId); 
 
 %The number of images in the dataset is determined and the associated
 %image IDs are loaded and sorted them from smallest to largest.
-numImages = images.size;
-for thisImage = 0:numImages-1
-    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
+numImages = length(images);
+for thisImage = 1:numImages
+    imageIds(thisImage) = images(thisImage).getId.getValue;
 end
 imageIds = sort(imageIds);
 
@@ -2149,7 +1338,7 @@ else
     warndlg('There is no "Next Image".');
     return;
 end
-newImageObj = gateway.getImage(newImageId);
+newImageObj = getImages(session, newImageId);
 
 %The application data of the next replace the application data of the open
 %image so that the next image becomes the current image.
@@ -2167,7 +1356,7 @@ function prevImageButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway
+global session;
 
 imageId = getappdata (handles.boxIt, 'imageId');
 projectId = getappdata(handles.boxIt, 'projectId');
@@ -2178,13 +1367,13 @@ datasetContainer = omero.api.ContainerClass.Dataset;
 
 %An ArrayList of images in the current dataset is retrieved from the OMERO 
 %server.
-images = gateway.getImages(datasetContainer,datasetId);
+images = getImages(session,'dataset', dsId);
 
 %The number of images in the dataset is determined and the associated
 %image IDs are loaded and sorted them from smallest to largest.
-numImages = images.size;
-for thisImage = 0:numImages-1
-    imageIds(thisImage+1) = images.get(thisImage).getId.getValue;
+numImages = length(images);
+for thisImage = 1:numImages
+    imageIds(thisImage) = images(thisImage).getId.getValue;
 end
 imageIds = sort(imageIds);
 
@@ -2207,7 +1396,7 @@ else
     warndlg('There is no "Previous Image".');
     return;
 end
-newImageObj = gateway.getImage(newImageId);
+newImageObj = getImages(session, newImageId);
 
 %The application data of the next replace the application data of the open
 %image so that the next image becomes the current image.

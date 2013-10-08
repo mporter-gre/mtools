@@ -332,7 +332,7 @@ dsId = getappdata(handles.imageSelector, 'dsId');
 %images = gateway.getImages(datasetContainer,datasetId);
 images = getImages(session, 'dataset', dsId);
 
-numImages = images.size;
+numImages = length(images);
 if numImages == 0
     set(handles.imagesSelect, 'Value', 1);
     set(handles.imagesSelect, 'String', 'No images in this dataset');
@@ -356,7 +356,7 @@ for thisImage = 1:numImages
     imageNameId{thisImage,1} = char(images(thisImage).getName.getValue.getBytes');
     imageNameId{thisImage,2} = num2str(images(thisImage).getId.getValue);
 end
-numImages = images.size;
+numImages = length(images);
 if numImages > 1
     imageNameId = sortrows(imageNameId);
 end
