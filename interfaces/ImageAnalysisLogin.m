@@ -294,18 +294,25 @@ if ispc
     sysUser = getenv('username');
     sysUserHome = getenv('userprofile');
     historyFile = [sysUserHome '\omero\analysisHistory.mat'];
-    try
-        history = open(historyFile);
-        set(handles.usernameText, 'String', history.omeroUser);
-        set(handles.serverText, 'String', history.omeroServer);
-        try  %previous versions didn't include port details.
-            set(handles.serverPort, 'String', history.omeroPort);
-        catch
-        end
-        uicontrol(handles.passwordText);
+else
+    sysUser = getenv('USER');
+    sysUserHome = getenv('HOME');
+    historyFile = [sysUserHome '/omero/analysisHistory.mat'];
+end
+try
+    history = open(historyFile);
+    set(handles.usernameText, 'String', history.omeroUser);
+    set(handles.serverText, 'String', history.omeroServer);
+    try  %previous versions didn't include port details.
+        set(handles.serverPort, 'String', history.omeroPort);
     catch
     end
+    uicontrol(handles.passwordText);
+catch
 end
+
+
+
 
 
 function saveHistory(credentials)
@@ -318,11 +325,18 @@ if ispc
     sysUser = getenv('username');
     omeroDir = [sysUserHome '\omero'];
     historyFile = [sysUserHome '\omero\analysisHistory.mat'];
-    if ~isdir(omeroDir)
-        mkdir(omeroDir)
-    end
-    save(historyFile, 'omeroUser', 'omeroServer', 'omeroPort');
+else
+    sysUserHome = getenv('HOME');
+    sysUser = getenv('USER');
+    omeroDir = [sysUserHome '/omero'];
+    historyFile = [sysUserHome '/omero/analysisHistory.mat'];
 end
+
+if ~isdir(omeroDir)
+    mkdir(omeroDir)
+end
+save(historyFile, 'omeroUser', 'omeroServer', 'omeroPort');
+
 
 
 function success = logIn(handles)
