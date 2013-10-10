@@ -390,8 +390,8 @@ end
 %reestablished.
 changed = getappdata(handles.ImageAnalysisLoginWindow, 'changed');
 if changed == true
-    gatewayDisconnect;
-    gatewayConnect(credentials{1}, credentials{2}, credentials{3}, credentials{4});
+    userLogoutOmero
+    userLoginOmero(credentials{1}, credentials{2}, credentials{3}, credentials{4});
 end
 
 

@@ -1,4 +1,5 @@
 function [patches, measureSegChannel] = cutPatchesFromROI(roiShapes, channels, channelsToFetch, pixels, thisROI)
+global session;
 
 measureSegChannel = 1;
 
@@ -11,8 +12,8 @@ for thisFetchChannel = channelsToFetch
         numZ = roiShapes{thisROI}.numShapes;
         %numT = length(unique(roiShapes{thisROI}.T));
         thisPatch = 1;
-        X = roiShapes{thisROI}.shape1.getX.getValue+1;    %svg entry in xml file indexes from (0, 0) instead of (1, 1), so +1
-        Y = roiShapes{thisROI}.shape1.getY.getValue+1;
+        X = floor(roiShapes{thisROI}.shape1.getX.getValue+1);    %svg entry in xml file indexes from (0, 0) instead of (1, 1), so +1
+        Y = floor(roiShapes{thisROI}.shape1.getY.getValue+1);
         width = int32(roiShapes{thisROI}.shape1.getWidth.getValue);
         height = int32(roiShapes{thisROI}.shape1.getHeight.getValue);
         %Check to see if there's a tranform (translate) on the shape and
@@ -61,11 +62,12 @@ for thisFetchChannel = channelsToFetch
         maxX = pixels.getSizeX.getValue;
         maxY = pixels.getSizeY.getValue;
         pixelsId = pixels.getId.getValue;
+        imageId = pixels.getImage.getId.getValue;
 
         for thisZ = 1:numZ
             for thisT = 1
                 %for thisC = channelsToFetch(1:end)
-                    thisPlane = getPlaneFromPixelsId(pixelsId, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue, thisFetchChannel-1, 0); %roiShapes{thisROI}.T(thisT));
+                    thisPlane = getPlane(session, imageId, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue, thisFetchChannel-1, 0); %roiShapes{thisROI}.T(thisT));
                     patch(:,:, thisPatch) = zeros(height,width);
                     
                     %Check for the ROI going outwith the image. If it does
@@ -100,8 +102,8 @@ for thisFetchChannel = channelsToFetch
                             end
                         end
                     else
-                        posX = X+width-1;
-                        posY = Y+height-1;
+                        posX = floor(X+width-1);
+                        posY = floor(Y+height-1);
                         patch(:,:,thisPatch) = thisPlane(Y:posY,X:posX);
                     end
                     thisPatch = thisPatch + 1;

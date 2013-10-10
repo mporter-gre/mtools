@@ -297,7 +297,8 @@ function populateDatasetsList(handles)
 
 global session
 projId = getappdata(handles.datasetChooser, 'projectId');
-datasets = getDatasets(session, projId, false);
+project = getProjects(session, projId, false);
+datasets = toMatlabList(project.linkedDatasetList);
 numDs = length(datasets);
 if numDs == 0
     set(handles.datasetsList, 'Value', 1);
