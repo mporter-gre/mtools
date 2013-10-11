@@ -52,6 +52,8 @@ function distanceMeasureLaunchpad_OpeningFcn(hObject, eventdata, handles, vararg
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to distanceMeasureLaunchpad (see VARARGIN)
 
+global session;
+
 % Choose default command line output for distanceMeasureLaunchpad
 handles.output = hObject;
 
@@ -94,7 +96,7 @@ guidata(hObject, handles);
 
 
 for thisImage = 1:numImages
-    pixelsId = pixels{thisImage}.getId.getValue;
+    imageId = pixels{thisImage}.getImage.getId.getValue;
     channelLabelsThisImage = channelLabels{thisImage};
     numChannels = length(channelLabelsThisImage);
     numROI = length(roiShapes{thisImage});
@@ -114,7 +116,7 @@ for thisImage = 1:numImages
         end
         for thisChannel = 1:numChannels
             for thisZ = 1:numROIZ
-                [planesThisROI{thisROI}{thisChannel}(:,:,thisZ)] = getPlaneFromPixelsId(pixelsId, theZs(thisZ), thisChannel-1, 0);
+                [planesThisROI{thisROI}{thisChannel}(:,:,thisZ)] = getPlane(session, imageId, theZs(thisZ), thisChannel-1, 0);
                 waitbar(planesCounter/numPlanes);
                 planesCounter = planesCounter + 1;
             end
