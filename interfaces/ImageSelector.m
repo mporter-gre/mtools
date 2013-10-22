@@ -253,7 +253,7 @@ function populateProjectsSelect(handles)
 global gateway
 global session
 
-projects = getProjects(session, []); %gateway.getProjects([],0);
+projects = getProjects(session, [], false); %gateway.getProjects([],0);
 %projIter = projects.iterator;
 numProj = length(projects);
 projNameId{numProj,2} = [];
