@@ -60,6 +60,8 @@ numC = pixels.getSizeC.getValue;
 pixelsType = pixels.getPixelsType.getValue.getValue;
 pixelsType = char(pixelsType);
 pixelsId = pixels.getId.getValue;
+theImage = pixels.getImage;
+imageId = theImage.getId.getValue;
 
 %Ask the user about sending image masks to the server.
 % if remembered == 0
@@ -83,7 +85,8 @@ extraTAfter{numROI} = [];
 actualT{numROI} = [];
 actualZ{numROI} = [];
 %ROIText = uicontrol(fig1, 'Style', 'text', 'Position', [25 10 250 15]);
-planeInfoForPixels = gateway.findAllByQuery(['select info from PlaneInfo as info where pixels.id = ', num2str(pixelsId), ' and theZ = 0 and theC = 0 order by deltat']);
+%planeInfoForPixels = gateway.findAllByQuery(['select info from PlaneInfo as info where pixels.id = ', num2str(pixelsId), ' and theZ = 0 and theC = 0 order by deltat']);
+
 
 for thisROI = 1:numROI
     %set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
@@ -131,10 +134,11 @@ for thisROI = 1:numROI
     end
     extraT{thisROI} = [extraTBefore{thisROI} extraTAfter{thisROI}];
    
-    
-    firstDeltaT = planeInfoForPixels.get(roiShapes{thisROI}.shape1.getTheT.getValue).getDeltaT.getValue;
+    firstPlaneInfo = getPlaneInfo(session, imageId, 0, 0, roiShapes{thisROI}.shape1.getTheT.getValue);
+    secondPlaneInfo = getPlaneInfo(session, imageId, 0, 0, roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue);
+    firstDeltaT = firstPlaneInfo.getDeltaT.getValue; %planeInfoForPixels.get(roiShapes{thisROI}.shape1.getTheT.getValue).getDeltaT.getValue;
     %planeInfoForPixels = gateway.findAllByQuery(['select info from PlaneInfo as info where pixels.id = ', num2str(pixelsId), ' and info.theT = ' num2str(roishapeIdx{thisROI}.T(end)), ' and theZ = ', num2str(roishapeIdx{thisROI}.Z(1)), ' and theC = 0']);
-    lastDeltaT = planeInfoForPixels.get(roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue).getDeltaT.getValue;
+    lastDeltaT = secondPlaneInfo.getDeltaT.getValue; %planeInfoForPixels.get(roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue).getDeltaT.getValue;
     roiShapes{thisROI}.deltaT = lastDeltaT - firstDeltaT;
     roiShapes{thisROI}.name = [origImageName '_event_' num2str(thisROI)];
     roiShapes{thisROI}.origName = origImageName;
