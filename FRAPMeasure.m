@@ -3,6 +3,7 @@ function [roiShapes indices] = FRAPMeasure(theImages, imageId, imageName, roiSha
 %Copyright 2009 University of Dundee. All rights reserved
 
 global gateway;
+global session;
 
 % try
 %     [roiIdx roishapeIdx] = readEllipseROIs([filepath filename]);
@@ -46,7 +47,8 @@ maxY = pixels.getSizeY.getValue;
 %fullT = pixels.getSizeT.getValue;
 %numC = pixels.getSizeC.getValue;
 fullT = pixels.getSizeT.getValue;
-planeInfoForPixels = gateway.findAllByQuery(['select info from PlaneInfo as info where pixels.id = ', num2str(pixelsId), ' and theZ = 0 and theC = 0 order by deltat']);
+
+%planeInfoForPixels = gateway.findAllByQuery(['select info from PlaneInfo as info where pixels.id = ', num2str(pixelsId), ' and theZ = 0 and theC = 0 order by deltat']);
 
 %This FRAP is done using 4 named ROI's that are propogated along all the
 %time-points of the event to be measured. They are 1.FRAP, 2.Ref, 3.Base
@@ -60,7 +62,7 @@ includeT = [];
 excludeT = [];
 numROI = length(roiShapes);
 for thisT = 1:fullT
-    thisPlane = getPlaneFromPixelsId(pixelsId, 0, 0, thisT-1);
+    thisPlane = getPlane(session, imageId, 0, 0, thisT-1);
     for thisROI = 1:numROI
         if strcmpi(char(roiShapes{thisROI}.shape1.getTextValue.getValue.getBytes'), 'FRAP')
             numShapes = roiShapes{thisROI}.numShapes;
@@ -127,7 +129,8 @@ for thisT = 1:fullT
             frapMaskFilled = imfill(frapMask, 'holes');
             frapROI = find(frapMaskFilled);
             roiShapes{thisROI}.frapData(thisT) = mean(thisPlane(frapROI));
-            roiShapes{thisROI}.timestamp(thisT) = planeInfoForPixels.get(roiShapes{thisROI}.(['shape' num2str(thisT)]).getTheT.getValue).getDeltaT.getValue;
+            planeInfo = getPlaneInfo(session, theImages, 0, 0, thisT-1);
+            roiShapes{thisROI}.timestamp(thisT) = planeInfo.getDeltaT.getValue;
         end
 %         if strcmpi(char(roiShapes{thisROI}.shape1.getTextValue.getValue.getBytes'), 'Ref')
 %             numShapes = roiShapes{thisROI}.numShapes;
