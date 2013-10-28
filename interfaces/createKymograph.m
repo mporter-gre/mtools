@@ -247,7 +247,7 @@ set(handles.tSlider, 'Value', includeROI(1));
 set(handles.tLabel, 'String', ['T = ' num2str(includeROI(1))]);
 setappdata(handles.CreateKymograph, 'rotationView', 0);
 setappdata(handles.CreateKymograph, 'setAnchor', 1);
-getPlane(handles, thisZ-1, includeROI(1)-1)
+getPlanes(handles, thisZ-1, includeROI(1)-1)
 refreshDisplay(handles)
 setappdata(handles.CreateKymograph, 'stopRecording', 0);
 rectPos = getappdata(handles.CreateKymograph, 'rectPos');
@@ -275,7 +275,7 @@ for thisT = includeROI
         setappdata(handles.CreateKymograph, 'trapPointer', 0);
         break;
     end
-    getPlane(handles, thisZ-1, thisT-1)
+    getPlanes(handles, thisZ-1, thisT-1)
     zoomLevel = getappdata(handles.CreateKymograph, 'zoomLevel');
     if zoomLevel > 1
         zoomImage(handles);
@@ -358,7 +358,7 @@ rotationView = getappdata(handles.CreateKymograph, 'rotationView');
 alignPos = getappdata(handles.CreateKymograph, 'alignPos');
 zoomLevel = getappdata(handles.CreateKymograph, 'zoomLevel');
 set(handles.tLabel, 'String', ['T = ' num2str(t)]);
-getPlane(handles, z-1, t-1);
+getPlanes(handles, z-1, t-1);
 if zoomLevel > 1
     zoomImage(handles);
 end
@@ -450,13 +450,14 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function getPlane(handles, z, t)
+function getPlanes(handles, z, t)
+global session;
 
-pixelsId = getappdata(handles.CreateKymograph, 'pixelsId');
+imageId = getappdata(handles.CreateKymograph, 'imageId');
 pixels = getappdata(handles.CreateKymograph, 'pixels');
 numC = getappdata(handles.CreateKymograph, 'numC');
 for thisC = 1:numC
-    plane(:,:,thisC) = getPlaneFromPixelsId(pixelsId, z, thisC-1, t);
+    plane(:,:,thisC) = getPlane(session, imageId, z, thisC-1, t);
 end
 renderedImage = createRenderedImage(plane, pixels);
 setappdata(handles.CreateKymograph, 'renderedImage', renderedImage);
@@ -508,7 +509,7 @@ alignPos = getappdata(handles.CreateKymograph, 'alignPos');
 rotationView = getappdata(handles.CreateKymograph, 'rotationView');
 set(handles.zLabel, 'String', ['Z = ' num2str(z)]);
 axes(handles.imageAxes);
-getPlane(handles, z-1, t-1);
+getPlanes(handles, z-1, t-1);
 zoomLevel = getappdata(handles.CreateKymograph, 'zoomLevel');
 if zoomLevel > 1
     zoomImage(handles);
@@ -907,7 +908,7 @@ for thisT = firstT:numT
     set(handles.tSlider, 'Value', thisT);
     set(handles.tLabel, 'String', ['T = ' num2str(thisT)]);
     thisZ = round(get(handles.zSlider, 'Value'));
-    getPlane(handles, thisZ-1, thisT-1)
+    getPlanes(handles, thisZ-1, thisT-1)
     zoomLevel = getappdata(handles.CreateKymograph, 'zoomLevel');
     if zoomLevel > 1
         zoomImage(handles);
@@ -1169,7 +1170,7 @@ set(handles.alertText, 'Visible', 'on');
 set(handles.tSlider, 'Value', includeROI(1));
 set(handles.tLabel, 'String', ['T = ' num2str(includeROI(1))]);
 setappdata(handles.CreateKymograph, 'rotationView', 0);
-getPlane(handles, thisZ-1, includeROI(1)-1)
+getPlanes(handles, thisZ-1, includeROI(1)-1)
 refreshDisplay(handles);
 setappdata(handles.CreateKymograph, 'stopRecording', 0);
 alignPos = getappdata(handles.CreateKymograph, 'alignPos');
@@ -1196,7 +1197,7 @@ for thisT = includeROI
         setappdata(handles.CreateKymograph, 'trapPointer', 0);
         break;
     end
-    getPlane(handles, thisZ-1, thisT-1)
+    getPlanes(handles, thisZ-1, thisT-1)
     zoomLevel = getappdata(handles.CreateKymograph, 'zoomLevel');
     if zoomLevel > 1
         zoomImage(handles);
@@ -1440,7 +1441,7 @@ switch answer,
         setZSlider(handles);
         set(handles.stopZText, 'String', num2str(getappdata(handles.CreateKymograph, 'numZ')));
         defaultZ = getappdata(handles.CreateKymograph, 'defaultZ');
-        getPlane(handles, defaultZ, 0)
+        getPlanes(handles, defaultZ, 0)
         setappdata(handles.CreateKymograph, 'clearAnswer', 'Yes');
         clearAllItem_Callback([], eventdata, handles);    
         refreshDisplay(handles);
@@ -1471,6 +1472,7 @@ redrawAlign(handles);
 
 
 function processChymograph(handles)
+global session;
 
 set(handles.CreateKymograph, 'Visible', 'off');
 scrsz = get(0,'ScreenSize');
@@ -1484,7 +1486,7 @@ drawnow;
 
 
 numC = getappdata(handles.CreateKymograph, 'numC');
-pixelsId = getappdata(handles.CreateKymograph, 'pixelsId');
+imageId = getappdata(handles.CreateKymograph, 'imageId');
 pixels = getappdata(handles.CreateKymograph, 'pixels');
 includeROI = getappdata(handles.CreateKymograph, 'includeROI');
 numIncluded = length(includeROI);
@@ -1504,7 +1506,7 @@ counter = 1;
 for thisT = includeROI
     for thisC = 1:numC
         for thisZ = zSections
-            planesThisC(:,:,thisZ) = getPlaneFromPixelsId(pixelsId, thisZ-1, thisC-1, thisT-1);
+            planesThisC(:,:,thisZ) = getPlane(session, imageId, thisZ-1, thisC-1, thisT-1);
         end
         if strcmp(projectionType, 'max')
             projectionThisC(:,:,thisC) = max(planesThisC, [], 3);
@@ -1753,10 +1755,7 @@ renderSettingsService = session.getRenderingSettingsService;
 
 imageId = getappdata(handles.CreateKymograph, 'imageId');
 imageObj = getappdata(handles.CreateKymograph, 'newImageObj');
-pixels = gateway.getPixelsFromImage(imageId);
-if strcmp(class(pixels), 'java.util.ArrayList');
-    pixels = pixels.get(0);
-end
+pixels = imageObj.getPrimaryPixels;
 pixelsId = pixels.getId.getValue;
 %handles.fullImage = varargin{2};
 imageName = native2unicode(imageObj.getName.getValue.getBytes');
