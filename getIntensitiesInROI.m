@@ -31,5 +31,5 @@ for thisChannel = 1:numChannels
         intensities.(['channel' num2str(thisChannel)])(:,:,thisZ) = reshape(varargin{thisChannel}(Y:Y+height-1, X:X+width-1, thisZ), 1, []);
     end
     intensities.(['channel' num2str(thisChannel)]) = squeeze(reshape(intensities.(['channel' num2str(thisChannel)]), 1, []));
-    varargout{thisChannel} = [sum(intensities.(['channel' num2str(thisChannel)])), mean(intensities.(['channel' num2str(thisChannel)])), std(intensities.(['channel' num2str(thisChannel)]))];
+    varargout{thisChannel} = [sum(intensities.(['channel' num2str(thisChannel)])), mean(intensities.(['channel' num2str(thisChannel)])), std(double(intensities.(['channel' num2str(thisChannel)])))];
 end
