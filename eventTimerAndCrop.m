@@ -186,8 +186,8 @@ if saveMasks == 1
     %channelLabels{1} = [channelLabels{1} 1000];
     newImage = createNewImageFromOldPixels(imageId, channelLabels, [origImageName, '_events'], '');
     newImageId = newImage.getId.getValue;
-    newPixels = gateway.getPixelsFromImage(newImageId);
-    newPixelsId = newPixels.get(0).getId.getValue;
+    newPixels = newImage.getPrimaryPixels;
+    newPixelsId = newPixels.getId.getValue;
     store.setPixelsId(newPixelsId, false);
 
     %Make the full image from the ROI patches and send it to the server each
@@ -238,13 +238,15 @@ if saveMasks == 1
                                     newPlane = labelPlane;
                                 end
                             else  %Copy the intensity patch from the original image to the new plane;
-                                thisPlane = getPlaneFromPixelsId(pixelsId, thisZ-1, thisC-1, thisT-1);
+                                thisPlane = getPlane(session, imageId, thisZ-1, thisC-1, thisT-1);
                                 newPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X) = thisPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X);
                             end
                         
                     end
                 end
-                planeAsBytes = omerojava.util.GatewayUtils.convertClientToServer(newPixels.get(0), newPlane');
+                %planeAsBytes = omerojava.util.GatewayUtils.convertClientToServer(newPixels, newPlane');
+                [sizeY, sizeX] = size(newPlane);
+                planeAsBytes = typecast(swapbytes(reshape(newPlane, sizeX * sizeY, 1)), 'int8');
                 store.setPlane(planeAsBytes, thisZ-1, thisC-1, thisT-1);
                 %gateway.uploadPlane(newPixelsId, thisZ-1, thisC-1, thisT-1, planeAsBytes);
                 %set(ROIText, 'String', ['Sending images to server... ' num2str(countPlanes) '/ ' numPlanes]);
