@@ -1,5 +1,7 @@
 function varargout = selectUserDefaultGroup(varargin)
 % SELECTUSERDEFAULTGROUP M-file for selectUserDefaultGroup.fig
+%       This no longer changes the user's default group, but instead now
+%       changes the securityContext of the session.
 %      SELECTUSERDEFAULTGROUP, by itself, creates a new SELECTUSERDEFAULTGROUP or raises the existing
 %      singleton*.
 %
@@ -135,21 +137,18 @@ function okButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global session
+
 adminService = getappdata(handles.selectUserDefaultGroupFig, 'adminService');
 userGroupIds = getappdata(handles.selectUserDefaultGroupFig, 'userGroupIds');
 currDefaultGroup = getappdata(handles.selectUserDefaultGroupFig, 'currDefaultGroup');
 userObj = getappdata(handles.selectUserDefaultGroupFig, 'userObj');
 selectedGroupIdx = get(handles.groupSelect, 'Value');
 selectedGroupName = get(handles.groupSelect, 'String');
-if strcmp(selectedGroupName{selectedGroupIdx}, currDefaultGroup)
-    setappdata(handles.parentHandles.(handles.parentFigName), 'changed', false);
-else
-    setappdata(handles.parentHandles.(handles.parentFigName), 'changed', true);
-end
 
 selectedGroupId = userGroupIds(selectedGroupIdx);
-defaultGroup = adminService.getGroup(selectedGroupId);
-adminService.setDefaultGroup(userObj, defaultGroup);
+workingGroup = adminService.getGroup(selectedGroupId);
+session.setSecurityContext(workingGroup);
 %guidata(hObject, handles);
 
 delete(handles.selectUserDefaultGroupFig);
