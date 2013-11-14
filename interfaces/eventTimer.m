@@ -186,6 +186,11 @@ roiShapes = deleteElementFromCells(imageIdxNoROIs, roiShapes);
 datasetNames = deleteElementFromCells(imageIdxNoROIs, datasetNames);
 numImages = images.size;
 
+if numImages == 0
+    warndlg('There are no images with appropriate ROIs in the chosen datasets');
+    return;
+end
+
 for thisImage = 1:numImages
     theImage = images.get(thisImage-1);
     pixels{thisImage} = theImage.getPixels(0);
