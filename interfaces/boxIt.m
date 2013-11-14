@@ -263,7 +263,7 @@ plane = getappdata(handles.boxIt, 'currentPlane');
 zInHand = size(plane, 3);
 if zInHand == 1
     thisT = round(get(handles.tSlider, 'Value'));
-    getPlane(handles, z, thisT);
+    getImagePlane(handles, z, thisT);
 end
 refreshDisplay(handles);
 
