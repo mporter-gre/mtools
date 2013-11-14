@@ -106,6 +106,11 @@ imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
 %roiShapes = deleteElementFromCells(imageIdxNoROIs, roiShapes);
 datasetNames = deleteElementFromCells(imageIdxNoROIs, datasetNames);
 
+if isempty(imageIds)
+    warndlg('No images with ROIs selected');
+    return;
+end
+
 setappdata(handles.bugCounterMain, 'savePath', savePath);
 setappdata(handles.bugCounterMain, 'images', images);
 setappdata(handles.bugCounterMain, 'imageIds', imageIds);
@@ -127,6 +132,7 @@ delete(gcf);
 function countBugs(handles)
 
 global gateway;
+global session;
 
 progressBar = waitbar(0,'Ready to process images') ;
 
@@ -148,11 +154,15 @@ summaryDataOut = [];
 namedDataOut = [];
 
 for thisImg = 1:numImages
-    filename = num2str(imageIds(thisImg));
-    pixels = gateway.getPixelsFromImage(imageIds(thisImg));
-    DICStack = getStackFromPixels(pixels, 0, 0);
-    greenStack = getStackFromPixels(pixels, 1, 0);
-    redStack = getStackFromPixels(pixels, 2, 0);
+    if length(imageIds) > 1
+        imageId = imageIds(thisImg);
+    else
+        imageId = imageIds;
+    end
+    filename = num2str(imageId);
+    DICStack = getStack(session, imageId, 0, 0);
+    greenStack = getStack(session, imageId, 1, 0);
+    redStack = getStack(session, imageId, 2, 0);
     waitbar((thisImg/numImages),progressBar,['Segmenting image ' num2str(thisImg) ' of ' num2str(numImages)]);
     segStack = DICSeg(DICStack, 60);
     waitbar((thisImg/numImages),progressBar,['Calculating intensities of image ' num2str(thisImg) ' of ' num2str(numImages)]);

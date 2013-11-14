@@ -614,6 +614,7 @@ selectedImageIdx = get(handles.imageSelect, 'Value');
 pixelsList = getappdata(handles.ImageSegmentation, 'pixels');
 pixels = pixelsList{selectedImageIdx};
 pixelsId = pixels.getId.getValue;
+imageId = pixels.getImage.getId.getValue;
 renderService = session.getRenderingSettingsService;
 renderDef = renderService.getRenderingSettings(pixelsId);
 defaultZ = renderDef.getDefaultZ.getValue;
@@ -624,7 +625,7 @@ penTablet = zeros(numY, numX);
 setappdata(handles.ImageSegmentation, 'penTablet', penTablet);
 planes = zeros(numY, numX, numC);
 for thisC = 1:numC
-   planes(:,:,thisC) = getPlaneFromPixelsId(pixelsId, defaultZ, thisC-1, 0);
+   planes(:,:,thisC) = getPlane(session, imageId, defaultZ, thisC-1, 0);
 end
 renderedImage = createRenderedImage(planes, pixels);
 axes(handles.imageAxes)
@@ -733,7 +734,9 @@ end
 
 
 function segmentROI(handles)
+global session
 %Segment the ROI chosen on the image. (ROI 1 at app launch)
+
 disableControls(handles);
 segPatches = getappdata(handles.ImageSegmentation, 'segPatches');
 selectedImageIdx = get(handles.imageSelect, 'Value');
@@ -758,6 +761,7 @@ roiShapes = getappdata(handles.ImageSegmentation, 'roiShapes');
 pixelsList = getappdata(handles.ImageSegmentation, 'pixels');
 pixels = pixelsList{selectedImageIdx};
 pixelsId = pixels.getId.getValue;
+imageId = pixels.getImage.getId.getValue;
 X = round(roiShapes{selectedImageIdx}{selectedROI}.shape1.getX.getValue+1);
 Y = round(roiShapes{selectedImageIdx}{selectedROI}.shape1.getY.getValue+1);
 numROIZ = roiShapes{selectedImageIdx}{selectedROI}.numShapes;
@@ -802,7 +806,7 @@ lowestValue = getappdata(handles.ImageSegmentation, 'lowestValue');
 if isempty(segPatches{selectedROI}{selectedChannel+1})
     counter = 1;
     for ROIZ = Z;
-        plane = getPlaneFromPixelsId(pixelsId, ROIZ, selectedChannel, 0);
+        plane = getPlane(session, imageId, ROIZ, selectedChannel, 0);
         patches(:,:,counter) = plane(indices.Y, indices.X);
         counter = counter + 1;
     end

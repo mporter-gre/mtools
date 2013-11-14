@@ -13,64 +13,16 @@ global progBar;
 framesBefore = frames(1);
 framesAfter = frames(2);
 numROI = length(roiShapes);
-% try
-%     [roiIdx roishapeIdx] = readROIs([filepath filename]);
-% catch
-%     helpdlg(['There was a problem opening the ROI file ', filename, ', please check this file and retry it.', 'Problem']);
-%     set(handles.beginAnalysisButton, 'Enable', 'on');
-%     badImage = 1;
-%     return;
-% end
-% try
-%     [client, session, gateway] = gatewayConnect(credentials{1}, credentials{2}, credentials{3});
-% catch
-%     helpdlg('Could not log you on to the server. Check your username and password');
-%     set(handles.beginAnalysisButton, 'Enable', 'on');
-%     badCredentials = 1;
-%     return;
-% end
-% try
-%     [pixelsId, imageName] = getPixIdFromROIFile([filepath filename], credentials{1}, credentials{3});
-%     [imageName remain] = strtok(filename, '.');
-% catch
-%     helpdlg(['Reference to ', filename, ' could not be found in your roiFileMap.xml. Please re-save the ROI file in Insight and try analysis again.']);
-%     set(handles.beginAnalysisButton, 'Enable', 'on');
-%     badImage = 1;
-%     return;
-% end
-
-%Let the user know what's going on...
-% scrsz = get(0,'ScreenSize');
-% fig1 = figure('Name','Processing...','NumberTitle','off','MenuBar','none','Position',[(scrsz(3)/2)-150 (scrsz(4)/2)-80 300 80]);
-% conditionText = uicontrol(fig1, 'Style', 'text', 'String', ['Condition ', num2str(conditionNum), ' of ' num2str(numConditions)], 'Position', [25 60 250 15]);
-% fileText = uicontrol(fig1, 'Style', 'text', 'String', ['ROI file ',
-% num2str(fileNum), ' of ' num2str(numFiles)], 'Position', [25 35 250 15]);
-% drawnow;
-
-% pixelsId = str2double(pixelsId);
-% pixels = gateway.getPixels(pixelsId);
-% imageId = pixels.getImage.getId.getValue;
-% theImage = gateway.getImage(imageId);
 
 maxX = pixels.getSizeX.getValue;
 maxY = pixels.getSizeY.getValue;
 fullZ = pixels.getSizeZ.getValue;
 fullT = pixels.getSizeT.getValue;
 numC = pixels.getSizeC.getValue;
-pixelsType = pixels.getPixelsType.getValue.getValue;
-pixelsType = char(pixelsType);
+pixelsType = char(pixels.getPixelsType.getValue.getValue);
 pixelsId = pixels.getId.getValue;
-
-%Ask the user about sending image masks to the server.
-% if remembered == 0
-%     [saveMasks framesBefore framesAfter remembered scope] = eventTimerChoices(origImageName{1});
-%     drawnow;
-%     if strcmp(scope, 'condition')
-%         scope = conditionNum;
-%     else
-%         scope = -1;
-%     end
-% end
+theImage = pixels.getImage;
+imageId = theImage.getId.getValue;
 
 
 %Find the linear indices of the ROI's position on each frame (x,y,t,z).
@@ -82,8 +34,7 @@ extraTBefore{numROI} = [];
 extraTAfter{numROI} = [];
 actualT{numROI} = [];
 actualZ{numROI} = [];
-%ROIText = uicontrol(fig1, 'Style', 'text', 'Position', [25 10 250 15]);
-planeInfoForPixels = gateway.findAllByQuery(['select info from PlaneInfo as info where pixels.id = ', num2str(pixelsId), ' and theZ = 0 and theC = 0 order by deltat']);
+
 
 for thisROI = 1:numROI
     %set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
@@ -131,10 +82,10 @@ for thisROI = 1:numROI
     end
     extraT{thisROI} = [extraTBefore{thisROI} extraTAfter{thisROI}];
    
-    
-    firstDeltaT = planeInfoForPixels.get(roiShapes{thisROI}.shape1.getTheT.getValue).getDeltaT.getValue;
-    %planeInfoForPixels = gateway.findAllByQuery(['select info from PlaneInfo as info where pixels.id = ', num2str(pixelsId), ' and info.theT = ' num2str(roishapeIdx{thisROI}.T(end)), ' and theZ = ', num2str(roishapeIdx{thisROI}.Z(1)), ' and theC = 0']);
-    lastDeltaT = planeInfoForPixels.get(roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue).getDeltaT.getValue;
+    firstPlaneInfo = getPlaneInfo(session, imageId, 0, 0, roiShapes{thisROI}.shape1.getTheT.getValue);
+    secondPlaneInfo = getPlaneInfo(session, imageId, 0, 0, roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue);
+    firstDeltaT = firstPlaneInfo.getDeltaT.getValue; %planeInfoForPixels.get(roiShapes{thisROI}.shape1.getTheT.getValue).getDeltaT.getValue;
+    lastDeltaT = secondPlaneInfo.getDeltaT.getValue; %planeInfoForPixels.get(roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue).getDeltaT.getValue;
     roiShapes{thisROI}.deltaT = lastDeltaT - firstDeltaT;
     roiShapes{thisROI}.name = [origImageName '_event_' num2str(thisROI)];
     roiShapes{thisROI}.origName = origImageName;
@@ -144,8 +95,6 @@ end
 if saveMasks == 1
     store = session.createRawPixelsStore();
     currPlane = 0;
-%    set(ROIText, 'String', 'Sending images to server...');
-%     countPlanes = 1;
     numPlanes = fullZ * fullT * (numC+1);
     for thisROI = 1:numROI
         for thisT = 1:numT(thisROI)
@@ -179,15 +128,15 @@ if saveMasks == 1
     %Create the new Image on the server so we can upload planes to it.
     %channelLabels = getChannelLabelsFromPixels(pixels);
     channelLabels{end+1} = 1000;
-    %channelLabels{1} = [channelLabels{1} 1000];
-    newImage = createNewImageFromOldPixels(imageId, channelLabels, [origImageName, '_events'], '');
+    newImage = createNewImageFromOldPixels(imageId, channelLabels, [origImageName, '_events'], 'uint16');
     newImageId = newImage.getId.getValue;
-    newPixels = gateway.getPixelsFromImage(newImageId);
-    newPixelsId = newPixels.get(0).getId.getValue;
+    newPixels = newImage.getPrimaryPixels;
+    newPixelsId = newPixels.getId.getValue;
     store.setPixelsId(newPixelsId, false);
 
     %Make the full image from the ROI patches and send it to the server each
     %completed T at a time.
+    pixelsType = char(pixels.getPixelsType().getValue().getValue());
     drawnow;
     for thisT = 1:fullT
         for thisZ = 1:fullZ
@@ -200,9 +149,7 @@ if saveMasks == 1
                         ROIZ = find(actualZ{thisROI}== thisZ-1);
                         ROIT = find(setdiff(actualT{thisROI}, extraT{thisROI})== thisT);
                         if isempty(ROIT)
-                            %if ismember(thisT, extraTBefore{thisROI})
                                 ROIT = 1;
-                            %end
                             if ismember(thisT, extraTAfter{thisROI})
                                 Tdiff = setdiff(actualT{thisROI}, extraT{thisROI});
                                 ROIT = length(Tdiff);
@@ -234,16 +181,19 @@ if saveMasks == 1
                                     newPlane = labelPlane;
                                 end
                             else  %Copy the intensity patch from the original image to the new plane;
-                                thisPlane = getPlaneFromPixelsId(pixelsId, thisZ-1, thisC-1, thisT-1);
+                                thisPlane = getPlane(session, imageId, thisZ-1, thisC-1, thisT-1);
                                 newPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X) = thisPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X);
                             end
                         
                     end
                 end
-                planeAsBytes = omerojava.util.GatewayUtils.convertClientToServer(newPixels.get(0), newPlane');
+                
+                planeType = class(newPlane);
+                if ~strcmpi(planeType, pixelsType)
+                    newPlane = setMatrixType(newPlane, pixelsType);
+                end
+                planeAsBytes = toByteArray(newPlane', pixels);
                 store.setPlane(planeAsBytes, thisZ-1, thisC-1, thisT-1);
-                %gateway.uploadPlane(newPixelsId, thisZ-1, thisC-1, thisT-1, planeAsBytes);
-                %set(ROIText, 'String', ['Sending images to server... ' num2str(countPlanes) '/ ' numPlanes]);
                 drawnow;
                 currPlane = currPlane + 1;
                 waitbar(currPlane/numPlanes, progBar);
@@ -283,25 +233,18 @@ if saveMasks == 1
     renderingEngine.setRGBA(thisC,255,255,255,200); %Set the label channel to grey, alpha 200;
     renderingEngine.saveCurrentSettings;
     renderingEngine.close();
-
-    %Link the new image into the same dataset as the original image.
-    thisImageLinks = gateway.findAllByQuery(['select link from DatasetImageLink as link where link.child.id = ', num2str(imageId)]);
-    imageLinksIter = thisImageLinks.iterator;
-    thisIter = 1;
-    while imageLinksIter.hasNext
-        imageLinks(thisIter) = imageLinksIter.next.getParent.getId.getValue;
-        thisIter = thisIter + 1;
-    end
-    sortedLinks = sort(imageLinks);
-
-    aDataset = gateway.getDataset(sortedLinks(1),0);
-    aDataset.unload;
-    newImage.unload;
+    
+    
+    % Retrieve all datasets linked to image
+    queryService = session.getQueryService();
+    links = queryService.findAllByQuery(['select link from DatasetImageLink as link where link.child.id = ', num2str(imageId)], []);
+    links = toMatlabList(links);
+    datasetId = links(1).getParent().getId().getValue();
+    
+    % Link creation
     newLink = omero.model.DatasetImageLinkI();
-    newLink.link(aDataset, newImage);
-    gateway.saveObject(newLink);
-end
-
-%close(fig1);
+    newLink.setParent(omero.model.DatasetI(datasetId, false));
+    newLink.setChild(omero.model.ImageI(newImageId, false));
+    session.getUpdateService().saveObject(newLink);
 
 end

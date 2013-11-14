@@ -138,7 +138,7 @@ lastT = str2double(get(handles.endTText, 'String'));
 set(handles.tSlider, 'Value', firstT);
 set(handles.tLabel, 'String', ['T = ' num2str(firstT)]);
 setappdata(handles.ROITweak, 'rotationView', 0);
-getPlane(handles, thisZ-1, firstT-1)
+getThePlane(handles, thisZ-1, firstT-1)
 redrawImage(handles);
 setappdata(handles.ROITweak, 'stopRecording', 0);
 setappdata(handles.ROITweak, 'trapPointer', 1);
@@ -181,7 +181,7 @@ for thisT = firstT:lastT
         set(gcf,'Pointer','arrow');
         break;
     end
-    getPlane(handles, thisZ-1, thisT-1)
+    getThePlane(handles, thisZ-1, thisT-1)
     redrawImage(handles);
     set(handles.tSlider, 'Value', thisT);
     set(handles.tLabel, 'String', ['T = ' num2str(thisT)]);
@@ -239,7 +239,7 @@ function tSlider_Callback(hObject, eventdata, handles)
 z = round(get(handles.zSlider, 'Value'));
 t = round(get(hObject, 'Value'));
 set(handles.tLabel, 'String', ['T = ' num2str(t)]);
-getPlane(handles, z-1, t-1);
+getThePlane(handles, z-1, t-1);
 redrawImage(handles);
 redrawROIs(handles);
 guidata(hObject, handles);
@@ -258,13 +258,15 @@ end
 
 
 
-function getPlane(handles, z, t)
+function getThePlane(handles, z, t)
+global session
 
+imageId = getappdata(handles.ROITweak, 'imageId');
 pixelsId = getappdata(handles.ROITweak, 'pixelsId');
 pixels = getappdata(handles.ROITweak, 'pixels');
 numC = getappdata(handles.ROITweak, 'numC');
 for thisC = 1:numC
-    plane(:,:,thisC) = getPlaneFromPixelsId(pixelsId, z, thisC-1, t);
+    plane(:,:,thisC) = getPlane(session, imageId, z, thisC-1, t); %getPlaneFromPixelsId(pixelsId, z, thisC-1, t);
 end
 renderedImage = createRenderedImage(plane, pixels);
 imageSize = size(renderedImage);
@@ -323,7 +325,7 @@ z = round(get(hObject, 'Value'));
 t = round(get(handles.tSlider, 'Value'));
 set(handles.zLabel, 'String', ['Z = ' num2str(z)]);
 axes(handles.imageAxes);
-getPlane(handles, z-1, t-1);
+getThePlane(handles, z-1, t-1);
 redrawImage(handles);
 redrawROIs(handles);
 guidata(hObject, handles);
@@ -784,7 +786,7 @@ for thisT = firstT:numT
     set(handles.tSlider, 'Value', thisT);
     set(handles.tLabel, 'String', ['T = ' num2str(thisT)]);
     thisZ = round(get(handles.zSlider, 'Value'));
-    getPlane(handles, thisZ-1, thisT-1)
+    getThePlane(handles, thisZ-1, thisT-1)
     
     refreshDisplay(handles);
 %     redrawImage(handles);
@@ -944,7 +946,7 @@ set(handles.roiSelect, 'Value', 1);
 set(handles.recentreROIButton, 'Enable', 'off');
 set(handles.recordROIButton, 'Enable', 'off');
 
-getPlane(handles, defaultZ-1, defaultT-1);
+getThePlane(handles, defaultZ-1, defaultT-1);
 redrawImage(handles);
 getROIIds(handles);
 populateROISelect(handles);

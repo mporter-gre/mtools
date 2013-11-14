@@ -1,4 +1,5 @@
 function imgStack = getStackFromPixels(pixels, theC, theT)
+global session;
 
 try
     numZ = pixels.get(0).getSizeZ.getValue;
@@ -14,5 +15,5 @@ end
 imgStack = zeros(sizeY, sizeX, numZ);
 
 for thisZ = 1:numZ
-    imgStack(:,:,thisZ) = getPlaneFromPixelsId(pixelsId, thisZ-1, theC, theT);
+    imgStack(:,:,thisZ) = getPlane(session, imageId, thisZ-1, theC, theT);
 end

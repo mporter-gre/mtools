@@ -294,18 +294,25 @@ if ispc
     sysUser = getenv('username');
     sysUserHome = getenv('userprofile');
     historyFile = [sysUserHome '\omero\analysisHistory.mat'];
-    try
-        history = open(historyFile);
-        set(handles.usernameText, 'String', history.omeroUser);
-        set(handles.serverText, 'String', history.omeroServer);
-        try  %previous versions didn't include port details.
-            set(handles.serverPort, 'String', history.omeroPort);
-        catch
-        end
-        uicontrol(handles.passwordText);
+else
+    sysUser = getenv('USER');
+    sysUserHome = getenv('HOME');
+    historyFile = [sysUserHome '/omero/analysisHistory.mat'];
+end
+try
+    history = open(historyFile);
+    set(handles.usernameText, 'String', history.omeroUser);
+    set(handles.serverText, 'String', history.omeroServer);
+    try  %previous versions didn't include port details.
+        set(handles.serverPort, 'String', history.omeroPort);
     catch
     end
+    uicontrol(handles.passwordText);
+catch
 end
+
+
+
 
 
 function saveHistory(credentials)
@@ -318,11 +325,18 @@ if ispc
     sysUser = getenv('username');
     omeroDir = [sysUserHome '\omero'];
     historyFile = [sysUserHome '\omero\analysisHistory.mat'];
-    if ~isdir(omeroDir)
-        mkdir(omeroDir)
-    end
-    save(historyFile, 'omeroUser', 'omeroServer', 'omeroPort');
+else
+    sysUserHome = getenv('HOME');
+    sysUser = getenv('USER');
+    omeroDir = [sysUserHome '/omero'];
+    historyFile = [sysUserHome '/omero/analysisHistory.mat'];
 end
+
+if ~isdir(omeroDir)
+    mkdir(omeroDir)
+end
+save(historyFile, 'omeroUser', 'omeroServer', 'omeroPort');
+
 
 
 function success = logIn(handles)
@@ -347,7 +361,7 @@ end
 %will persist and be kept alive until application close.
 try
     if ~isjava(client)
-        gatewayConnect(credentials{1}, credentials{2}, credentials{3}, credentials{4});
+        userLoginOmero(credentials{1}, credentials{2}, credentials{3}, credentials{4});
         saveHistory(credentials);
         success = true;
         selectUserDefaultGroup(credentials{1}, handles, 'ImageAnalysisLoginWindow');
@@ -356,7 +370,7 @@ try
         if strcmp(experimenter, credentials{1})
             success = true;
         else
-            gatewayDisconnect;
+            userLogoutOmero;
             success = logIn(handles);
         end
     end
@@ -370,14 +384,6 @@ catch ME
     warndlg('Could not log on to the server. Check your details and try again.');
     success = false;
     return;
-end
-
-%If the defaultGroup was changed then the gateway (actually, services) needs to be
-%reestablished.
-changed = getappdata(handles.ImageAnalysisLoginWindow, 'changed');
-if changed == true
-    gatewayDisconnect;
-    gatewayConnect(credentials{1}, credentials{2}, credentials{3}, credentials{4});
 end
 
 

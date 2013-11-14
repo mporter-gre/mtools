@@ -21,7 +21,7 @@ for counter = 1:numObj
     for thisChannel = 1:numChannels
         dataOut(counter, columnCounter + 1) = sum(intStack.(['stack' num2str(thisChannel)])(segStack == thisObj));
         dataOut(counter, columnCounter + 2) = mean(intStack.(['stack' num2str(thisChannel)])(segStack == thisObj));
-        dataOut(counter, columnCounter + 3) = std(intStack.(['stack' num2str(thisChannel)])(segStack == thisObj));
+        dataOut(counter, columnCounter + 3) = std(double(intStack.(['stack' num2str(thisChannel)])(segStack == thisObj)));
         columnCounter = columnCounter + 3;
     end
 end

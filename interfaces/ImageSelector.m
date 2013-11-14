@@ -229,12 +229,14 @@ function okButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global gateway;
+global session;
+
 imagesSelectIdx = get(handles.imagesSelect, 'Value');
 if imagesSelectIdx == 1
     return;
 end
 imageId = getappdata(handles.imageSelector, 'imageId');
-theImage = gateway.getImage(imageId);
+theImage = getImages(session, imageId);
 projectId = getappdata(handles.imageSelector, 'projectId');
 datasetId = getappdata(handles.imageSelector, 'dsId');
 setappdata(handles.parentHandles.(handles.parentHandles.parentWindowName), 'imageId', imageId);
@@ -249,17 +251,18 @@ delete(handles.imageSelector);
 function populateProjectsSelect(handles)
 
 global gateway
-projects = gateway.getProjects([],0);
-projIter = projects.iterator;
-numProj = projects.size;
+global session
+
+projects = getProjects(session, [], false); %gateway.getProjects([],0);
+%projIter = projects.iterator;
+numProj = length(projects);
 projNameId{numProj,2} = [];
 projNameList{numProj} = [];
 projIdList = [];
 counter = 1;
-while projIter.hasNext
-    projNameId{counter,1} = char(projects.get(counter-1).getName.getValue.getBytes');
-    projNameId{counter,2} = num2str(projects.get(counter-1).getId.getValue);
-    projIter.next;
+for thisProj = 1:numProj
+    projNameId{thisProj,1} = char(projects(thisProj).getName.getValue.getBytes');
+    projNameId{thisProj,2} = num2str(projects(thisProj).getId.getValue);
     counter = counter + 1;
 end
 projNameId = sortrows(projNameId);
@@ -277,10 +280,13 @@ setappdata(handles.imageSelector, 'projIdList', projIdList);
 function populateDatasetsSelect(handles)
 
 global gateway
+global session
+
 projId = getappdata(handles.imageSelector, 'projectId');
-projectId = java.util.ArrayList;
-projectId.add(java.lang.Long(projId));
-project = gateway.getProjects(projectId, 0).get(0);
+% projectId = java.util.ArrayList;
+% projectId.add(java.lang.Long(projId));
+%project = gateway.getProjects(projectId, 0).get(0);
+project = getProjects(session, projId, true);
 numDs = project.sizeOfDatasetLinks;
 if numDs == 0
     set(handles.datasetsSelect, 'Value', 1);
@@ -316,14 +322,17 @@ setappdata(handles.imageSelector, 'dsIdList', dsIdList);
 function populateImagesSelect(handles)
 
 global gateway
+global session
+
 dsId = getappdata(handles.imageSelector, 'dsId');
-datasetId = java.util.ArrayList;
-datasetId.add(java.lang.Long(dsId));
-datasetContainer = omero.api.ContainerClass.Dataset;
+% datasetId = java.util.ArrayList;
+% datasetId.add(java.lang.Long(dsId));
+% datasetContainer = omero.api.ContainerClass.Dataset;
 
-images = gateway.getImages(datasetContainer,datasetId);
+%images = gateway.getImages(datasetContainer,datasetId);
+images = getImages(session, 'dataset', dsId);
 
-numImages = images.size;
+numImages = length(images);
 if numImages == 0
     set(handles.imagesSelect, 'Value', 1);
     set(handles.imagesSelect, 'String', 'No images in this dataset');
@@ -331,7 +340,7 @@ if numImages == 0
 end
 if handles.ROIFilter == 1
     for thisImage = 1:numImages
-        imageIds(thisImage) = images.get(thisImage-1).getId.getValue;
+        imageIds(thisImage) = images(thisImage).getId.getValue;
     end
     [imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
     images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
@@ -340,20 +349,14 @@ end
 numImages = length(images);
 
 imageNameId{numImages,2} = [];
-imageNameId{numImages,2} = [];
-imageNameId{numImages,2} = [];
-imageNameId{numImages,2} = [];
 imageNameList{numImages} = [];
 
-imageIter = images.iterator;
-counter = 1;
-while imageIter.hasNext
-    imageNameId{counter,1} = char(images.get(counter-1).getName.getValue.getBytes');
-    imageNameId{counter,2} = num2str(images.get(counter-1).getId.getValue);
-    counter = counter + 1;
-    imageIter.next;
+
+for thisImage = 1:numImages
+    imageNameId{thisImage,1} = char(images(thisImage).getName.getValue.getBytes');
+    imageNameId{thisImage,2} = num2str(images(thisImage).getId.getValue);
 end
-numImages = images.size;
+numImages = length(images);
 if numImages > 1
     imageNameId = sortrows(imageNameId);
 end

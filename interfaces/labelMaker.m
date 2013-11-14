@@ -131,7 +131,7 @@ function tSlider_Callback(hObject, eventdata, handles)
 z = round(get(handles.zSlider, 'Value'));
 t = round(get(hObject, 'Value'));
 set(handles.tLabel, 'String', ['T = ' num2str(t)]);
-getPlane(handles, z-1, t-1);
+getPlanes(handles, z-1, t-1);
 refreshDisplay(handles);
 
 
@@ -148,13 +148,14 @@ end
 
 
 
-function getPlane(handles, z, t)
+function getPlanes(handles, z, t)
+global session;
 
-pixelsId = getappdata(handles.labelMaker, 'pixelsId');
+imageId = getappdata(handles.labelMaker, 'imageId');
 pixels = getappdata(handles.labelMaker, 'pixels');
 numC = getappdata(handles.labelMaker, 'numC');
 for thisC = 1:numC
-    plane(:,:,thisC) = getPlaneFromPixelsId(pixelsId, z, thisC-1, t);
+    plane(:,:,thisC) = getPlane(session, imageId, z, thisC-1, t);
 end
 renderedImage = createRenderedImage(plane, pixels);
 imageSize = size(renderedImage);
@@ -210,7 +211,7 @@ function zSlider_Callback(hObject, eventdata, handles)
 z = round(get(hObject, 'Value'));
 t = round(get(handles.tSlider, 'Value'));
 set(handles.zLabel, 'String', ['Z = ' num2str(z)]);
-getPlane(handles, z-1, t-1);
+getPlanes(handles, z-1, t-1);
 refreshDisplay(handles);
 
 
@@ -297,7 +298,7 @@ for thisT = firstT:numT
     set(handles.tSlider, 'Value', thisT);
     set(handles.tLabel, 'String', ['T = ' num2str(thisT)]);
     thisZ = round(get(handles.zSlider, 'Value'));
-    getPlane(handles, thisZ-1, thisT-1)
+    getPlanes(handles, thisZ-1, thisT-1)
     %redrawImage(handles);
     refreshDisplay(handles);
     pause(0.05);
@@ -1034,8 +1035,7 @@ if isempty(theImage)
     return;
 end
 imageId = theImage.getId.getValue;
-pixels = gateway.getPixelsFromImage(imageId);
-pixels = pixels.get(0);
+pixels = theImage.getPrimaryPixels;
 pixelsId = pixels.getId.getValue;
 
 numC = pixels.getSizeC.getValue;
@@ -1069,7 +1069,7 @@ set(handles.tSlider, 'Value', defaultT);
 set(handles.tLabel, 'String', ['T = ' num2str(defaultT)]);
 set(handles.zSlider, 'Value', defaultZ);
 set(handles.zLabel, 'String', ['Z = ' num2str(defaultZ)]);
-getPlane(handles, defaultZ-1, defaultT-1);
+getPlanes(handles, defaultZ-1, defaultT-1);
 
 
 % --------------------------------------------------------------------

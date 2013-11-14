@@ -12,24 +12,25 @@ function [newImage] = createNewImageFromOldPixels(oldImageId, channelList, image
 global session;
 global gateway;
 
-oldPixels = gateway.getPixelsFromImage(oldImageId);
-oldPixelsId = oldPixels.get(0).getId.getValue;
-oldNumChannels = oldPixels.get(0).getSizeC.getValue;
-sizeX = oldPixels.get(0).getSizeX.getValue;
-sizeY = oldPixels.get(0).getSizeY.getValue;
-sizeT = oldPixels.get(0).getSizeT.getValue;
-sizeZ = oldPixels.get(0).getSizeZ.getValue;
+theImage = getImages(session, oldImageId);
+oldPixels = theImage.getPrimaryPixels;
+oldPixelsId = oldPixels.getId.getValue;
+oldNumChannels = oldPixels.getSizeC.getValue;
+sizeX = oldPixels.getSizeX.getValue;
+sizeY = oldPixels.getSizeY.getValue;
+sizeT = oldPixels.getSizeT.getValue;
+sizeZ = oldPixels.getSizeZ.getValue;
 try
-    physSizeX = oldPixels.get(0).getPhysicalSizeX.getValue;
-    physSizeY = oldPixels.get(0).getPhysicalSizeY.getValue;
-    physSizeZ = oldPixels.get(0).getPhysicalSizeZ.getValue;
+    physSizeX = oldPixels.getPhysicalSizeX.getValue;
+    physSizeY = oldPixels.getPhysicalSizeY.getValue;
+    physSizeZ = oldPixels.getPhysicalSizeZ.getValue;
 catch
     physSizeX = 1;
     physSizeY = 1;
     physSizeZ = 1;
 end
 oldPixelsDescription = session.getPixelsService.retrievePixDescription(oldPixelsId);
-oldPixelsType = oldPixels.get(0).getPixelsType.getValue.getValue;
+oldPixelsType = oldPixels.getPixelsType.getValue.getValue;
 oldPixelsType = char(oldPixelsType);
 omeroPixelsType = omero.model.PixelsTypeI;
 if ~isempty(pixelsType)
