@@ -136,7 +136,7 @@ function tSlider_Callback(hObject, eventdata, handles)
 
 t = round(get(hObject, 'Value'));
 set(handles.tLabel, 'String', ['T = ' num2str(t)]);
-getPlane(handles);
+getImagePlane(handles);
 refreshDisplay(handles);
 
 
@@ -964,7 +964,7 @@ if rect(3) < 2 || rect(4) < 2
 end
 
 if zInHand < numZ
-    getPlane(handles);
+    getImagePlane(handles);
     plane = double(getappdata(handles.boxIt, 'currentPlane'));
 end
 zHeight = str2double(get(handles.zHeightText, 'String'));
