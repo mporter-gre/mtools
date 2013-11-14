@@ -1,10 +1,19 @@
-function plane = getPlaneFromImageId(id, z, c, t, gateway)
+function plane = getPlaneFromImageId(imageId, z, c, t)
 
-pixels = gateway.getPixelsFromImage(id);
-pixelsId = pixels.get(0).getId().getValue();
+global gateway;
+
+pixels = gateway.getPixelsFromImage(imageId);
+pixels = pixels.get(0);
+pixelsId = pixels.getId().getValue();
+
 rawPlane = gateway.getPlane(pixelsId, z, c , t);
-rawPlaneTypecast = setMatrixType(rawPlane, char(pixels.get(0).getPixelsType.getValue.getValue));
-plane2D = reshape(rawPlaneTypecast, pixels.get(0).getSizeX.getValue, pixels.get(0).getSizeY.getValue);
-plane = swapbytes(plane2D);
+rawPlaneTypecast = typecastMatrix(rawPlane, char(pixels.getPixelsType.getValue.getValue));
+plane2D = reshape(rawPlaneTypecast, pixels.getSizeX.getValue, pixels.getSizeY.getValue);
+plane = swapbytes(plane2D');
+
+clear('rawPlane');
+clear('rawPlaneTypecast');
+clear('plane2D');
+
 
 end
