@@ -192,7 +192,7 @@ if saveMasks == 1
                 if ~strcmpi(planeType, pixelsType)
                     newPlane = setMatrixType(newPlane, pixelsType);
                 end
-                planeAsBytes = toByteArray(newPlane, pixels);
+                planeAsBytes = toByteArray(newPlane', pixels);
                 store.setPlane(planeAsBytes, thisZ-1, thisC-1, thisT-1);
                 drawnow;
                 currPlane = currPlane + 1;
