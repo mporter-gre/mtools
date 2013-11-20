@@ -1300,6 +1300,14 @@ function nextImageButton_Callback(hObject, eventdata, handles)
 %start.
 global session
 
+modified = getappdata(handles.boxIt, 'modified');
+if modified == 1
+    answer = questdlg([{'The current set of ROIs has been modified.'} {'Discard changes and open a new image?'}], 'Discard Changes?', 'Yes', 'No', 'No');
+    if strcmp(answer, 'No')
+        return;
+    end
+end
+
 %Declaration of the current image ID variables: The image, project and
 %dataset IDs are stored in the application data.
 imageId = getappdata (handles.boxIt, 'imageId');
@@ -1357,6 +1365,14 @@ function prevImageButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global session;
+
+modified = getappdata(handles.boxIt, 'modified');
+if modified == 1
+    answer = questdlg([{'The current set of ROIs has been modified.'} {'Discard changes and open a new image?'}], 'Discard Changes?', 'Yes', 'No', 'No');
+    if strcmp(answer, 'No')
+        return;
+    end
+end
 
 imageId = getappdata (handles.boxIt, 'imageId');
 projectId = getappdata(handles.boxIt, 'projectId');
