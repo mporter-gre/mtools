@@ -68,41 +68,14 @@ setappdata(handles.ImageSegmentation, 'segmentationType', 'Otsu');
 handles.parentHandles = varargin{1};
 handles.credentials = varargin{2};
 guidata(hObject, handles);
-%set(handles.channelSelect, 'String', varargin{1});
-% counter = 1;
-% handles.numConditions = length(varargin{1});
-% for thisCondition = 1:handles.numConditions
-%     numFiles = length(varargin{1}{thisCondition});
-%     for thisFile = 1:numFiles
-%         handles.channelLabel{counter} = varargin{1}{thisCondition}{thisFile};
-%         handles.pixels{counter} = varargin{2}{thisCondition}{thisFile};
-%         handles.roishapeIdx{counter} = varargin{3}{thisCondition}{thisFile};
-%         handles.imageNames{counter} = varargin{4}{thisCondition}{thisFile};
-%         counter = counter + 1;
-%     end
-% end
 
-% handles.numImages = length(handles.imageNames);
-% handles.selectedROI = 1;
-% %Set the first image's segPatches structure
-% numChannels = handles.pixels{1}.getSizeC.getValue;
-% numROI = length(handles.roishapeIdx{1});
-% for thisROI = 1:numROI
-%     segPatches{thisROI}{numChannels} = [];
-%     segmentationType{thisROI}{numChannels} = [];
-% end
-% setappdata(handles.ImageSegmentation, 'segPatches', []);
-% setappdata(handles.ImageSegmentation, 'segmentationType', []);
-% 
+if isemtpy(varargin{3})
 set(handles.imageSelect, 'String', 'Choose datasets from File menu'); %handles.imageNames);
 set(handles.channelSelect, 'String', 'Channel'); %handles.channelLabel{1});
-% 
-% showChannelCheckBoxes(handles);
-% displayLoadingImage(handles);
-% displayImage(handles);
-% drawROIs(handles);
-% segmentROI(handles);
-% guidata(hObject, handles);
+else
+    setappdata(handles.ImageSegmentation, 'selectedDsIds', varargin{3});
+end
+
 uiwait(handles.ImageSegmentation);
 
 
@@ -1054,53 +1027,8 @@ function chooseDatasetsItem_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 datasetChooser(handles, 'ImageSegmentation');
-selectedDsIds = getappdata(handles.ImageSegmentation, 'selectedDsIds');
-if isempty(selectedDsIds)
-    return;
-end
-[images imageIds imageNames datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
-[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
-images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
-imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
-imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
-roiShapes = deleteElementFromCells(imageIdxNoROIs, roiShapes);
-datasetNames = deleteElementFromCells(imageIdxNoROIs, datasetNames);
-numImages = images.size;
+setAnalysisQueue(handles);
 
-if numImages == 0
-    errordlg('No images with ROIs found.', 'No Images');
-    return;
-end
-
-%Sort the ROIShapes by Z
-for thisImage = 1:numImages
-    numROI = length(roiShapes{thisImage});
-    for thisROI = 1:numROI
-        roiShapes{thisImage}{thisROI} = sortROIShapes(roiShapes{thisImage}{thisROI}, 'byZ');
-    end
-end
-
-for thisImage = 1:numImages
-    theImage = images.get(thisImage-1);
-    pixels{thisImage} = theImage.getPixels(0);
-    channelLabels{thisImage} = getChannelsFromPixels(pixels{thisImage});
-end
-
-set(handles.imageSelect, 'Value', 1);
-set(handles.imageSelect, 'String', imageNames);
-set(handles.channelSelect, 'Value', 1);
-set(handles.channelSelect, 'String', channelLabels{1});
-set(handles.channelSelect, 'Enable', 'on');
-setappdata(handles.ImageSegmentation, 'imageIds', imageIds);
-setappdata(handles.ImageSegmentation, 'imageNames', imageNames);
-setappdata(handles.ImageSegmentation, 'roiShapes', roiShapes);
-setappdata(handles.ImageSegmentation, 'channelLabels', channelLabels);
-setappdata(handles.ImageSegmentation, 'pixels', pixels);
-setappdata(handles.ImageSegmentation, 'datasetNames', datasetNames);
-handles.selectedROI = 1;
-guidata(hObject, handles);
-%Make the first image load...
-imageSelect_Callback(handles.imageSelect, eventdata, handles);
 
 
 % --- Executes on button press in previewButton.
@@ -1224,3 +1152,55 @@ function gapText_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+function setAnalysisQueue(handles)
+
+selectedDsIds = getappdata(handles.ImageSegmentation, 'selectedDsIds');
+if isempty(selectedDsIds)
+    return;
+end
+[images, imageIds, imageNames, datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
+[imageIdxNoROIs, roiShapes] = ROIImageCheck(imageIds);
+images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
+imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
+imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
+roiShapes = deleteElementFromCells(imageIdxNoROIs, roiShapes);
+datasetNames = deleteElementFromCells(imageIdxNoROIs, datasetNames);
+numImages = images.size;
+
+if numImages == 0
+    errordlg('No images with ROIs found.', 'No Images');
+    return;
+end
+
+%Sort the ROIShapes by Z
+for thisImage = 1:numImages
+    numROI = length(roiShapes{thisImage});
+    for thisROI = 1:numROI
+        roiShapes{thisImage}{thisROI} = sortROIShapes(roiShapes{thisImage}{thisROI}, 'byZ');
+    end
+end
+
+for thisImage = 1:numImages
+    theImage = images.get(thisImage-1);
+    pixels{thisImage} = theImage.getPixels(0);
+    channelLabels{thisImage} = getChannelsFromPixels(pixels{thisImage});
+end
+
+set(handles.imageSelect, 'Value', 1);
+set(handles.imageSelect, 'String', imageNames);
+set(handles.channelSelect, 'Value', 1);
+set(handles.channelSelect, 'String', channelLabels{1});
+set(handles.channelSelect, 'Enable', 'on');
+setappdata(handles.ImageSegmentation, 'imageIds', imageIds);
+setappdata(handles.ImageSegmentation, 'imageNames', imageNames);
+setappdata(handles.ImageSegmentation, 'roiShapes', roiShapes);
+setappdata(handles.ImageSegmentation, 'channelLabels', channelLabels);
+setappdata(handles.ImageSegmentation, 'pixels', pixels);
+setappdata(handles.ImageSegmentation, 'datasetNames', datasetNames);
+handles.selectedROI = 1;
+guidata(hObject, handles);
+%Make the first image load...
+imageSelect_Callback(handles.imageSelect, eventdata, handles);
+

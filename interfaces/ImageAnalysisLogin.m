@@ -55,6 +55,31 @@ function ImageAnalysisLogin_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for ImageAnalysisLogin
 handles.output = hObject;
 
+numArgs = nargin-3;
+if numArgs > 0
+    global session;
+    
+    [sessionId, server, tool, datatype, ids] = parseVarargin(varargin);
+    
+    %Please remove this!!!
+    props = java.util.Properties();
+    props.setProperty('omero.host', 'nightshade.openmicroscopy.org.uk');
+    props.setProperty('omero.user', 'mike');
+    props.setProperty('omero.pass', 'Homer');
+    props.setProperty('omero.port', '4064');
+    props.setProperty('omero.keep_alive', '60');
+    [client, session] = connectOmero(props);
+
+%     client = javaObject('omero.client', server);
+%     session = client.getSession(sessionId);
+    credentials = credentialsFromSession(session);
+    
+    if strcmpi(tool, 'intensityAnalysis')
+        intensityMeasureLaunchpad(handles, credentials, ids);
+    end
+    
+end
+
 password = '';
 setappdata(hObject,'passData',password);
 %Set the key press function of the password box for **** insertion.
@@ -191,7 +216,7 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-intensityMeasureLaunchpad(handles, credentials);
+intensityMeasureLaunchpad(handles, credentials, []);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
