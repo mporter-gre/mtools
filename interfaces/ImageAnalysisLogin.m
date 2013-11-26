@@ -55,6 +55,7 @@ function ImageAnalysisLogin_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for ImageAnalysisLogin
 handles.output = hObject;
 
+handles.exitApplication = 0;
 numArgs = nargin-3;
 if numArgs > 0
     global session;
@@ -64,8 +65,8 @@ if numArgs > 0
     %Please remove this!!!
     props = java.util.Properties();
     props.setProperty('omero.host', 'nightshade.openmicroscopy.org.uk');
-    props.setProperty('omero.user', 'mike');
-    props.setProperty('omero.pass', 'Homer');
+    props.setProperty('omero.user', '*****');
+    props.setProperty('omero.pass', '*****');
     props.setProperty('omero.port', '4064');
     props.setProperty('omero.keep_alive', '60');
     [client, session] = connectOmero(props);
@@ -75,7 +76,10 @@ if numArgs > 0
     credentials = credentialsFromSession(session);
     
     if strcmpi(tool, 'intensityAnalysis')
-        intensityMeasureLaunchpad(handles, credentials, ids);
+        set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+        handles.exitApplication = 1;
+        guidata(hObject, handles);
+        intensityMeasureLaunchpad(handles, credentials, str2double(ids));
     end
     
 end
@@ -106,8 +110,11 @@ function varargout = ImageAnalysisLogin_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-gatewayDisconnect;
+userLogoutOmero;
 varargout{1} = handles.output;
+if (isfield(handles,'exitApplication') && handles.exitApplication == 1)
+      closeReqFcn(hObject, eventdata, handles);
+end
 
 
 
@@ -415,7 +422,7 @@ end
 
 function closeReqFcn(hObject, eventdata, handles)
 
-gatewayDisconnect;
+%userLogoutOmero;
 delete(handles.ImageAnalysisLoginWindow);
 
 

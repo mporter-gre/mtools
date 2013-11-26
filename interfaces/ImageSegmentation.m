@@ -67,16 +67,22 @@ setappdata(handles.ImageSegmentation, 'segmentationType', 'Otsu');
 
 handles.parentHandles = varargin{1};
 handles.credentials = varargin{2};
+ids = varargin{3};
 guidata(hObject, handles);
 
-if isemtpy(varargin{3})
-set(handles.imageSelect, 'String', 'Choose datasets from File menu'); %handles.imageNames);
-set(handles.channelSelect, 'String', 'Channel'); %handles.channelLabel{1});
+if isempty(ids)
+    set(handles.imageSelect, 'String', 'Choose datasets from File menu'); %handles.imageNames);
+    set(handles.channelSelect, 'String', 'Channel'); %handles.channelLabel{1});
+    uiwait(handles.ImageSegmentation);
 else
-    setappdata(handles.ImageSegmentation, 'selectedDsIds', varargin{3});
+    setappdata(handles.ImageSegmentation, 'selectedDsIds', ids);
+    setAnalysisQueue(handles)
+    imageSelect_Callback(handles.imageSelect, eventdata, handles);
+    uiwait(handles.ImageSegmentation);
 end
 
-uiwait(handles.ImageSegmentation);
+
+
 
 
 % UIWAIT makes ImageSegmentation wait for user response (see UIRESUME)
@@ -194,6 +200,7 @@ showChannelCheckBoxes(handles);
 segmentROI(handles);
 drawROIs(handles);
 guidata(hObject, handles);
+
 
 
 % Hints: contents = get(hObject,'String') returns imageSelect contents as cell array
@@ -442,7 +449,7 @@ selectedZ = round(get(hObject, 'Value'));
 set(hObject, 'Value', selectedZ);
 set(handles.zLabel, 'String', ['Z = ' num2str(selectedZ)]);
 selectedChannel = get(handles.channelSelect, 'Value');
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 axes(handles.segAxes)
 groupObjects = get(handles.groupObjectsRadio, 'Value');
 if groupObjects == 0
@@ -615,7 +622,7 @@ function drawROIs(handles)
 %their areas.
 
 selectedImageIdx = get(handles.imageSelect, 'Value');
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 roiShapes = getappdata(handles.ImageSegmentation, 'roiShapes');
 penTablet = getappdata(handles.ImageSegmentation, 'penTablet');
 numROI = length(roiShapes{selectedImageIdx});
@@ -713,7 +720,7 @@ global session
 disableControls(handles);
 segPatches = getappdata(handles.ImageSegmentation, 'segPatches');
 selectedImageIdx = get(handles.imageSelect, 'Value');
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 selectedChannel = get(handles.channelSelect, 'Value')-1;
 featherSize = str2double(get(handles.featherText, 'String'));
 minSize = str2double(get(handles.minSizeText, 'String'));
@@ -886,7 +893,7 @@ if strcmp(isEnabled, 'on')
     selectedROI = penTablet(Y,X);
     if selectedROI ~= 0
         displayLoadingImage(handles);
-        handles.selectedROI = selectedROI;
+        setappdata(handles.ImageSegmentation, 'selectedROI', selectedROI);
         guidata(hObject, handles);
         drawROIs(handles);
         drawnow;
@@ -932,7 +939,7 @@ drawnow
 
 function groupObjectsRadio_Callback(hObject, eventdata, handles)
 
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 selectedChannel = get(handles.channelSelect, 'Value');
 selectedZ = round(get(handles.zSlider, 'Value'));
 segPatches = getappdata(handles.ImageSegmentation, 'segPatches');
@@ -942,7 +949,7 @@ handles.segHandle = imshow(segPatches{selectedROI}{selectedChannel}(:,:,selected
 
 function separateObjectsRadio_Callback(hObject, eventdata, handles)
 
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 selectedChannel = get(handles.channelSelect, 'Value');
 selectedZ = round(get(handles.zSlider, 'Value'));
 segPatches = getappdata(handles.ImageSegmentation, 'segPatches');
@@ -952,7 +959,7 @@ handles.segHandle = imshow(segPatches{selectedROI}{selectedChannel}(:,:,selected
 
 function updateThresholdSlider(handles)
 
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 selectedChannel = get(handles.channelSelect, 'Value');
 textThreshold = str2double(get(handles.thresholdText, 'String'));
 patchMax = getappdata(handles.ImageSegmentation, 'patchMax');
@@ -975,7 +982,7 @@ set(handles.thresholdSlider, 'SliderStep', [thresholdStep, thresholdStep*4]);
 
 function resegment(handles)
 segPatches = getappdata(handles.ImageSegmentation, 'segPatches');
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 selectedChannel = get(handles.channelSelect, 'Value');
 segPatches{selectedROI}{selectedChannel} = [];
 setappdata(handles.ImageSegmentation, 'segPatches', segPatches);
@@ -1028,6 +1035,7 @@ function chooseDatasetsItem_Callback(hObject, eventdata, handles)
 
 datasetChooser(handles, 'ImageSegmentation');
 setAnalysisQueue(handles);
+imageSelect_Callback(handles.imageSelect, eventdata, handles);
 
 
 
@@ -1040,7 +1048,7 @@ function previewButton_Callback(hObject, eventdata, handles)
 %Delete the current segmentation from segPatches, and re-run segmentROI
 displayLoadingImage(handles);
 segPatches = getappdata(handles.ImageSegmentation, 'segPatches');
-selectedROI = handles.selectedROI;
+selectedROI = getappdata(handles.ImageSegmentation, 'selectedROI');
 selectedChannel = get(handles.channelSelect, 'Value');
 segPatches{selectedROI}{selectedChannel} = [];
 setappdata(handles.ImageSegmentation, 'segPatches', segPatches);
@@ -1199,8 +1207,7 @@ setappdata(handles.ImageSegmentation, 'roiShapes', roiShapes);
 setappdata(handles.ImageSegmentation, 'channelLabels', channelLabels);
 setappdata(handles.ImageSegmentation, 'pixels', pixels);
 setappdata(handles.ImageSegmentation, 'datasetNames', datasetNames);
-handles.selectedROI = 1;
-guidata(hObject, handles);
-%Make the first image load...
-imageSelect_Callback(handles.imageSelect, eventdata, handles);
+setappdata(handles.ImageSegmentation, 'selectedROI', 1);
+guidata(handles.ImageSegmentation, handles);
+
 
