@@ -62,7 +62,7 @@ handles.credentials = varargin{2};
 datasetChooser(handles, 'distanceMeasureLaunchpad');
 selectedDsIds = getappdata(handles.distanceMeasureLaunchpad, 'selectedDsIds');
 [images imageIds imageNames datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
-[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
+[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds, 'rect');
 images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
 imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
 imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);

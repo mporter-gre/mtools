@@ -178,7 +178,7 @@ function beginButton_Callback(hObject, eventdata, handles)
 
 selectedDsIds = getappdata(handles.eventTimer, 'selectedDsIds');
 [images imageIds imageNames datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
-[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
+[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds, 'rect');
 images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
 imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
 imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
