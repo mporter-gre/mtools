@@ -110,7 +110,10 @@ function varargout = ImageAnalysisLogin_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-userLogoutOmero;
+try
+    userLogoutOmero;
+catch ME
+end
 varargout{1} = handles.output;
 if (isfield(handles,'exitApplication') && handles.exitApplication == 1)
       closeReqFcn(hObject, eventdata, handles);

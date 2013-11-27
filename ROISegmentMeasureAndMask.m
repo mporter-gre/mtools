@@ -86,7 +86,7 @@ for thisROI = 1:numROI
         end
 
         for thisZ = 1:numZ(thisROI)
-            if fix(cropPatch) == 1
+            if floor(cropPatch) == 1
                 for col = 1:width
                     posX = col+X-1;
                     if posX > maxX  %If the ROI was drawn to extend off the image, set the crop to the edge of the image only.
