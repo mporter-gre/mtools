@@ -649,6 +649,9 @@ numROI = length(roiShapes{selectedImageIdx});
 axes(handles.imageAxes);
 
 for thisROI = 1:numROI
+%     if ~strcmpi(roiShapes{selectedImageIdx}{thisROI}.shapeType, 'rect')
+%         continue;
+%     end
     X = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getX.getValue);
     Y = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getY.getValue);
     
@@ -1059,7 +1062,7 @@ if isempty(selectedDsIds)
     return;
 end
 [images imageIds imageNames datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
-[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
+[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds, 'rect');
 images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
 imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
 imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
