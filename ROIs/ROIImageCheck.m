@@ -2,7 +2,7 @@ function [imageIdxNoROI roiShapes] = ROIImageCheck(imageIds, varargin)
 %Collects ROIs for a vector of imageIds and returns indices of those
 %without ROIs for removal from other lists. To filter for only specific
 %types of ROI, list them in varargin. Choices are: 'line', 'ellipse',
-%'rect'.
+%'rect' etc.
 
 
 
