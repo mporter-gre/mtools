@@ -61,6 +61,7 @@ segmentationType = [];
 patchMax = [];
 lowestValue = [];
 handles.loadingImage = importdata('loadingImage.JPG');
+handles.selectDatasetsImage = importdata('selectDatasets.tif');
 setappdata(handles.ImageSegmentation, 'patchMax', patchMax);
 setappdata(handles.ImageSegmentation, 'lowestValue', lowestValue);
 setappdata(handles.ImageSegmentation, 'segmentationType', 'Otsu');
@@ -94,7 +95,7 @@ guidata(hObject, handles);
 % setappdata(handles.ImageSegmentation, 'segPatches', []);
 % setappdata(handles.ImageSegmentation, 'segmentationType', []);
 % 
-set(handles.imageSelect, 'String', 'Choose datasets from File menu'); %handles.imageNames);
+%set(handles.imageSelect, 'String', 'Choose datasets from File menu'); %handles.imageNames);
 set(handles.channelSelect, 'String', 'Channel'); %handles.channelLabel{1});
 % 
 % showChannelCheckBoxes(handles);
@@ -103,6 +104,12 @@ set(handles.channelSelect, 'String', 'Channel'); %handles.channelLabel{1});
 % drawROIs(handles);
 % segmentROI(handles);
 % guidata(hObject, handles);
+axes(handles.imageAxes);
+imshow(handles.selectDatasetsImage);
+drawnow;
+axes(handles.segAxes);
+imshow(handles.selectDatasetsImage);
+drawnow;
 uiwait(handles.ImageSegmentation);
 
 
@@ -1091,6 +1098,7 @@ end
 
 set(handles.imageSelect, 'Value', 1);
 set(handles.imageSelect, 'String', imageNames);
+set(handles.imageSelect, 'Enable', 'on');
 set(handles.channelSelect, 'Value', 1);
 set(handles.channelSelect, 'String', channelLabels{1});
 set(handles.channelSelect, 'Enable', 'on');
