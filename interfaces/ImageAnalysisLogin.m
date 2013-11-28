@@ -60,7 +60,7 @@ numArgs = nargin-3;
 if numArgs > 0
     global session;
     
-    [sessionId, server, tool, datatype, ids] = parseVarargin(varargin);
+    [sessionId, server, port, workflow, datatype, ids] = parseVarargin(varargin);
     
     %Please remove this!!!
     props = java.util.Properties();
@@ -75,7 +75,7 @@ if numArgs > 0
 %     session = client.getSession(sessionId);
     credentials = credentialsFromSession(session);
     
-    if strcmpi(tool, 'intensityAnalysis')
+    if strcmpi(workflow, 'intensityAnalysis')
         set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
         handles.exitApplication = 1;
         guidata(hObject, handles);
