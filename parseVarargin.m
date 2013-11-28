@@ -2,7 +2,7 @@ function [sessionId, server, port, workflow, datatype, ids] = parseVarargin(vara
 varargin = varargin{1};
 numArgs = length(varargin);
 
-sessionIdFind = strfind(varargin, '--sid');
+sessionIdFind = strfind(varargin, '-k');
 sessionIdIdx = findIndex(sessionIdFind) + 1;
 portFind = strfind(varargin, '-p');
 portIdx = findIndex(portFind) + 1;
