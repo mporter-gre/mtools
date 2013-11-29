@@ -65,8 +65,8 @@ if numArgs > 0
     %Please remove this!!!
     props = java.util.Properties();
     props.setProperty('omero.host', 'nightshade.openmicroscopy.org.uk');
-    props.setProperty('omero.user', '*****');
-    props.setProperty('omero.pass', '*****');
+    props.setProperty('omero.user', 'mike');
+    props.setProperty('omero.pass', 'Homer');
     props.setProperty('omero.port', '4064');
     props.setProperty('omero.keep_alive', '60');
     [client, session] = connectOmero(props);
@@ -75,12 +75,21 @@ if numArgs > 0
 %     session = client.getSession(sessionId);
     credentials = credentialsFromSession(session);
     
-    if strcmpi(workflow, 'intensityAnalysis')
-        set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-        handles.exitApplication = 1;
-        guidata(hObject, handles);
-        intensityMeasureLaunchpad(handles, credentials, str2double(ids));
+    switch workflow
+        case 'intensityanalysis'
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            intensityMeasureLaunchpad(handles, credentials, str2double(ids));
+        
+        case 'boxit'
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            boxIt(handles, credentials, str2double(ids));
     end
+    
+    
     
 end
 

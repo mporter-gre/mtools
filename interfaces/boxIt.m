@@ -53,7 +53,7 @@ function boxIt_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to boxit (see VARARGIN)
 
-global gateway;
+global session;
 warning off MATLAB:xlswrite:NoCOMServer
 %Set up the play and pause buttons
 startImage = imread('startImageImage.jpg', 'jpg');
@@ -107,6 +107,16 @@ setZControls(handles);
 
 % Update handles structure
 guidata(hObject, handles);
+
+imageId = varargin{3};
+
+if ~isempty(imageId)
+    theImage = getImages(session, imageId);
+    setappdata(handles.boxIt, 'imageId', imageId);
+    setappdata(handles.boxIt, 'theImage', theImage);
+    loadNewImage(handles);
+    uiwait(handles.boxIt);
+end
 
 % UIWAIT makes boxit wait for user response (see UIRESUME)
 uiwait(handles.boxIt);
