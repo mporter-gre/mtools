@@ -38,7 +38,7 @@ for thisROI = 1:numROI
         set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
         drawnow;
         baseZ = roiShapes{thisROI}.shape1.getTheZ.getValue;
-        numZ(thisROI) = length(roiShapesThisT);
+        numZ(thisROI) = length(roiShapesThisT{1}.numShapes);
         maxX = pixels.getSizeX.getValue;
         maxY = pixels.getSizeY.getValue;
         width = roiShapes{thisROI}.shape1.getWidth.getValue;
@@ -59,12 +59,12 @@ for thisROI = 1:numROI
         %the correct range of Z-sections. If there is only 1 Z or there is nothing segmented
         %then just use it.
         maxPatch = max(max(max(patchMasks)));
-        if numZ(thisROI) > 1 && maxPatch > 0
+        if numZthisT > 1 && maxPatch > 0
             if verifyZ == 1
                 [startZ, stopZ] = zChooser(patchMasks);
             else
                 startZ = 1;
-                stopZ = numZ(thisROI);
+                stopZ = numZthisT-1;
             end
         else
             startZ = 1;

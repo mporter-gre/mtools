@@ -61,7 +61,7 @@ segmentationType = [];
 patchMax = [];
 lowestValue = [];
 handles.loadingImage = importdata('loadingImage.JPG');
-%handles.selectDatasetsImage = importdata('selectDatasets.tif');
+%handles.selectDatasetsImage = importdata('selectDatasets.png');
 handles.selectDatasetsImage = importdata('loadingImage.JPG');
 setappdata(handles.ImageSegmentation, 'patchMax', patchMax);
 setappdata(handles.ImageSegmentation, 'lowestValue', lowestValue);
