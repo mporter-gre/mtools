@@ -1,4 +1,4 @@
-function [roiShapes, fullMaskImg, data, dataAround, objectData, objectDataAround numSegPixels measureSegChannel] = ROISegmentMeasureAndMask(roiShapes, pixels, measureChannels, measureAroundChannels, segChannel, verifyZ, featherSize, groupObjects, minSize, selectedSegType, threshold, channelsToFetch, numROI, annulusSize, gapSize)
+function [roiShapes, fullMaskImg, data, dataAround, objectCounter, objectData, objectDataAround, numSegPixels, measureSegChannel] = ROISegmentMeasureAndMask(roiShapes, pixels, measureChannels, measureAroundChannels, segChannel, verifyZ, featherSize, groupObjects, minSize, selectedSegType, threshold, channelsToFetch, numROI, annulusSize, gapSize)
 %Author Michael Porter
 %Copyright 2009 University of Dundee. All rights reserved
 
@@ -14,6 +14,7 @@ fullT = pixels.getSizeT.getValue;
 for thisFullT = 1:fullT
     fullMaskImg{thisFullT} = uint8(zeros(maxY,maxX,fullZ));
 end
+
 %numChannels = length(patches);
 %numROI = length(patches{segChannel});
 
@@ -177,14 +178,15 @@ for thisROI = 1:numROI
                 if groupObjects == 0
                     [row, col, objectValues] = find(unique(patchMasks));
                     numObjects = length(objectValues);
-                    roiShapes{thisROI}.numObjects = numObjects;
+                    objectCounter{thisROI}{thisT}.numObjects = numObjects;
+                    %roiShapes{thisROI}{thisT}.numObjects = numObjects;
                     %If there are no segmented pixels per object enter zero.
                     if isempty(objectValues)
-                        objectData{thisROI}{1}{counter}.sumPix = 0;
-                        objectData{thisROI}{1}{counter}.numPix = 0;
-                        objectData{thisROI}{1}{counter}.meanPix = 0;
-                        objectData{thisROI}{1}{counter}.stdPix = 0;
-                        objectData{thisROI}{1}{counter}.channel = thisMeasureChannel;
+                        objectData{thisROI}{thisT}{1}{counter}.sumPix = 0;
+                        objectData{thisROI}{thisT}{1}{counter}.numPix = 0;
+                        objectData{thisROI}{thisT}{1}{counter}.meanPix = 0;
+                        objectData{thisROI}{thisT}{1}{counter}.stdPix = 0;
+                        objectData{thisROI}{thisT}{1}{counter}.channel = thisMeasureChannel;
                     else
                         objectIntensityVector = {};
                         for thisObject = 1:numObjects
@@ -198,7 +200,8 @@ for thisROI = 1:numROI
                     end
                 else
                     objectData = [];
-                    roiShapes{thisROI}.numObjects = 1;
+                    %roiShapes{thisROI}.numObjects = 1;
+                    objectCounter{thisROI}{thisT}.numObjects = 1;
                 end
                 
                 counter = counter + 1;

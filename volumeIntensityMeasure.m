@@ -1,4 +1,4 @@
-function [roiShapes measureSegChannel data dataAround objectData objectDataAround segChannel groupObjects numSegPixels] = volumeIntensityMeasure(handles, segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageId, imageName, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize)
+function [roiShapes, measureSegChannel, data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels] = volumeIntensityMeasure(handles, segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageId, imageName, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize)
 %Author Michael Porter
 %Copyright 2009 University of Dundee. All rights reserved
 
@@ -18,7 +18,7 @@ channelsToFetch = unique([measureChannels measureAroundChannels]);
 %it back to the server. Use segmented patches, also calculated here.
 
 drawnow;
-[roiShapes, fullMaskImg, data, dataAround, objectData, objectDataAround, numSegPixels, measureSegChannel] = ROISegmentMeasureAndMask(roiShapes, pixels, measureChannels, measureAroundChannels, segChannel, verifyZ, featherSize, groupObjects, minSize, selectedSegType, threshold, channelsToFetch, numROI, annulusSize, gapSize);
+[roiShapes, fullMaskImg, data, dataAround, objectCounter, objectData, objectDataAround, numSegPixels, measureSegChannel] = ROISegmentMeasureAndMask(roiShapes, pixels, measureChannels, measureAroundChannels, segChannel, verifyZ, featherSize, groupObjects, minSize, selectedSegType, threshold, channelsToFetch, numROI, annulusSize, gapSize);
 
 
 %Use only a single channel and time point for the fullMaskImage upload.
@@ -43,8 +43,8 @@ if saveMasks == 1
 
     for thisT = 1:length(fullMaskImg)
         for thisZ = 1:length(fullMaskImg{thisT}(1,1,:))
-            planeAsBytes = toByteArray(fullMaskImg(:,:,thisZ)', newPixels);
-            store.setPlane(planeAsBytes, thisZ-1, 0, 0);
+            planeAsBytes = toByteArray(fullMaskImg{thisT}(:,:,thisZ)', newPixels);
+            store.setPlane(planeAsBytes, thisZ-1, 0, thisT-1);
         end
     end
     store.save();

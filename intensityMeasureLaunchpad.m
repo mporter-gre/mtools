@@ -11,15 +11,15 @@ progBar = waitbar(0, 'Analysing image');
 
 for thisImage = 1:numImages
     waitbar(thisImage/numImages, progBar, ['Analysing image ' num2str(thisImage) ' of ' num2str(numImages)]);
-    [roiShapes{thisImage} measureSegChannel data{thisImage} dataAround{thisImage} objectData{thisImage} objectDataAround{thisImage} segChannel groupObjects numSegPixels{thisImage}] = volumeIntensityMeasure(handles, segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds(thisImage), imageNames{thisImage}, roiShapes{thisImage}, channelLabels, pixels{thisImage}, datasetNames, annulusSize, gapSize);
+    [roiShapes{thisImage}, measureSegChannel, data{thisImage}, dataAround{thisImage}, objectCounter{thisImage}, objectData{thisImage}, objectDataAround{thisImage}, segChannel, groupObjects, numSegPixels{thisImage}] = volumeIntensityMeasure(handles, segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds(thisImage), imageNames{thisImage}, roiShapes{thisImage}, channelLabels, pixels{thisImage}, datasetNames, annulusSize, gapSize);
 end
 close(progBar);
 
-writeDataOut(data, dataAround, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize);
+writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize);
 
 
 
-function writeDataOut(data, dataAround, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize)
+function writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize)
 
 %Find the maximum number of channels needing written out.
 maxChannels = 0;
@@ -103,7 +103,7 @@ for thisImage = 1:numImages
             dataOut1 = [];
             dataOut2 = [];
             dataAroundOut2 = [];
-            dataOut1 = [dataOut1 {roiShapes{thisImage}{thisROI}.origName roiShapes{thisImage}{thisROI}.name datasetNames{thisImage} num2str(thisROI) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} roiShapes{thisImage}{thisROI}.numObjects numSegPixels{thisImage}{thisROI}}];
+            dataOut1 = [dataOut1 {roiShapes{thisImage}{thisROI}.origName roiShapes{thisImage}{thisROI}.name datasetNames{thisImage} num2str(thisROI) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} objectCounter{thisImage}{thisROI}{thisT}.numObjects numSegPixels{thisImage}{thisROI}}];
             if numMeasureChannels > 0
                 for thisChannel = 1:numMeasureChannels
                     dataOut2 = [dataOut2 {data{thisImage}{thisROI}{thisT}{thisChannel}.sumPix data{thisImage}{thisROI}{thisT}{thisChannel}.meanPix data{thisImage}{thisROI}{thisT}{thisChannel}.stdPix}];
@@ -162,7 +162,7 @@ for thisImage = 1:numImages
                 
                 if numMeasureAroundChannels > 0 && annulusSize > 0
                     for thisAroundHeader = 1:numMeasureAroundChannels
-                        thisChannelAroundName = num2str(channelLabels{thisImage}{dataAround{thisImage}{thisROI}{thisAroundHeader}.channel});
+                        thisChannelAroundName = num2str(channelLabels{thisImage}{dataAround{thisImage}{thisROI}{thisT}{thisAroundHeader}.channel});
                         thisChannelsAroundHeader = [thisChannelsAroundHeader {['Summed Intensity ', num2str(annulusSize), 'px annulus Ch ', thisChannelAroundName], ['Mean Intensity ', num2str(annulusSize), 'px annulus Ch ', thisChannelAroundName], ['Standard Deviation ', num2str(annulusSize), 'px annulus Ch ', thisChannelAroundName], ['Number Pixels In Annulus ', thisChannelAroundName]}];
                     end
                     if numMeasureAroundChannels < maxAroundChannels
@@ -174,7 +174,7 @@ for thisImage = 1:numImages
                 
                 if numMeasureChannels > 0
                     %numObjects = length(objectData{thisImage}{thisROI}{thisChannel});
-                    numObjects = roiShapes{thisImage}{thisROI}.numObjects;
+                    numObjects = objectCounter{thisImage}{thisROI}{thisT}.numObjects;
                     objectDataOut1 = [];
                     for thisObject = 1:numObjects
                         %numMeasureChannels = length(objectData{thisImage}{thisROI}{thisObject}{thisChannel});
