@@ -3,6 +3,7 @@ function intensityMeasureLaunchpad(handles, credentials)
 try
     [segChannel measureChannels measureAroundChannels featherSize saveMasks verifyZ groupObjects minSize selectedSegType threshold imageIds imageNames roiShapes channelLabels pixels datasetNames annulusSize gapSize] = ImageSegmentation(handles, credentials);
 catch ME
+    throw(ME)
     return;
 end
 numImages = length(roiShapes);
@@ -29,18 +30,18 @@ numImages = length(imageNames);
 for thisImage = 1:numImages
     numROI = length(roiShapes{thisImage});
     for thisROI = 1:numROI
-        thisChannel = length(data{thisImage}{thisROI}{1});
+        thisChannel = length(data{thisImage}{thisROI}{1}{1});
         if thisChannel > maxChannels
             maxChannels = thisChannel;
         end
-        thisAroundChannel = length(dataAround{thisImage}{thisROI}{1});
+        thisAroundChannel = length(dataAround{thisImage}{thisROI}{1}{1});
         if thisAroundChannel > maxAroundChannels
             maxAroundChannels = thisAroundChannel;
         end
     end
 end
 
-mainHeader = {'Original Image', 'Mask Image', 'Dataset', 'ROI', 'Channel Segmented', 'Number Objects', 'Number Pixels'};
+mainHeader = {'Original Image', 'Mask Image', 'Dataset', 'ROI', 'Time Point', 'Channel Segmented', 'Number Objects', 'Number Pixels'};
 partEmptyLine = {' ',' ',' ',' ',' ',' ',' '};
 dataOut = [];
 objectDataOut = [];
@@ -48,28 +49,31 @@ objectDataOut = [];
 for thisImage = 1:numImages
     numROI = length(roiShapes{thisImage});
     for thisROI = 1:numROI
-        %Output is variable in number of columns. Do the sums...
-        %numROI = length(ROIIdx{thisImage}{thisROI});
-        if ~isempty(data{thisImage}{thisROI}{1}.channel)
-            numMeasureChannels = length(data{thisImage}{thisROI});
-        else
-            numMeasureChannels = 0;
-        end
-        if ~isempty(dataAround{thisImage}{thisROI}{1}.channel)
-            numMeasureAroundChannels = length(dataAround{thisImage}{thisROI});
-        else
-            numMeasureAroundChannels = 0;
-        end
-        
-        %Write a header line for each image
-        dataOut3 = [];
-        emptyLine = [];
-        %for thisROI = 1:numROI
+        timePoints = getROITimePoints(roiShapes{thisImage}{thisROI});
+        numT = length(timePoints);
+        for thisT = 1:numT
+            %Output is variable in number of columns. Do the sums...
+            %numROI = length(ROIIdx{thisImage}{thisROI});
+            if ~isempty(data{thisImage}{thisROI}{1}{1}.channel)
+                numMeasureChannels = length(data{thisImage}{thisROI}{1});
+            else
+                numMeasureChannels = 0;
+            end
+            if ~isempty(dataAround{thisImage}{thisROI}{1}{1}.channel)
+                numMeasureAroundChannels = length(dataAround{thisImage}{thisROI}{1});
+            else
+                numMeasureAroundChannels = 0;
+            end
+            
+            %Write a header line for each image
+            dataOut3 = [];
+            emptyLine = [];
+            %for thisROI = 1:numROI
             thisChannelsHeader = [];
             thisChannelsAroundHeader = [];
             if numMeasureChannels > 0
                 for thisHeader = 1:numMeasureChannels
-                    thisChannelName = num2str(channelLabels{thisImage}{data{thisImage}{thisROI}{thisHeader}.channel});
+                    thisChannelName = num2str(channelLabels{thisImage}{data{thisImage}{thisROI}{1}{thisHeader}.channel});
                     thisChannelsHeader = [thisChannelsHeader {['Summed Intensity Ch ', thisChannelName], ['Mean Intensity Ch ', thisChannelName], ['Standard Deviation Ch ', thisChannelName]}];
                 end
                 if numMeasureChannels < maxChannels
@@ -78,10 +82,10 @@ for thisImage = 1:numImages
                     end
                 end
             end
-
+            
             if numMeasureAroundChannels > 0
                 for thisAroundHeader = 1:numMeasureAroundChannels
-                    thisChannelAroundName = num2str(channelLabels{thisImage}{dataAround{thisImage}{thisROI}{thisAroundHeader}.channel});
+                    thisChannelAroundName = num2str(channelLabels{thisImage}{dataAround{thisImage}{thisROI}{thisT}{thisAroundHeader}.channel});
                     if annulusSize > 0
                         thisChannelsAroundHeader = [thisChannelsAroundHeader {['Summed Intensity ', num2str(annulusSize), 'px annulus Ch ', thisChannelAroundName], ['Mean Intensity ', num2str(annulusSize), 'px annulus Ch ', thisChannelAroundName], ['Standard Deviation ', num2str(annulusSize), 'px annulus Ch ', thisChannelAroundName], ['Number Pixels In Annulus ', thisChannelAroundName]}];
                     else
@@ -99,10 +103,10 @@ for thisImage = 1:numImages
             dataOut1 = [];
             dataOut2 = [];
             dataAroundOut2 = [];
-            dataOut1 = [dataOut1 {roiShapes{thisImage}{thisROI}.origName roiShapes{thisImage}{thisROI}.name datasetNames{thisImage} num2str(thisROI) channelLabels{thisImage}{segChannel} roiShapes{thisImage}{thisROI}.numObjects numSegPixels{thisImage}{thisROI}}];
+            dataOut1 = [dataOut1 {roiShapes{thisImage}{thisROI}.origName roiShapes{thisImage}{thisROI}.name datasetNames{thisImage} num2str(thisROI) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} roiShapes{thisImage}{thisROI}.numObjects numSegPixels{thisImage}{thisROI}}];
             if numMeasureChannels > 0
                 for thisChannel = 1:numMeasureChannels
-                    dataOut2 = [dataOut2 {data{thisImage}{thisROI}{thisChannel}.sumPix data{thisImage}{thisROI}{thisChannel}.meanPix data{thisImage}{thisROI}{thisChannel}.stdPix}];
+                    dataOut2 = [dataOut2 {data{thisImage}{thisROI}{thisT}{thisChannel}.sumPix data{thisImage}{thisROI}{thisT}{thisChannel}.meanPix data{thisImage}{thisROI}{thisT}{thisChannel}.stdPix}];
                 end
                 if numMeasureChannels < maxChannels
                     for thisPadding = numMeasureChannels+1:maxChannels
@@ -110,10 +114,10 @@ for thisImage = 1:numImages
                     end
                 end
             end
-
+            
             if numMeasureAroundChannels > 0
                 for thisAroundChannel = 1:numMeasureAroundChannels
-                    dataAroundOut2 = [dataAroundOut2 {dataAround{thisImage}{thisROI}{thisAroundChannel}.sumPix dataAround{thisImage}{thisROI}{thisAroundChannel}.meanPix dataAround{thisImage}{thisROI}{thisAroundChannel}.stdPix dataAround{thisImage}{thisROI}{thisAroundChannel}.numPix}];
+                    dataAroundOut2 = [dataAroundOut2 {dataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}.sumPix dataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}.meanPix dataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}.stdPix dataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}.numPix}];
                 end
                 if numMeasureAroundChannels < maxAroundChannels
                     for thisPadding = numMeasureAroundChannels+1:maxAroundChannels
@@ -122,23 +126,23 @@ for thisImage = 1:numImages
                 end
             end
             dataOut3 = [dataOut3; [dataOut1 dataOut2 dataAroundOut2]];
-        %end
-        %Make an empty line to separate image data
-        %totalCols = 5 + numMeasureChannels + numMeasureAroundChannels;
-        [blah totalCols] = size(dataOut3);
-        for thisCol = 1:totalCols
-            emptyLine = [emptyLine, {' '}];
-        end
-
-        dataOut = [dataOut; [mainHeader thisChannelsHeader thisChannelsAroundHeader]; dataOut3; emptyLine];
-
-        %Compile the data for each segmented object, if not grouped.
-        if groupObjects == 0
-            %Write a header for each image
-            mainHeaderObjects = {'Original Image', 'Dataset', 'ROI', 'Channel Segmented', 'Number Pixels'};
-            partEmptyLineObjects = {' ',' ',' ',' '};
-            emptyLine = [];
+            %end
+            %Make an empty line to separate image data
+            %totalCols = 5 + numMeasureChannels + numMeasureAroundChannels;
+            [~, totalCols] = size(dataOut3);
+            for thisCol = 1:totalCols
+                emptyLine = [emptyLine, {' '}];
+            end
             
+            dataOut = [dataOut; [mainHeader thisChannelsHeader thisChannelsAroundHeader]; dataOut3; emptyLine];
+            
+            %Compile the data for each segmented object, if not grouped.
+            if groupObjects == 0
+                %Write a header for each image
+                mainHeaderObjects = {'Original Image', 'Dataset', 'ROI', 'Time Point', 'Channel Segmented', 'Number Pixels'};
+                partEmptyLineObjects = {' ',' ',' ',' '};
+                emptyLine = [];
+                
                 thisChannelsHeader = [];
                 thisChannelsAroundHeader = [];
                 objectDataOut1 = [];
@@ -146,7 +150,7 @@ for thisImage = 1:numImages
                 objectDataAroundOut2 = [];
                 if numMeasureChannels > 0
                     for thisHeader = 1:numMeasureChannels
-                        thisChannelName = num2str(channelLabels{thisImage}{data{thisImage}{thisROI}{thisHeader}.channel});
+                        thisChannelName = num2str(channelLabels{thisImage}{data{thisImage}{thisROI}{thisT}{thisHeader}.channel});
                         thisChannelsHeader = [thisChannelsHeader {['Summed Intensity Ch ', thisChannelName], ['Mean Intensity Ch ', thisChannelName], ['Standard Deviation Ch ', thisChannelName]}];
                     end
                     if numMeasureChannels < maxChannels
@@ -167,7 +171,7 @@ for thisImage = 1:numImages
                         end
                     end
                 end
-            
+                
                 if numMeasureChannels > 0
                     %numObjects = length(objectData{thisImage}{thisROI}{thisChannel});
                     numObjects = roiShapes{thisImage}{thisROI}.numObjects;
@@ -175,14 +179,14 @@ for thisImage = 1:numImages
                     for thisObject = 1:numObjects
                         %numMeasureChannels = length(objectData{thisImage}{thisROI}{thisObject}{thisChannel});
                         for thisChannel = 1:numMeasureChannels
-                            if isfield(objectData{thisImage}{thisROI}{thisObject}{thisChannel}, 'numPix')
-                                numSegObjectPixels = objectData{thisImage}{thisROI}{thisObject}{thisChannel}.numPix;
+                            if isfield(objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}, 'numPix')
+                                numSegObjectPixels = objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.numPix;
                                 continue;
                             end
                         end
-                        objectDataOut1 = [objectDataOut1 {roiShapes{thisImage}{thisROI}.origName datasetNames{thisImage} num2str(thisROI) channelLabels{thisImage}{segChannel} numSegObjectPixels}];
+                        objectDataOut1 = [objectDataOut1 {roiShapes{thisImage}{thisROI}.origName datasetNames{thisImage} num2str(thisROI) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} numSegObjectPixels}];
                         for thisChannel = 1:numMeasureChannels
-                            objectDataOut1 = [objectDataOut1 {objectData{thisImage}{thisROI}{thisObject}{thisChannel}.sumPix objectData{thisImage}{thisROI}{thisObject}{thisChannel}.meanPix objectData{thisImage}{thisROI}{thisObject}{thisChannel}.stdPix}];
+                            objectDataOut1 = [objectDataOut1 {objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.sumPix objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.meanPix objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.stdPix}];
                         end
                         if numMeasureChannels < maxChannels
                             for thisPadding = numMeasureChannels+1:maxChannels
@@ -198,10 +202,10 @@ for thisImage = 1:numImages
                         for thisObject = 1:numObjects
                             objectDataAroundThisObject = [];
                             for thisAroundChannel = 1:numMeasureAroundChannels
-                                objectDataAroundThisObject = [objectDataAroundThisObject {objectDataAround{thisImage}{thisROI}{thisAroundChannel}{thisObject}.sumPix objectDataAround{thisImage}{thisROI}{thisAroundChannel}{thisObject}.meanPix objectDataAround{thisImage}{thisROI}{thisAroundChannel}{thisObject}.stdPix objectDataAround{thisImage}{thisROI}{thisAroundChannel}{thisObject}.numPix}];
+                                objectDataAroundThisObject = [objectDataAroundThisObject {objectDataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}{thisObject}.sumPix objectDataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}{thisObject}.meanPix objectDataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}{thisObject}.stdPix objectDataAround{thisImage}{thisROI}{thisT}{thisAroundChannel}{thisObject}.numPix}];
                             end
                             objectDataAroundOut2 = [objectDataAroundOut2; objectDataAroundThisObject];
-
+                            
                             if numMeasureAroundChannels < maxAroundChannels
                                 for thisPadding = numMeasureAroundChannels+1:maxAroundChannels
                                     objectDataAroundOut2 = [objectDataAroundOut2 {' ', ' ', ' ',' '}];
@@ -209,24 +213,24 @@ for thisImage = 1:numImages
                             end
                         end
                     end
-                    [blah numDataOutCols] = size(objectDataOut2);
-                    [blah numDataAroundOutCols] = size(objectDataAroundOut2);
+                    [~, numDataOutCols] = size(objectDataOut2);
+                    [~, numDataAroundOutCols] = size(objectDataAroundOut2);
                     totalCols = numDataOutCols + numDataAroundOutCols;
                     for thisCol = 1:totalCols
                         emptyLine = [emptyLine, {' '}];
                     end
-
+                    
                     objectDataOut = [objectDataOut; [mainHeaderObjects thisChannelsHeader thisChannelsAroundHeader]; [objectDataOut2 objectDataAroundOut2]; emptyLine];
                 else
-                    [blah totalCols] = size(objectDataOut2);
+                    [~, totalCols] = size(objectDataOut2);
                     for thisCol = 1:totalCols
                         emptyLine = [emptyLine, {' '}];
                     end
                     objectDataOut = [objectDataOut; [mainHeaderObjects thisChannelsHeader]; objectDataOut2; emptyLine];
                 end
-
-            %end
-
+                
+            end
+            
         end
     end
 end

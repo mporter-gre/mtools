@@ -10,7 +10,7 @@ end
 for thisFetchChannel = channelsToFetch
     %for thisROI = 1:numROI
         numZ = roiShapes{thisROI}.numShapes;
-        %numT = length(unique(roiShapes{thisROI}.T));
+        timePoints = getROITimePoints(roiShapes{thisROI});
         thisPatch = 1;
         X = floor(roiShapes{thisROI}.shape1.getX.getValue+1);    %svg entry in xml file indexes from (0, 0) instead of (1, 1), so +1
         Y = floor(roiShapes{thisROI}.shape1.getY.getValue+1);
@@ -67,7 +67,7 @@ for thisFetchChannel = channelsToFetch
         for thisZ = 1:numZ
             for thisT = 1
                 %for thisC = channelsToFetch(1:end)
-                    thisPlane = getPlane(session, imageId, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue, thisFetchChannel-1, 0); %roiShapes{thisROI}.T(thisT));
+                    thisPlane = getPlane(session, imageId, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue, thisFetchChannel-1, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheT.getValue);
                     patch(:,:, thisPatch) = zeros(height,width);
                     
                     %Check for the ROI going outwith the image. If it does

@@ -41,9 +41,11 @@ if saveMasks == 1
     set(ROIText, 'String', 'Sending mask image to server');
     drawnow;
 
-    for thisZ = 1:length(fullMaskImg(1,1,:))
-        planeAsBytes = toByteArray(fullMaskImg(:,:,thisZ)', newPixels);
-        store.setPlane(planeAsBytes, thisZ-1, 0, 0);
+    for thisT = 1:length(fullMaskImg)
+        for thisZ = 1:length(fullMaskImg{thisT}(1,1,:))
+            planeAsBytes = toByteArray(fullMaskImg(:,:,thisZ)', newPixels);
+            store.setPlane(planeAsBytes, thisZ-1, 0, 0);
+        end
     end
     store.save();
     store.close();

@@ -61,7 +61,8 @@ segmentationType = [];
 patchMax = [];
 lowestValue = [];
 handles.loadingImage = importdata('loadingImage.JPG');
-handles.selectDatasetsImage = importdata('selectDatasets.tif');
+%handles.selectDatasetsImage = importdata('selectDatasets.tif');
+handles.selectDatasetsImage = importdata('loadingImage.JPG');
 setappdata(handles.ImageSegmentation, 'patchMax', patchMax);
 setappdata(handles.ImageSegmentation, 'lowestValue', lowestValue);
 setappdata(handles.ImageSegmentation, 'segmentationType', 'Otsu');
@@ -774,7 +775,13 @@ pixelsId = pixels.getId.getValue;
 imageId = pixels.getImage.getId.getValue;
 X = round(roiShapes{selectedImageIdx}{selectedROI}.shape1.getX.getValue+1);
 Y = round(roiShapes{selectedImageIdx}{selectedROI}.shape1.getY.getValue+1);
-numROIZ = roiShapes{selectedImageIdx}{selectedROI}.numShapes;
+numShapes = roiShapes{selectedImageIdx}{selectedROI}.numShapes;
+numROIZ = 0;
+for thisShape = 1:numShapes
+    if roiShapes{selectedImageIdx}{selectedROI}.(['shape' num2str(thisShape)]).getTheT.getValue == 1
+        numROIZ = numROIZ + 1;
+    end
+end
 Z = [];
 for thisROIZ = 1:numROIZ
     thisZ = roiShapes{selectedImageIdx}{selectedROI}.(['shape' num2str(thisROIZ)]).getTheZ.getValue;
@@ -1082,11 +1089,11 @@ if numImages == 0
     return;
 end
 
-%Sort the ROIShapes by Z
+%Sort the ROIShapes byTZ
 for thisImage = 1:numImages
     numROI = length(roiShapes{thisImage});
     for thisROI = 1:numROI
-        roiShapes{thisImage}{thisROI} = sortROIShapes(roiShapes{thisImage}{thisROI}, 'byZ');
+        roiShapes{thisImage}{thisROI} = sortROIShapes(roiShapes{thisImage}{thisROI}, 'byTbyZ');
     end
 end
 

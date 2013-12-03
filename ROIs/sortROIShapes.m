@@ -1,7 +1,8 @@
 function sortedShapes = sortROIShapes(roiShapes, sorting)
 %By default ROI shapes are returned sorted by id. Sort them into Z by doing
 %sortedShapes = sortROIShapes(roiShapes, sorting), where sorting is string
-%'byZ'. Will add more sorting options in future ('byT')
+%'byZ', or by T using ('byT'). Sort by one then the other with strings
+%'byZbyT' or 'byTbyZ'
 
 if strcmpi(sorting, 'byZ')
     theZs = [];
@@ -32,3 +33,36 @@ if strcmpi(sorting, 'byT')
     sortedShapes.shapeType = roiShapes.shapeType;
     sortedShapes.numShapes = roiShapes.numShapes;
 end
+
+if strcmpi(sorting, 'byTbyZ')
+    theTs = [];
+    numShapes = roiShapes.numShapes;
+    for thisShape = 1:numShapes
+        theTZ(thisShape,1) = roiShapes.(['shape' num2str(thisShape)]).getTheT.getValue;
+        theTZ(thisShape,2) = roiShapes.(['shape' num2str(thisShape)]).getTheZ.getValue;
+    end
+    [listItems, idx] = sortrows(theTZ, [1,2]);
+    for thisShape = 1:numShapes
+        thisIdx = idx(thisShape);
+        sortedShapes.(['shape' num2str(thisShape)]) = roiShapes.(['shape' num2str(thisIdx)]);
+    end
+    sortedShapes.shapeType = roiShapes.shapeType;
+    sortedShapes.numShapes = roiShapes.numShapes;
+end
+
+if strcmpi(sorting, 'byZbyT')
+    theTs = [];
+    numShapes = roiShapes.numShapes;
+    for thisShape = 1:numShapes
+        theZT(thisShape,1) = roiShapes.(['shape' num2str(thisShape)]).getTheT.getValue;
+        theZT(thisShape,2) = roiShapes.(['shape' num2str(thisShape)]).getTheZ.getValue;
+    end
+    [listItems, idx] = sortrows(theZT, [2,1]);
+    for thisShape = 1:numShapes
+        thisIdx = idx(thisShape);
+        sortedShapes.(['shape' num2str(thisShape)]) = roiShapes.(['shape' num2str(thisIdx)]);
+    end
+    sortedShapes.shapeType = roiShapes.shapeType;
+    sortedShapes.numShapes = roiShapes.numShapes;
+end
+
