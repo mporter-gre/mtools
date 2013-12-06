@@ -777,7 +777,7 @@ Y = round(roiShapes{selectedImageIdx}{selectedROI}.shape1.getY.getValue+1);
 numShapes = roiShapes{selectedImageIdx}{selectedROI}.numShapes;
 numROIZ = 0;
 for thisShape = 1:numShapes
-    if roiShapes{selectedImageIdx}{selectedROI}.(['shape' num2str(thisShape)]).getTheT.getValue == 1
+    if roiShapes{selectedImageIdx}{selectedROI}.(['shape' num2str(thisShape)]).getTheT.getValue == 0
         numROIZ = numROIZ + 1;
     end
 end
