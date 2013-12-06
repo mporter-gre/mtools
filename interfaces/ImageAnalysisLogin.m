@@ -60,7 +60,7 @@ numArgs = nargin-3;
 if numArgs > 0
     global session;
     
-    [sessionId, server, port, workflow, datatype, ids] = parseVarargin(varargin);
+    workflow = parseVarargin('-w', varargin);
     
     %Please remove this!!!
     props = java.util.Properties();
@@ -77,6 +77,7 @@ if numArgs > 0
     
     switch workflow
         case 'intensityanalysis'
+            workflow = parseVarargin('-w', varargin);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);

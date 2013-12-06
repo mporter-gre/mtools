@@ -1,24 +1,22 @@
-function [sessionId, server, port, workflow, datatype, ids] = parseVarargin(varargin)
+function itemVal = parseVarargin(item, varargin)
+%Parse the varargin for specific switches to get the values. 'item' is a
+%string relating to the switch. Possible switches are:
+%       -k for sessionId
+%       -s for server
+%       -p for port
+%       -w for workflow
+%       -d for datasetId (one value only)
+%       -i for imageId (one value only)
+%       -t for type (dataset/image/plate etc)
+%       id for one or more ids for the objects specified by -t.
+%              These ids should terminate the list of arguments.
+
 varargin = varargin{1};
-numArgs = length(varargin);
 
-sessionIdFind = strfind(varargin, '-k');
-sessionIdIdx = findIndex(sessionIdFind) + 1;
-portFind = strfind(varargin, '-p');
-portIdx = findIndex(portFind) + 1;
-serverFind = strfind(varargin, '-s');
-serverIdx = findIndex(serverFind) + 1;
-workflowFind = strfind(varargin, '-w');
-workflowIdx = findIndex(workflowFind) + 1;
-datatypeFind = strfind(varargin, '-t');
-datatypeIdx = findIndex(datatypeFind) + 1;
-idsFind = strfind(varargin, 'id');
-idsIdx = findIndex(idsFind) + 1;
-
-
-sessionId = varargin{sessionIdIdx};
-server = varargin{serverIdx};
-port = varargin{portIdx};
-workflow = varargin{workflowIdx};
-datatype = varargin{datatypeIdx};
-ids = varargin{idsIdx:end};
+itemIdFind = strfind(varargin, item);
+itemIdx = findIndex(itemIdFind) +1;
+if strcmpi(item, 'id')
+    itemVal = varargin{itemIdx:end};
+else
+    itemVal = varargin{itemIdx};
+end
