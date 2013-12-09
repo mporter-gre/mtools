@@ -385,11 +385,12 @@ end
 setappdata(handles.labelMaker, 'theImage', newImageObj);
 setappdata(handles.labelMaker, 'imageId', newImageId);
 getMetadata(handles);
+imageName = getappdata(handles.labelMaker, 'imageName');
 setappdata(handles.labelMaker, 'newImageObj', []);
 setappdata(handles.labelMaker, 'newImageId', []);
 setappdata(handles.labelMaker, 'points', []);
 %setappdata(handles.labelMaker, 'filePath', []);
-setappdata(handles.labelMaker, 'fileName', []);
+setappdata(handles.labelMaker, 'fileName', imageName);
 setappdata(handles.labelMaker, 'modified', 0);
 redrawImage(handles);
 
@@ -440,8 +441,11 @@ if isempty(points)
 end
 filePath = getappdata(handles.labelMaker, 'filePath');
 fileName = getappdata(handles.labelMaker, 'fileName');
-if isempty(fileName)
-    [fileName filePath] = uiputfile('*.mat', 'Save labels', filePath);
+if ~strcmpi(fileName(end-3:end), '.mat')
+    fileName = [fileName '.mat'];
+end
+if isempty(fileName) || isempty(filePath);
+    [fileName filePath] = uiputfile('*.mat', 'Save labels', [filePath fileName]);
     if fileName == 0
         return;
     end
@@ -456,6 +460,7 @@ save([filePath fileName], 'points', 'projectId', 'datasetId', 'imageId', 'labelT
 setappdata(handles.labelMaker, 'filePath', filePath);
 setappdata(handles.labelMaker, 'fileName', fileName);
 setappdata(handles.labelMaker, 'modified', 0);
+msgbox('Points saved', 'Saved');
 
 
 
