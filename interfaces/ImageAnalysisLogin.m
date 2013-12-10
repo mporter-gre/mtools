@@ -60,6 +60,8 @@ numArgs = nargin-3;
 if numArgs > 0
     global session;
     
+    server = parseVarargin('-s', varargin);
+    port = parseVarargin('-p', varargin);
     workflow = parseVarargin('-w', varargin);
     
     %Please remove this!!!
@@ -77,17 +79,25 @@ if numArgs > 0
     
     switch workflow
         case 'intensityanalysis'
-            workflow = parseVarargin('-w', varargin);
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-            handles.exitApplication = 1;
-            guidata(hObject, handles);
-            intensityMeasureLaunchpad(handles, credentials, str2double(ids));
+            dataType = parseVarargin('-t', varargin);
+            ids = parseVarargin('id', varargin);
+            if ~strcmpi(dataType, 'dataset') || isempty(ids)
+                warndlg('Argument check failed');
+            else
+                set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+                handles.exitApplication = 1;
+                guidata(hObject, handles);
+                intensityMeasureLaunchpad(handles, credentials, str2double(ids));
+            end
         
         case 'boxit'
+            dataType = parseVarargin('-t', varargin);
+            ids = str2double(parseVarargin('id', varargin));
+            datasetId = str2double(parseVarargin('-d', varargin));
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
-            boxIt(handles, credentials, str2double(ids));
+            boxIt(handles, credentials, ids, datasetId);
     end
     
     
@@ -516,7 +526,7 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-boxIt(handles, credentials);
+boxIt(handles, credentials, [], []);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 

@@ -109,13 +109,14 @@ setZControls(handles);
 guidata(hObject, handles);
 
 imageId = varargin{3};
+datasetId = varargin{4};
 
-if ~isempty(imageId)
+if ~isempty(imageId) && ~isempty(datasetId)
     theImage = getImages(session, imageId);
     setappdata(handles.boxIt, 'imageId', imageId);
     setappdata(handles.boxIt, 'theImage', theImage);
+    setappdata(handles.boxIt, 'datasetId', datasetId);
     loadNewImage(handles);
-    uiwait(handles.boxIt);
 end
 
 % UIWAIT makes boxit wait for user response (see UIRESUME)
