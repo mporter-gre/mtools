@@ -52,7 +52,7 @@ function ROITweak_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to roitweak (see VARARGIN)
 
-global gateway;
+global session;
 %Set up the play and pause buttons
 startImage = imread('startImage.jpg', 'jpg');
 playIcon = imread('playButton.png', 'png');
@@ -91,6 +91,14 @@ setZSlider(handles);
 
 % Update handles structure
 guidata(hObject, handles);
+
+imageId = varargin{2};
+if ~isempty(imageId)
+    theImage = getImages(session, imageId);
+    setappdata(handles.ROITweak, 'newImageObj', theImage);
+    setappdata(handles.ROITweak, 'imageId', imageId);
+    initialiseImage(handles);
+end
 
 % UIWAIT makes roitweak wait for user response (see UIRESUME)
 uiwait(handles.ROITweak);
@@ -872,7 +880,6 @@ function openImageItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway;
 global session;
 
 % currDir = getappdata(handles.ROITweak, 'currDir');
@@ -896,61 +903,7 @@ global session;
 %     return;
 % end
 ImageSelector(handles, 'ROITweak', 1);
-theImage = getappdata(handles.ROITweak, 'newImageObj');
-imageId = theImage.getId.getValue;
-pixels = theImage.getPixels(0);
-pixelsId = pixels.getId.getValue;
-imageName = char(theImage.getName.getValue.getBytes');
-roiShapes = getROIsFromImageId(imageId);
-numC = pixels.getSizeC.getValue;
-numT = pixels.getSizeT.getValue;
-numZ = pixels.getSizeZ.getValue;
-sizeX = pixels.getSizeX.getValue;
-sizeY = pixels.getSizeY.getValue;
-rTransX = 1;
-rTransY = 1;
-if sizeX ~= 512
-    rTransX = 512/sizeX;
-end
-if sizeY ~= 512
-    rTransY = 512/sizeY;
-end
-renderingSettings = session.getRenderingSettingsService.getRenderingSettings(pixelsId);
-defaultT = renderingSettings.getDefaultT.getValue + 1;
-defaultZ = renderingSettings.getDefaultZ.getValue + 1;
-
-%setappdata(handles.ROITweak, 'xmlStruct', xmlStruct);
-%setappdata(handles.ROITweak, 'filePathName', [filePath fileName]);
-setappdata(handles.ROITweak, 'pixels', pixels)
-setappdata(handles.ROITweak, 'pixelsId', pixelsId)
-setappdata(handles.ROITweak, 'numC', numC);
-setappdata(handles.ROITweak, 'numT', numT);
-setappdata(handles.ROITweak, 'numZ', numZ);
-setappdata(handles.ROITweak, 'defaultT', defaultT);
-setappdata(handles.ROITweak, 'defaultZ', defaultZ);
-setappdata(handles.ROITweak, 'roiShapes', roiShapes);
-setappdata(handles.ROITweak, 'imageId', imageId);
-setappdata(handles.ROITweak, 'ROIsToUpdate', []);
-setappdata(handles.ROITweak, 'rTransX', rTransX);
-setappdata(handles.ROITweak, 'rTransY', rTransY);
-%setappdata(handles.ROITweak, 'currDir', filePath);
-
-set(handles.imageNameLabel, 'String', imageName);
-setTSlider(handles);
-setZSlider(handles);
-set(handles.tSlider, 'Value', defaultT);
-set(handles.tLabel, 'String', ['T = ' num2str(defaultT)]);
-set(handles.zSlider, 'Value', defaultZ);
-set(handles.zLabel, 'String', ['Z = ' num2str(defaultZ)]);
-set(handles.roiSelect, 'Value', 1);
-set(handles.recentreROIButton, 'Enable', 'off');
-set(handles.recordROIButton, 'Enable', 'off');
-
-getThePlane(handles, defaultZ-1, defaultT-1);
-redrawImage(handles);
-getROIIds(handles);
-populateROISelect(handles);
-redrawROIs(handles);
+initialiseImage(handles);
 
 
 
@@ -1556,3 +1509,62 @@ recentreROI = getappdata(handles.ROITweak, 'recentreROI');
 if stopRecording == 1 && recentreROI ~= 1
     redrawROIs(handles);
 end
+
+
+function initialiseImage(handles)
+
+global session;
+
+theImage = getappdata(handles.ROITweak, 'newImageObj');
+imageId = theImage.getId.getValue;
+pixels = theImage.getPixels(0);
+pixelsId = pixels.getId.getValue;
+imageName = char(theImage.getName.getValue.getBytes');
+roiShapes = getROIsFromImageId(imageId);
+numC = pixels.getSizeC.getValue;
+numT = pixels.getSizeT.getValue;
+numZ = pixels.getSizeZ.getValue;
+sizeX = pixels.getSizeX.getValue;
+sizeY = pixels.getSizeY.getValue;
+rTransX = 1;
+rTransY = 1;
+if sizeX ~= 512
+    rTransX = 512/sizeX;
+end
+if sizeY ~= 512
+    rTransY = 512/sizeY;
+end
+renderingSettings = session.getRenderingSettingsService.getRenderingSettings(pixelsId);
+defaultT = renderingSettings.getDefaultT.getValue + 1;
+defaultZ = renderingSettings.getDefaultZ.getValue + 1;
+
+setappdata(handles.ROITweak, 'pixels', pixels)
+setappdata(handles.ROITweak, 'pixelsId', pixelsId)
+setappdata(handles.ROITweak, 'numC', numC);
+setappdata(handles.ROITweak, 'numT', numT);
+setappdata(handles.ROITweak, 'numZ', numZ);
+setappdata(handles.ROITweak, 'defaultT', defaultT);
+setappdata(handles.ROITweak, 'defaultZ', defaultZ);
+setappdata(handles.ROITweak, 'roiShapes', roiShapes);
+setappdata(handles.ROITweak, 'imageId', imageId);
+setappdata(handles.ROITweak, 'ROIsToUpdate', []);
+setappdata(handles.ROITweak, 'rTransX', rTransX);
+setappdata(handles.ROITweak, 'rTransY', rTransY);
+%setappdata(handles.ROITweak, 'currDir', filePath);
+
+set(handles.imageNameLabel, 'String', imageName);
+setTSlider(handles);
+setZSlider(handles);
+set(handles.tSlider, 'Value', defaultT);
+set(handles.tLabel, 'String', ['T = ' num2str(defaultT)]);
+set(handles.zSlider, 'Value', defaultZ);
+set(handles.zLabel, 'String', ['Z = ' num2str(defaultZ)]);
+set(handles.roiSelect, 'Value', 1);
+set(handles.recentreROIButton, 'Enable', 'off');
+set(handles.recordROIButton, 'Enable', 'off');
+
+getThePlane(handles, defaultZ-1, defaultT-1);
+redrawImage(handles);
+getROIIds(handles);
+populateROISelect(handles);
+redrawROIs(handles);

@@ -114,6 +114,14 @@ if numArgs > 0
             handles.exitApplication = 1;
             guidata(hObject, handles);
             createKymograph(handles, ids);
+            
+        case 'tweakrois'
+            dataType = parseVarargin('-t', varargin);
+            ids = str2double(parseVarargin('id', varargin));
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            ROITweak(handles, ids);
     end
     
     
@@ -479,7 +487,7 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-ROITweak(handles, credentials);
+ROITweak(handles, []);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
