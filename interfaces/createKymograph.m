@@ -52,7 +52,6 @@ function createKymograph_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to createkymograph (see VARARGIN)
 
-global gateway;
 global session;
 renderSettingsService = session.getRenderingSettingsService;
 %Set up the play and pause buttons
@@ -139,6 +138,14 @@ enableDisableControls(handles, 'off');
 
 % Update handles structure
 guidata(hObject, handles);
+
+imageId = varargin{2};
+if ~isempty(imageId)
+    theImage = getImages(session, imageId);
+    setappdata(handles.CreateKymograph, 'newImageObj', theImage);
+    setappdata(handles.CreateKymograph, 'imageId', imageId);
+    initialiseImage(handles);
+end
 
 % UIWAIT makes createkymograph wait for user response (see UIRESUME)
 uiwait(handles.CreateKymograph);
@@ -1435,16 +1442,7 @@ switch answer,
     case 'Yes',
 %         loginImageSelector;
         ImageSelector(handles, 'CreateKymograph');
-        getImageParameters(handles);
-        enableDisableControls(handles, 'on');
-        setTSlider(handles);
-        setZSlider(handles);
-        set(handles.stopZText, 'String', num2str(getappdata(handles.CreateKymograph, 'numZ')));
-        defaultZ = getappdata(handles.CreateKymograph, 'defaultZ');
-        getPlanes(handles, defaultZ, 0)
-        setappdata(handles.CreateKymograph, 'clearAnswer', 'Yes');
-        clearAllItem_Callback([], eventdata, handles);    
-        refreshDisplay(handles);
+        initialiseImage(handles);
         
         %close(handles.CreateKymograph);
     case 'No'
@@ -1791,3 +1789,17 @@ set(handles.tSlider, 'enable', onOff);
 set(handles.rectButton, 'enable', onOff);
 set(handles.playButton, 'enable', onOff);
 set(handles.pauseButton, 'enable', onOff);
+
+
+function initialiseImage(handles)
+
+getImageParameters(handles);
+enableDisableControls(handles, 'on');
+setTSlider(handles);
+setZSlider(handles);
+set(handles.stopZText, 'String', num2str(getappdata(handles.CreateKymograph, 'numZ')));
+defaultZ = getappdata(handles.CreateKymograph, 'defaultZ');
+getPlanes(handles, defaultZ, 0)
+setappdata(handles.CreateKymograph, 'clearAnswer', 'Yes');
+clearAllItem_Callback([], [], handles);
+refreshDisplay(handles);

@@ -106,6 +106,14 @@ if numArgs > 0
             handles.exitApplication = 1;
             guidata(hObject, handles);
             FRAPLaunchpad(ids);
+            
+        case 'createkymograph'
+            dataType = parseVarargin('-t', varargin);
+            ids = str2double(parseVarargin('id', varargin));
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            createKymograph(handles, ids);
     end
     
     
@@ -515,8 +523,7 @@ if success == 0
     return;
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-createKymograph(handles, credentials);
+createKymograph(handles, []);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
