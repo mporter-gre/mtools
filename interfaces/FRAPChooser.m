@@ -58,8 +58,16 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+ids = varargin{1};
+if ~isempty(ids)
+    setappdata(handles.FRAPChooser, 'selectedDsIds', ids);
+    beginButton_Callback([], [], handles);
+    
+else
+
 % UIWAIT makes FRAPChooser wait for user response (see UIRESUME)
 uiwait(handles.FRAPChooser);
+end
 
 
 % --- Outputs from this function are returned to the command line.

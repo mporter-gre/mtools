@@ -1,6 +1,6 @@
-function FRAPLaunchpad(handles, credentials)
+function FRAPLaunchpad(ids)
 
-[images imageIds imageNames roiShapes datasetNames pixels] = FRAPChooser;
+[images, imageIds, imageNames, roiShapes, datasetNames, pixels] = FRAPChooser(ids);
 
 numImages = length(imageIds);
 progBar = waitbar(0, 'Analysing...');
@@ -30,8 +30,13 @@ for thisImage = 1:numImages
 end
 
 
-
-[saveFile savePath] = uiputfile('*.xls','Save Results','/FrapAnalysisResults.xls');
+saveFile = 0;
+counter = 1;
+while saveFile == 0
+    [saveFile, savePath] = uiputfile('*.xls','Save Results','/FrapAnalysisResults.xls');
+    disp(counter);
+    counter = counter + 1;
+end
 
 if isnumeric(saveFile) && isnumeric(savePath)
     return;
@@ -43,7 +48,7 @@ try
 catch
     %If the xlswriter fails (no MSOffice installed, e.g.) then manually
     %create a .csv file. Turn every cell to string to make it easier.
-    [rows cols] = size(dataOut);
+    [rows, cols] = size(dataOut);
     for thisRow = 1:rows
         for thisCol = 1:cols
             if isnumeric(dataOut{thisRow, thisCol})
@@ -51,7 +56,7 @@ catch
             end
         end
     end
-    [rowsSummary colsSummary] = size(dataSummary);
+    [rowsSummary, colsSummary] = size(dataSummary);
     for thisRow = 1:rowsSummary
         for thisCol = 1:colsSummary
             if isnumeric(dataSummary{thisRow, thisCol})
@@ -61,7 +66,7 @@ catch
     end
     
     delete([savePath saveFile]); %Delete the .xls file and save again as .csv
-    [savePart remain] = strtok(saveFile, '.');
+    [savePart, remain] = strtok(saveFile, '.');
     saveFile = [savePart '.csv'];
     saveFileSummary = [savePart 'Summary.csv'];
     

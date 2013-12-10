@@ -98,6 +98,14 @@ if numArgs > 0
             handles.exitApplication = 1;
             guidata(hObject, handles);
             boxIt(handles, credentials, ids, datasetId);
+            
+        case 'frap'
+            dataType = parseVarargin('-t', varargin);
+            ids = str2double(parseVarargin('id', varargin));
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            FRAPLaunchpad(ids);
     end
     
     
@@ -314,7 +322,7 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-FRAPLaunchpad(handles, credentials);
+FRAPLaunchpad([]);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
