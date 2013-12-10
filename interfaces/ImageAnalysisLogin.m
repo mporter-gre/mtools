@@ -122,6 +122,14 @@ if numArgs > 0
             handles.exitApplication = 1;
             guidata(hObject, handles);
             ROITweak(handles, ids);
+            
+        case 'distancemeasure'
+            dataType = parseVarargin('-t', varargin);
+            ids = str2double(parseVarargin('id', varargin));
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            distanceMeasureLaunchpad(handles, ids);
     end
     
     
@@ -288,7 +296,7 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-distanceMeasureLaunchpad(handles, credentials);
+distanceMeasureLaunchpad(handles, []);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 

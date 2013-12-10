@@ -58,9 +58,13 @@ global session;
 handles.output = hObject;
 
 %First get the datasets or 'conditions'
-handles.credentials = varargin{2};
-datasetChooser(handles, 'distanceMeasureLaunchpad');
-selectedDsIds = getappdata(handles.distanceMeasureLaunchpad, 'selectedDsIds');
+selectedDsIds = varargin{2};
+
+if isempty(selectedDsIds)
+    datasetChooser(handles, 'distanceMeasureLaunchpad');
+    selectedDsIds = getappdata(handles.distanceMeasureLaunchpad, 'selectedDsIds'); 
+end
+
 [images imageIds imageNames datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
 [imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
 images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
@@ -126,7 +130,7 @@ for thisImage = 1:numImages
     channel1 = 1;
     channel2 = 1;
     for thisROI = 1:numROI
-        [selectorOutput channel1 channel2] = objectSelector(pixels{thisImage}, channelLabels{thisImage}, roiShapes{thisImage}{thisROI}, planesThisROI{thisROI}, handles.credentials, channel1, channel2);
+        [selectorOutput channel1 channel2] = objectSelector(pixels{thisImage}, channelLabels{thisImage}, roiShapes{thisImage}{thisROI}, planesThisROI{thisROI}, channel1, channel2);
         data{thisImage}{thisROI} = selectorOutput;
     end
 end

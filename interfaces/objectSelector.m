@@ -67,9 +67,8 @@ handles.pixels = varargin{1};
 handles.channelLabel = varargin{2};
 handles.roiShapes = varargin{3};
 handles.planesThisROI = varargin{4};
-handles.credentials = varargin{5};
-handles.channel1 = varargin{6};
-handles.channel2 = varargin{7};
+handles.channel1 = varargin{5};
+handles.channel2 = varargin{6};
 handles.firstRunSelect1 = 1;
 handles.firstRunSelect2 = 1;
 handles.currentPointSeg1 = 0;
@@ -590,12 +589,12 @@ physY = handles.pixels.getPhysicalSizeY.getValue;
 physZ = handles.pixels.getPhysicalSizeZ.getValue;
 
 %Hack to fix Nishal's metadata issues....
-credentials = handles.credentials;
-if strcmpi(credentials{1}, 'nypatel')
-    physX = 0.04;
-    physY = 0.04;
-    physZ = 0.125;
-end
+% credentials = handles.credentials;
+% if strcmpi(credentials{1}, 'nypatel')
+%     physX = 0.04;
+%     physY = 0.04;
+%     physZ = 0.125;
+% end
 
 numZ = handles.numZ;
 x1 = handles.objectCentroid1.Centroid(1);
