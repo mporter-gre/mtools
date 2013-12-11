@@ -130,6 +130,15 @@ if numArgs > 0
             handles.exitApplication = 1;
             guidata(hObject, handles);
             distanceMeasureLaunchpad(handles, ids);
+            
+            
+        case 'eventtimer'
+            dataType = parseVarargin('-t', varargin);
+            ids = str2double(parseVarargin('id', varargin));
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            eventTimerLaunchpad(handles, ids)
     end
     
     
@@ -295,7 +304,6 @@ if success == 0
     return;
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
 distanceMeasureLaunchpad(handles, []);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
@@ -320,8 +328,7 @@ if success == 0
     return;
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-eventTimerLaunchpad(handles, credentials)
+eventTimerLaunchpad(handles, [])
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 

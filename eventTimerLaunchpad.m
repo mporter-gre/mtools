@@ -1,6 +1,6 @@
-function eventTimerLaunchpad(handles, credentials)
+function eventTimerLaunchpad(handles, ids)
 global progBar;
-[images imageIds imageNames roiShapes datasetNames pixels channelLabels saveMasks frames] = eventTimer;
+[images imageIds imageNames roiShapes datasetNames pixels channelLabels saveMasks frames] = eventTimer(ids);
 
 numImages = length(imageIds);
 for thisImage = 1:numImages

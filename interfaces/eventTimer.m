@@ -55,8 +55,15 @@ function eventTimer_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for eventTimer
 handles.output = hObject;
 
+ids = varargin{1};
+if ~isempty(ids)
+    setappdata(handles.eventTimer, 'selectedDsIds', ids);
+    set(handles.beginButton, 'Enable', 'on');
+else
+    setappdata(handles.eventTimer, 'selectedDsIds', []);
+end
 setappdata(handles.eventTimer, 'selectedDsNames', []);
-setappdata(handles.eventTimer, 'selectedDsIds', []);
+
 
 % Update handles structure
 guidata(hObject, handles);
