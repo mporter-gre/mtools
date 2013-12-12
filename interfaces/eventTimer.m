@@ -58,11 +58,13 @@ handles.output = hObject;
 ids = varargin{1};
 if ~isempty(ids)
     setappdata(handles.eventTimer, 'selectedDsIds', ids);
+    getselectedDsNames(handles)
     set(handles.beginButton, 'Enable', 'on');
 else
     setappdata(handles.eventTimer, 'selectedDsIds', []);
+    setappdata(handles.eventTimer, 'selectedDsNames', []);
 end
-setappdata(handles.eventTimer, 'selectedDsNames', []);
+
 
 
 % Update handles structure
@@ -85,7 +87,7 @@ varargout{1} = getappdata(handles.eventTimer, 'images');
 varargout{2} = getappdata(handles.eventTimer, 'imageIds');
 varargout{3} = getappdata(handles.eventTimer, 'imageNames');
 varargout{4} = getappdata(handles.eventTimer, 'roiShapes');
-varargout{5} = getappdata(handles.eventTimer, 'datasetNames');
+varargout{5} = getappdata(handles.eventTimer, 'selectedDsNames');
 varargout{6} = getappdata(handles.eventTimer, 'pixels');
 varargout{7} = getappdata(handles.eventTimer, 'channelLabels');
 varargout{8} = get(handles.saveMasksCheck, 'Value');
@@ -184,13 +186,13 @@ function beginButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 selectedDsIds = getappdata(handles.eventTimer, 'selectedDsIds');
-[images imageIds imageNames datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
+[images imageIds imageNames selectedDsNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
 [imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
 images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
 imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
 imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
 roiShapes = deleteElementFromCells(imageIdxNoROIs, roiShapes);
-datasetNames = deleteElementFromCells(imageIdxNoROIs, datasetNames);
+selectedDsNames = deleteElementFromCells(imageIdxNoROIs, selectedDsNames);
 numImages = images.size;
 
 if numImages == 0
@@ -208,7 +210,7 @@ setappdata(handles.eventTimer, 'images', images);
 setappdata(handles.eventTimer, 'imageIds', imageIds);
 setappdata(handles.eventTimer, 'imageNames', imageNames);
 setappdata(handles.eventTimer, 'roiShapes', roiShapes);
-setappdata(handles.eventTimer, 'datasetNames', datasetNames);
+setappdata(handles.eventTimer, 'selectedDsNames', selectedDsNames);
 setappdata(handles.eventTimer, 'pixels', pixels);
 setappdata(handles.eventTimer, 'channelLabels', channelLabels);
 uiresume;
@@ -233,6 +235,19 @@ end
 
 
 
+function getselectedDsNames(handles)
 
+global session
 
+selectedDsIds = getappdata(handles.eventTimer, 'selectedDsIds');
+numDs = length(selectedDsIds);
+datasets = getDatasets(session, selectedDsIds, true);
+selectedDsNames = {};
+images = java.util.ArrayList;
+for thisDs = 1:numDs
+    datasetName = char(datasets(thisDs).getName.getValue.getBytes');
+    selectedDsNames{end+1} = datasetName;
+end
+
+setappdata(handles.eventTimer, 'selectedDsNames', selectedDsNames);
 
