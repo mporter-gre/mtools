@@ -52,7 +52,8 @@ function labelMaker_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to labelmaker (see VARARGIN)
 
-global gateway;
+global session;
+
 warning off MATLAB:xlswrite:NoCOMServer
 %Set up the play and pause buttons
 startImage = imread('startImagePoints.jpg', 'jpg');
@@ -76,8 +77,8 @@ set(handles.labelMaker, 'windowbuttonmotionfcn', {@windowButtonMotion, handles})
 set(handles.labelMaker, 'keypressfcn', {@currentWindowKeypress, handles});
 handles.output = hObject;
 
-setappdata(handles.labelMaker, 'username', varargin{1});
-setappdata(handles.labelMaker, 'server', varargin{2});
+%setappdata(handles.labelMaker, 'username', varargin{1});
+%setappdata(handles.labelMaker, 'server', varargin{2});
 setappdata(handles.labelMaker, 'recentreROI', 0);
 setappdata(handles.labelMaker, 'numT', 1);
 setappdata(handles.labelMaker, 'numZ', 1);
@@ -102,6 +103,14 @@ setZSlider(handles);
 
 % Update handles structure
 guidata(hObject, handles);
+
+ids = varargin{2};
+if ~isempty(ids)
+    setappdata(handles.labelMaker, 'newImageId', ids);
+    theImage = getImages(session, ids);
+    setappdata(handles.labelMaker, 'theImage', theImage);
+    initialiseImage(handles);
+end
 
 % UIWAIT makes labelmaker wait for user response (see UIRESUME)
 uiwait(handles.labelMaker);
@@ -384,14 +393,8 @@ if newImageId == imageId
 end
 setappdata(handles.labelMaker, 'theImage', newImageObj);
 setappdata(handles.labelMaker, 'imageId', newImageId);
-getMetadata(handles);
-setappdata(handles.labelMaker, 'newImageObj', []);
-setappdata(handles.labelMaker, 'newImageId', []);
-setappdata(handles.labelMaker, 'points', []);
-%setappdata(handles.labelMaker, 'filePath', []);
-setappdata(handles.labelMaker, 'fileName', []);
-setappdata(handles.labelMaker, 'modified', 0);
-redrawImage(handles);
+initialiseImage(handles);
+
 
 
 
@@ -1027,7 +1030,6 @@ setappdata(handles.labelMaker, 'labelsName', labelsName);
 
 function getMetadata(handles)
 
-global gateway
 global session
 
 theImage = getappdata(handles.labelMaker, 'theImage');
@@ -1654,3 +1656,13 @@ function deletePointButton_Callback(hObject, eventdata, handles)
 
 
 deletePoint(handles)
+
+function initialiseImage(handles)
+
+getMetadata(handles);
+setappdata(handles.labelMaker, 'newImageObj', []);
+setappdata(handles.labelMaker, 'newImageId', []);
+setappdata(handles.labelMaker, 'points', []);
+setappdata(handles.labelMaker, 'fileName', []);
+setappdata(handles.labelMaker, 'modified', 0);
+redrawImage(handles);

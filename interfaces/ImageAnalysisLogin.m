@@ -139,6 +139,16 @@ if numArgs > 0
             handles.exitApplication = 1;
             guidata(hObject, handles);
             eventTimerLaunchpad(handles, ids)
+            
+        case 'labelimages'
+            dataType = parseVarargin('-t', varargin);
+            ids = str2double(parseVarargin('id', varargin));
+            %datasetId = str2double(parseVarargin('-d', varargin));
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+            handles.exitApplication = 1;
+            guidata(hObject, handles);
+            labelMaker(handles, ids);
+
     end
     
     
@@ -526,9 +536,9 @@ if strcmp(answer, '')
     set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
     return;
 elseif strcmpi(answer, 'No')
-    labelMaker(handles, credentials);
+    labelMaker(handles, []);
 else strcmpi(answer, 'Yes')
-    labelMaker1024(handles, credentials);
+    labelMaker1024(handles, []);
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
