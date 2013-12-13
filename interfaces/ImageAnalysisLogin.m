@@ -84,7 +84,6 @@ if numArgs > 0
             if ~strcmpi(dataType, 'dataset') || isempty(ids)
                 warndlg('Argument check failed');
             else
-                set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
                 handles.exitApplication = 1;
                 guidata(hObject, handles);
                 intensityMeasureLaunchpad(handles, credentials, str2double(ids));
@@ -94,7 +93,6 @@ if numArgs > 0
             dataType = parseVarargin('-t', varargin);
             ids = str2double(parseVarargin('id', varargin));
             datasetId = str2double(parseVarargin('-d', varargin));
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
             boxIt(handles, credentials, ids, datasetId);
@@ -102,7 +100,6 @@ if numArgs > 0
         case 'frap'
             dataType = parseVarargin('-t', varargin);
             ids = str2double(parseVarargin('id', varargin));
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
             FRAPLaunchpad(ids);
@@ -110,7 +107,6 @@ if numArgs > 0
         case 'createkymograph'
             dataType = parseVarargin('-t', varargin);
             ids = str2double(parseVarargin('id', varargin));
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
             createKymograph(handles, ids);
@@ -118,7 +114,6 @@ if numArgs > 0
         case 'tweakrois'
             dataType = parseVarargin('-t', varargin);
             ids = str2double(parseVarargin('id', varargin));
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
             ROITweak(handles, ids);
@@ -126,7 +121,6 @@ if numArgs > 0
         case 'distancemeasure'
             dataType = parseVarargin('-t', varargin);
             ids = str2double(parseVarargin('id', varargin));
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
             distanceMeasureLaunchpad(handles, ids);
@@ -135,7 +129,6 @@ if numArgs > 0
         case 'eventtimer'
             dataType = parseVarargin('-t', varargin);
             ids = str2double(parseVarargin('id', varargin));
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
             eventTimerLaunchpad(handles, ids)
@@ -143,8 +136,6 @@ if numArgs > 0
         case 'labelimages'
             dataType = parseVarargin('-t', varargin);
             ids = str2double(parseVarargin('id', varargin));
-            %datasetId = str2double(parseVarargin('-d', varargin));
-            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             handles.exitApplication = 1;
             guidata(hObject, handles);
             labelMaker(handles, ids);
@@ -163,6 +154,7 @@ handles.conditionsFiles = '';
 handles.currDir = cd;
 set(handles.passwordText, 'KeyPressFcn', {@passKeyPress, handles});
 %set(handles.newConditionText, 'KeyPressFcn', {@newConditionTextKeyPress, handles});
+set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 uicontrol(handles.usernameText);
 checkLoginHistory(handles)
 
