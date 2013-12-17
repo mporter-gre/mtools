@@ -86,6 +86,7 @@ if numArgs > 0
             else
                 handles.exitApplication = 1;
                 guidata(hObject, handles);
+                set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
                 intensityMeasureLaunchpad(handles, credentials, str2double(ids));
             end
         
@@ -95,6 +96,7 @@ if numArgs > 0
             datasetId = str2double(parseVarargin('-d', varargin));
             handles.exitApplication = 1;
             guidata(hObject, handles);
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             boxIt(handles, credentials, ids, datasetId);
             
         case 'frap'
@@ -102,6 +104,7 @@ if numArgs > 0
             ids = str2double(parseVarargin('id', varargin));
             handles.exitApplication = 1;
             guidata(hObject, handles);
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             FRAPLaunchpad(ids);
             
         case 'createkymograph'
@@ -109,6 +112,7 @@ if numArgs > 0
             ids = str2double(parseVarargin('id', varargin));
             handles.exitApplication = 1;
             guidata(hObject, handles);
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             createKymograph(handles, ids);
             
         case 'tweakrois'
@@ -116,6 +120,7 @@ if numArgs > 0
             ids = str2double(parseVarargin('id', varargin));
             handles.exitApplication = 1;
             guidata(hObject, handles);
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             ROITweak(handles, ids);
             
         case 'distancemeasure'
@@ -123,6 +128,7 @@ if numArgs > 0
             ids = str2double(parseVarargin('id', varargin));
             handles.exitApplication = 1;
             guidata(hObject, handles);
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             distanceMeasureLaunchpad(handles, ids);
             
             
@@ -131,6 +137,7 @@ if numArgs > 0
             ids = str2double(parseVarargin('id', varargin));
             handles.exitApplication = 1;
             guidata(hObject, handles);
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             eventTimerLaunchpad(handles, ids)
             
         case 'labelimages'
@@ -138,6 +145,7 @@ if numArgs > 0
             ids = str2double(parseVarargin('id', varargin));
             handles.exitApplication = 1;
             guidata(hObject, handles);
+            set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             labelMaker(handles, ids);
 
     end
@@ -154,7 +162,6 @@ handles.conditionsFiles = '';
 handles.currDir = cd;
 set(handles.passwordText, 'KeyPressFcn', {@passKeyPress, handles});
 %set(handles.newConditionText, 'KeyPressFcn', {@newConditionTextKeyPress, handles});
-set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 uicontrol(handles.usernameText);
 checkLoginHistory(handles)
 
