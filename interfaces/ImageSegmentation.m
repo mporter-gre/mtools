@@ -65,9 +65,7 @@ setappdata(handles.ImageSegmentation, 'patchMax', patchMax);
 setappdata(handles.ImageSegmentation, 'lowestValue', lowestValue);
 setappdata(handles.ImageSegmentation, 'segmentationType', 'Otsu');
 
-handles.parentHandles = varargin{1};
-handles.credentials = varargin{2};
-ids = varargin{3};
+ids = varargin{1};
 guidata(hObject, handles);
 
 if isempty(ids)

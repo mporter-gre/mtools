@@ -1,7 +1,7 @@
-function intensityMeasureLaunchpad(handles, credentials, ids)
+function intensityMeasureLaunchpad(ids)
 
 try
-    [segChannel measureChannels measureAroundChannels featherSize saveMasks verifyZ groupObjects minSize selectedSegType threshold imageIds imageNames roiShapes channelLabels pixels datasetNames annulusSize gapSize] = ImageSegmentation(handles, credentials, ids);
+    [segChannel measureChannels measureAroundChannels featherSize saveMasks verifyZ groupObjects minSize selectedSegType threshold imageIds imageNames roiShapes channelLabels pixels datasetNames annulusSize gapSize] = ImageSegmentation(ids);
 catch ME
     return;
 end

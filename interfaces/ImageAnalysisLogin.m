@@ -61,21 +61,13 @@ if numArgs > 0
     global session;
     
     server = parseVarargin('-s', varargin);
-    port = parseVarargin('-p', varargin);
+    port = str2double(parseVarargin('-p', varargin));
     workflow = parseVarargin('-w', varargin);
+    sessionId = parseVarargin('-k', varargin);
     
-    %Please remove this!!!
-    props = java.util.Properties();
-    props.setProperty('omero.host', 'nightshade.openmicroscopy.org.uk');
-    props.setProperty('omero.user', 'mike');
-    props.setProperty('omero.pass', 'Homer');
-    props.setProperty('omero.port', '4064');
-    props.setProperty('omero.keep_alive', '60');
-    [client, session] = connectOmero(props);
-
-%     client = javaObject('omero.client', server);
-%     session = client.getSession(sessionId);
-    credentials = credentialsFromSession(session);
+    %client = javaObject('omero.client', server, port);
+    client = omero.client(server, port);
+    session = client.joinSession(sessionId);
     
     switch workflow
         case 'intensityanalysis'
@@ -87,7 +79,7 @@ if numArgs > 0
                 handles.exitApplication = 1;
                 guidata(hObject, handles);
                 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-                intensityMeasureLaunchpad(handles, credentials, str2double(ids));
+                intensityMeasureLaunchpad(str2double(ids));
             end
         
         case 'boxit'
@@ -97,7 +89,7 @@ if numArgs > 0
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-            boxIt(handles, credentials, ids, datasetId);
+            boxIt(ids, datasetId);
             
         case 'frap'
             dataType = parseVarargin('-t', varargin);
