@@ -15,6 +15,10 @@ ut=sum(h.*j);
 dett=sum(h.*((j-ut).^2));
 w0 = 0;
 mxvalue = 0;
+
+if mn == mx
+    K = 255;
+end
 for i=mn:mx-1
    j=0:i-1;
    w0 = w0 + h(i);
