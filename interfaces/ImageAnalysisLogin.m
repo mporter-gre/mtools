@@ -287,8 +287,8 @@ if success == 0
     return;
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-intensityMeasureLaunchpad(handles, credentials, []);
+%credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
+intensityMeasureLaunchpad([]);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
@@ -521,16 +521,16 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-answer = questdlg('Are your images larger than 512x512 pixels?', 'Image Size', 'Yes', 'No', 'No');
+%answer = questdlg('Are your images larger than 512x512 pixels?', 'Image Size', 'Yes', 'No', 'No');
 
-if strcmp(answer, '')
-    set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
-    return;
-elseif strcmpi(answer, 'No')
-    labelMaker(handles, []);
-else strcmpi(answer, 'Yes')
-    labelMaker1024(handles, []);
-end
+% if strcmp(answer, '')
+%     set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
+%     return;
+% elseif strcmpi(answer, 'No')
+labelMaker(handles, []);
+% else strcmpi(answer, 'Yes')
+%     labelMaker1024(handles, []);
+% end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
@@ -565,7 +565,7 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-boxIt(handles, credentials, [], []);
+boxIt([], []);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 

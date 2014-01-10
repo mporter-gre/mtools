@@ -3,6 +3,7 @@ function [maskStack minValue] = seg3D(cube, featherSize, groupObjects, minSize)
 %to segment out the object. If there is only 1 Z-section then seg2D.m is 
 %used instead. Pass it back as a stack of binary masks.
 
+cube = double(cube);
 numY = length(cube(:,1,1));
 numX = length(cube(1,:,1));
 numZ = length(cube(1,1,:));
