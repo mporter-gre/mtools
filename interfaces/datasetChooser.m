@@ -22,7 +22,7 @@ function varargout = datasetChooser(varargin)
 
 % Edit the above text to modify the response to help datasetChooser
 
-% Last Modified by GUIDE v2.5 26-Jul-2010 16:31:21
+% Last Modified by GUIDE v2.5 17-Jan-2014 10:15:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -74,6 +74,7 @@ setappdata(handles.datasetChooser, 'selectedDsNames', previousDsNames);
 setappdata(handles.datasetChooser, 'selectedDsIds', previousDsIds);
 set(handles.selectedDatasetsList, 'String', previousDsNames);
 
+populateUserSelect(handles);
 populateProjectsSelect(handles);
 
 % Update handles structure
@@ -268,7 +269,9 @@ function populateProjectsSelect(handles)
 
 global session
 
-projects = getProjects(session, [], false);
+userIdToView = getappdata(handles.datasetChooser, 'userIdToView');
+
+projects = getProjects(session, [], false, 'owner', userIdToView);
 numProj = length(projects);
 if numProj == 0
     warndlg('No projects found.');
@@ -324,4 +327,81 @@ set(handles.datasetsList, 'String', dsNameList);
 setappdata(handles.datasetChooser, 'dsNameList', dsNameList);
 setappdata(handles.datasetChooser, 'dsIdList', dsIdList);
 
+
+% --- Executes on selection change in userSelect.
+function userSelect_Callback(hObject, eventdata, handles)
+% hObject    handle to userSelect (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns userSelect contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from userSelect
+
+groupUserNames = getappdata(handles.datasetChooser, 'groupUserNames');
+groupUserIds = getappdata(handles.datasetChooser, 'groupUserIds');
+userSelectVal = get(handles.userSelect, 'Value');
+userIdToView = groupUserIds(userSelectVal);
+setappdata(handles.datasetChooser, 'userIdToView', userIdToView);
+populateProjectsSelect(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function userSelect_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to userSelect (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function populateUserSelect(handles)
+%Allow the user to select another user's datasets if the group allows it.
+
+global session;
+
+adminService = session.getAdminService;
+eventContext = adminService.getEventContext;
+username = char(eventContext.userName.getBytes');
+userId = eventContext.userId;
+groupObj = adminService.getGroup(eventContext.groupId);
+groupPermissions = groupObj.getDetails.getPermissions;
+groupRead = groupPermissions.isGroupRead;
+
+if ~groupRead
+    set(handles.userSelect, 'String', username);
+    set(handles.userSelect, 'Enable', 'off');
+    setappdata(handles.datasetChooser, 'groupUserNames', username);
+    setappdata(handles.datasetChooser, 'groupUserIds', userId);
+    setappdata(handles.datasetChooser, 'userIdToView', userId);
+else
+    groupUserNamesIds = {};
+    groupUsers = groupObj.linkedExperimenterList;
+    userIter = groupUsers.iterator;
+    while userIter.hasNext
+        thisUser = userIter.next;
+        groupUserNamesIds{end+1,1} = char(thisUser.getOmeName.getValue.getBytes');
+        groupUserNamesIds{end,2} = num2str(thisUser.getId.getValue);
+    end
+    groupUserNamesIds = sortrows(groupUserNamesIds);
+    numUsers = length(groupUserNamesIds);
+    groupUserNames = {};
+    groupUserIds = [];
+    for thisUser = 1:numUsers
+        groupUserNames{end+1} = groupUserNamesIds{thisUser,1};
+        groupUserIds(end+1) = str2double(groupUserNamesIds{thisUser,2});
+    end
+    userMatch = strfind(groupUserNames, 'mike');
+    userIdx = find(not(cellfun('isempty', userMatch)));
+    set(handles.userSelect, 'String', groupUserNames);
+    set(handles.userSelect, 'Value', userIdx);
+    
+    setappdata(handles.datasetChooser, 'groupUserNames', groupUserNames);
+    setappdata(handles.datasetChooser, 'groupUserIds', groupUserIds);
+    setappdata(handles.datasetChooser, 'userIdToView', groupUserIds(userIdx));
+end
 
