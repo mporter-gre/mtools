@@ -10,7 +10,7 @@ progBar = waitbar(0, 'Analysing image');
 
 for thisImage = 1:numImages
     waitbar(thisImage/numImages, progBar, ['Analysing image ' num2str(thisImage) ' of ' num2str(numImages)]);
-    [roiShapes{thisImage} measureSegChannel data{thisImage} dataAround{thisImage} objectData{thisImage} objectDataAround{thisImage} segChannel groupObjects numSegPixels{thisImage}] = volumeIntensityMeasure(handles, segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds(thisImage), imageNames{thisImage}, roiShapes{thisImage}, channelLabels, pixels{thisImage}, datasetNames, annulusSize, gapSize);
+    [roiShapes{thisImage} measureSegChannel data{thisImage} dataAround{thisImage} objectData{thisImage} objectDataAround{thisImage} segChannel groupObjects numSegPixels{thisImage}] = volumeIntensityMeasure(segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds(thisImage), imageNames{thisImage}, roiShapes{thisImage}, channelLabels, pixels{thisImage}, datasetNames, annulusSize, gapSize);
 end
 close(progBar);
 

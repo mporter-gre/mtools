@@ -1,4 +1,4 @@
-function [roiShapes measureSegChannel data dataAround objectData objectDataAround segChannel groupObjects numSegPixels] = volumeIntensityMeasure(handles, segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageId, imageName, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize)
+function [roiShapes measureSegChannel data dataAround objectData objectDataAround segChannel groupObjects numSegPixels] = volumeIntensityMeasure(segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageId, imageName, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize)
 %Author Michael Porter
 %Copyright 2009 University of Dundee. All rights reserved
 
