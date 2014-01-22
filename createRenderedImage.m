@@ -31,6 +31,9 @@ for thisChannel = 1:numChannels
     startVal = channelBinding.getInputStart.getValue;
     endVal = channelBinding.getInputEnd.getValue;
     globalMax = pixelsDescription.getChannel(thisChannel-1).getStatsInfo.getGlobalMax.getValue;
+    if startVal < 1
+        startVal = 1;
+    end
     globalMaxScaled = endVal/globalMax;
     startValScaled = startVal/globalMax;
     if globalMaxScaled > 1
