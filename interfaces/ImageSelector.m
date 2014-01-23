@@ -331,8 +331,9 @@ dsId = getappdata(handles.imageSelector, 'dsId');
 
 %images = gateway.getImages(datasetContainer,datasetId);
 images = getImages(session, 'dataset', dsId);
+images = toJavaList(images);
 
-numImages = length(images);
+numImages = images.size;
 if numImages == 0
     set(handles.imagesSelect, 'Value', 1);
     set(handles.imagesSelect, 'String', 'No images in this dataset');
@@ -340,23 +341,23 @@ if numImages == 0
 end
 if handles.ROIFilter == 1
     for thisImage = 1:numImages
-        imageIds(thisImage) = images(thisImage).getId.getValue;
+        imageIds(thisImage) = images.get(thisImage-1).getId.getValue;
     end
     [imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds);
     images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
     %imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
 end
-numImages = length(images);
+numImages = images.size;
 
 imageNameId{numImages,2} = [];
 imageNameList{numImages} = [];
 
 
 for thisImage = 1:numImages
-    imageNameId{thisImage,1} = char(images(thisImage).getName.getValue.getBytes');
-    imageNameId{thisImage,2} = num2str(images(thisImage).getId.getValue);
+    imageNameId{thisImage,1} = char(images.get(thisImage-1).getName.getValue.getBytes');
+    imageNameId{thisImage,2} = num2str(images.get(thisImage-1).getId.getValue);
 end
-numImages = length(images);
+
 if numImages > 1
     imageNameId = sortrows(imageNameId);
 end
