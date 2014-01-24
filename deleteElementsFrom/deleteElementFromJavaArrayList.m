@@ -24,7 +24,7 @@ numToBeDeleted = length(elementsForDeletion);
             %if ismember(thisElement, elementsForDeletion)
                 continue;
             end
-            newArrayList.add(arrayList.get(thisElement));
+            newArrayList.add(arrayList(thisElement));
         end
     %end
     %arrayList = newArrayList;

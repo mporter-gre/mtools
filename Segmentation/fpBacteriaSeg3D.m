@@ -7,6 +7,7 @@ for thisZ = 1:numZ
 end
 
 otsuThresh = max(otsuThresh);
+stackIn = double(stackIn);
 
 %Find the mean + 2x standard deviations of pixels below otsuThresh
 belowThresh = zeros(sizeY, sizeX, numZ);
@@ -16,7 +17,8 @@ belowThresh(belowThresh==0) = [];
 imageMax = max(max(max(stackIn)));
 meanBelowThresh = mean(belowThresh);
 stdBelowThresh = std(belowThresh);
-cannyThresh = (meanBelowThresh + (2*stdBelowThresh))/imageMax;
+%cannyThresh = (meanBelowThresh + (1*stdBelowThresh))/imageMax;
+cannyThresh = meanBelowThresh/imageMax;
 
 %Put the Z stack into a single plane for edge detection, apply a filter for
 %the background and exaggerate the gradients
