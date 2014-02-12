@@ -1,4 +1,4 @@
-function cellProps = TssBAnalysis(gfpStack, TssBStack)
+function cellProps = TssBRunAnalysis(gfpStack, TssBStack)
 
 [sizeY, sizeX, numZ] = size(gfpStack);
 gfpSeg = fpBacteriaSeg3D(gfpStack);
@@ -31,7 +31,7 @@ for thisCell = 1:numCells
     meanX = int16(mean(X));
     meanY = int16(mean(Y));
     meanZ = int16(mean(Z));
-    cellCentroid = double([meanX meanY meanZ]);
+    cellCentroid = double([meanY meanX meanZ]);
     cellProps{cellCounter}.centroid = cellCentroid;
     
     %Using regoinprops...
@@ -67,10 +67,13 @@ for thisCell = 1:numCells
         meanX = int16(mean(X));
         meanY = int16(mean(Y));
         meanZ = int16(mean(Z));
-        focusCentroid(thisFocus,:) = double([meanX meanY meanZ]);
+        focusCentroid(thisFocus,:) = double([meanY meanX meanZ]);
         
         %Distance of the focus from cell centroid
         fDist(thisFocus) = pdist([cellCentroid; focusCentroid(thisFocus,:)]);
+        majorAxis = cellProps{cellCounter}.props.MajorAxisLength;
+        halfLength = majorAxis/2;
+        focusPosition(thisFocus) = (fDist(thisFocus)/halfLength)*100;
         
     end
     
@@ -79,6 +82,11 @@ for thisCell = 1:numCells
     cellProps{cellCounter}.numFocusPx = numFocusPx;
     cellProps{cellCounter}.focusCentroid = focusCentroid;
     cellProps{cellCounter}.focusDistance = fDist;
+    cellProps{cellCounter}.focusPosition = focusPosition;
     
     cellCounter = cellCounter + 1;
 end
+
+cellProps = cellNeighbours(cellProps);
+cellProps = cellProximities(cellProps, gfpSegBWL);
+cellProps = neighboursWithFoci(cellProps);

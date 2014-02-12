@@ -19,7 +19,7 @@ end
 % numCells = length(cellVals);
 for thisCell = 1:numCells
     thisCellPxLoc = [];
-    thisCellVal = gfpSegBWL(centroids(thisCell, 2), centroids(thisCell, 1), centroids(thisCell, 3));
+    thisCellVal = gfpSegBWL(centroids(thisCell, 1), centroids(thisCell, 2), centroids(thisCell, 3));
     thisCellPxInd = find(gfpSegBWL==thisCellVal);
     [thisCellPxLoc(:,1), thisCellPxLoc(:,2), thisCellPxLoc(:,3)] = ind2sub([sizeY sizeX sizeZ], thisCellPxInd);
     thisCellNeighbours = cellNeighbours{thisCell,:};
@@ -31,7 +31,7 @@ for thisCell = 1:numCells
         for thisNeighbour = 1:numNeighbours
             thisNeighbourPxLoc = [];
             thisNeighbourCentroid = cellProps{thisCellNeighbours(thisNeighbour)}.centroid;
-            thisNeighbourVal = gfpSegBWL(thisNeighbourCentroid(2), thisNeighbourCentroid(1), thisNeighbourCentroid(3));
+            thisNeighbourVal = gfpSegBWL(thisNeighbourCentroid(1), thisNeighbourCentroid(2), thisNeighbourCentroid(3));
             thisNeighbourPxInd = find(gfpSegBWL==thisNeighbourVal);
             [thisNeighbourPxLoc(:,1), thisNeighbourPxLoc(:,2), thisNeighbourPxLoc(:,3)] = ind2sub([sizeY sizeX sizeZ], thisNeighbourPxInd);
             neighbourPxDist = pdist2(thisCellPxLoc, thisNeighbourPxLoc);
