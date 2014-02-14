@@ -163,7 +163,7 @@ function analyseBtn_Callback(hObject, eventdata, handles)
 set(handles.TssBAnalysis, 'visible', 'off');
 dsIds = getappdata(handles.TssBAnalysis, 'selectedDsIds');
 TssBAnalysisQueue(dsIds);
-set(handles.TssBAnalysis, 'visible', 'off');
+set(handles.TssBAnalysis, 'visible', 'on');
 
 
 function passKeyPress(hObject, eventdata, handles)

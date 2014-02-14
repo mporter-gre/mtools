@@ -39,8 +39,8 @@ for thisCell = 1:numCells
     end
 end
 
-xlswrite(imageName, cellData, 'Cell Data');
-xlswrite(imageName, neighbourData, 'Neighbour Data');
-xlswrite(imageName, focusData, 'Focus Data');
+xlswrite([imageName '.xls'], cellData, 'Cell Data');
+xlswrite([imageName '.xls'], neighbourData, 'Neighbour Data');
+xlswrite([imageName '.xls'], focusData, 'Focus Data');
 
 end

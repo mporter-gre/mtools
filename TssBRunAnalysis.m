@@ -1,5 +1,6 @@
-function cellProps = TssBRunAnalysis(gfpStack, TssBStack)
+function cellProps = TssBRunAnalysis(gfpStack, TssBStack, progress, progressFraction)
 
+waitbar(progressFraction, progress, 'Defining cells');
 [sizeY, sizeX, numZ] = size(gfpStack);
 gfpSeg = fpBacteriaSeg3D(gfpStack);
 TssBSeg = fpBacteriaSeg3D(TssBStack);
@@ -12,7 +13,7 @@ numCells = length(cellVals);
 
 %cellProps = cell(1,numCells);
 cellCounter = 1;
-
+waitbar(progressFraction, progress, 'Measuring cells');
 for thisCell = 1:numCells
     workImg = zeros(sizeY, sizeX, numZ);
     workImg(gfpSegBWL==cellVals(thisCell)) = 1;
@@ -22,6 +23,7 @@ for thisCell = 1:numCells
         continue;
     end
     cellProps{cellCounter}.numPx = numPx;
+    cellProps{cellCounter}.cellVal = cellVals(thisCell);
     
     %Centroid of cell
     zProj = logical(sum(workImg,3));
@@ -88,5 +90,6 @@ for thisCell = 1:numCells
 end
 
 cellProps = cellNeighbours(cellProps);
+waitbar(progressFraction, progress, 'Measuring proximities');
 cellProps = cellProximities(cellProps, gfpSegBWL);
 cellProps = neighboursWithFoci(cellProps);
