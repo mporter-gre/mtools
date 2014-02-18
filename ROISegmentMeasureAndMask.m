@@ -88,7 +88,7 @@ for thisROI = 1:numROI
         %channels.
         counter = 1;
         for thisMeasureChannel = measureChannels
-            thisROIIntensityShape{counter} = zeros(height,width,numZ(thisROI));
+            thisROIIntensityShape{counter} = zeros(size(patchMasks));
             ROIEndX = X+width;
             ROIEndY = Y+height;
             if ROIEndX > maxX || ROIEndY > maxY || X < 0 || Y < 0
@@ -104,7 +104,7 @@ for thisROI = 1:numROI
             end
             
             for thisZ = 1:numZ(thisROI)
-                if fix(cropPatch) == 1
+                if floor(cropPatch) == 1
                     for col = 1:width
                         posX = col+X-1;
                         if posX > maxX  %If the ROI was drawn to extend off the image, set the crop to the edge of the image only.
@@ -137,7 +137,7 @@ for thisROI = 1:numROI
         %channels. Detect if the 'around' signal come from an annulus.
         counter = 1;
         for thisMeasureAroundChannel = measureAroundChannels
-            thisAroundROIIntensityShape{counter} = zeros(height,width,numZ(thisROI));
+            thisAroundROIIntensityShape{counter} = zeros(size(patchMasks));
             %for thisZ = 1:numZ(thisROI)
             if annulusSize > 0
                 diskSize = annulusSize + gapSize;
