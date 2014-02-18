@@ -23,7 +23,18 @@ for thisCell = 1:numCells
 end
 
 
-focusData = {'Image name', 'Cell', 'Focus', 'Focus size', 'Focus Px in cell', 'Focus Px outside cell', 'Focus location %length', 'Focus distance to closest neighbour point'};
+focusData = {'Image name', 'Cell', 'Focus', 'Focus size', 'Focus Px in cell', 'Focus Px outside cell', 'Focus location %length'};
+for thisCell = 1:numCells
+    props = cellProps{thisCell};
+    numFoci = props.numFoci;
+    for thisFocus = 1:numFoci
+        focusData = [focusData; {imageName, thisCell, thisFocus, props.numFocusPx(thisFocus), props.numFocusPxInCell(thisFocus), props.numFocusPxOutsideCell(thisFocus), props.focusPosition(thisFocus)}];
+    end
+end
+
+
+
+focusNeighbourData = {'Image name', 'Cell', 'Focus', 'Focus distance to closest neighbour point'};
 for thisCell = 1:numCells
     props = cellProps{thisCell};
     numFoci = props.numFoci;
@@ -31,10 +42,8 @@ for thisCell = 1:numCells
     for thisFocus = 1:numFoci
         if numNeighbours > 0
             for thisNeighbour = 1:numNeighbours
-                focusData = [focusData; {imageName, thisCell, thisFocus, props.numFocusPx(thisFocus), props.numFocusPxInCell(thisFocus), props.numFocusPxOutsideCell(thisFocus), props.focusPosition(thisFocus), props.proxToFocusDist(thisFocus, thisNeighbour)}];
+                focusNeighbourData = [focusNeighbourData; {imageName, thisCell, thisFocus, props.proxToFocusDist(thisFocus, thisNeighbour)}];
             end
-        else
-            focusData = [focusData; {imageName, thisCell, thisFocus, props.numFocusPx(thisFocus), props.numFocusPxInCell(thisFocus), props.numFocusPxOutsideCell(thisFocus), props.focusPosition(thisFocus), 0}];
         end
     end
 end
@@ -42,5 +51,7 @@ end
 xlswrite([imageName '.xls'], cellData, 'Cell Data');
 xlswrite([imageName '.xls'], neighbourData, 'Neighbour Data');
 xlswrite([imageName '.xls'], focusData, 'Focus Data');
+xlswrite([imageName '.xls'], focusNeighbourData, 'Focus Neighbour Data');
+
 
 end

@@ -47,6 +47,9 @@ for thisCell = 1:numCells
             cellProxPxCoord(thisNeighbour,:) = thisCellPxLoc(cellPxIdx,:);
             neighbourProxPxCoord(thisNeighbour,:) = thisNeighbourPxLoc(neighbourPxIdx,:);
             neighbourDist(thisNeighbour) = pdist([cellProxPxCoord(thisNeighbour,:); neighbourProxPxCoord(thisNeighbour,:)]);
+            if neighbourDist(thisNeighbour) == 0
+                disp('zero')
+            end
         end
     else
         neighbourDist(1) = inf;
