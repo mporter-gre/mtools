@@ -60,10 +60,12 @@ numArgs = nargin-3;
 if numArgs > 0
     global session;
     
-    server = parseVarargin('-s', varargin);
-    port = str2double(parseVarargin('-p', varargin));
-    workflow = parseVarargin('-w', varargin);
-    sessionId = parseVarargin('-k', varargin);
+    argStrings = strsplit(args);
+    
+    server = parseVarargin('-s', argStrings);
+    port = str2double(parseVarargin('-p', argStrings));
+    workflow = parseVarargin('-w', argStrings);
+    sessionId = parseVarargin('-k', argStrings);
     
     %client = javaObject('omero.client', server, port);
     client = omero.client(server, port);
@@ -71,8 +73,8 @@ if numArgs > 0
     
     switch workflow
         case 'intensityanalysis'
-            dataType = parseVarargin('-t', varargin);
-            ids = parseVarargin('id', varargin);
+            dataType = parseVarargin('-t', argStrings);
+            ids = parseVarargin('id', argStrings);
             if ~strcmpi(dataType, 'dataset') || isempty(ids)
                 warndlg('Argument check failed');
             else
@@ -83,41 +85,41 @@ if numArgs > 0
             end
         
         case 'boxit'
-            dataType = parseVarargin('-t', varargin);
-            ids = str2double(parseVarargin('id', varargin));
-            datasetId = str2double(parseVarargin('-d', varargin));
+            dataType = parseVarargin('-t', argStrings);
+            ids = str2double(parseVarargin('id', argStrings));
+            datasetId = str2double(parseVarargin('-d', argStrings));
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             boxIt(ids, datasetId);
             
         case 'frap'
-            dataType = parseVarargin('-t', varargin);
-            ids = str2double(parseVarargin('id', varargin));
+            dataType = parseVarargin('-t', argStrings);
+            ids = str2double(parseVarargin('id', argStrings));
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             FRAPLaunchpad(ids);
             
         case 'createkymograph'
-            dataType = parseVarargin('-t', varargin);
-            ids = str2double(parseVarargin('id', varargin));
+            dataType = parseVarargin('-t', argStrings);
+            ids = str2double(parseVarargin('id', argStrings));
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             createKymograph(handles, ids);
             
         case 'tweakrois'
-            dataType = parseVarargin('-t', varargin);
-            ids = str2double(parseVarargin('id', varargin));
+            dataType = parseVarargin('-t', argStrings);
+            ids = str2double(parseVarargin('id', argStrings));
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             ROITweak(handles, ids);
             
         case 'distancemeasure'
-            dataType = parseVarargin('-t', varargin);
-            ids = str2double(parseVarargin('id', varargin));
+            dataType = parseVarargin('-t', argStrings);
+            ids = str2double(parseVarargin('id', argStrings));
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
@@ -125,16 +127,16 @@ if numArgs > 0
             
             
         case 'eventtimer'
-            dataType = parseVarargin('-t', varargin);
-            ids = str2double(parseVarargin('id', varargin));
+            dataType = parseVarargin('-t', argStrings);
+            ids = str2double(parseVarargin('id', argStrings));
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
             eventTimerLaunchpad(handles, ids)
             
         case 'labelimages'
-            dataType = parseVarargin('-t', varargin);
-            ids = str2double(parseVarargin('id', varargin));
+            dataType = parseVarargin('-t', argStrings);
+            ids = str2double(parseVarargin('id', argStrings));
             handles.exitApplication = 1;
             guidata(hObject, handles);
             set(handles.ImageAnalysisLoginWindow, 'visible', 'off');

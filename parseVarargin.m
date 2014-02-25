@@ -1,4 +1,4 @@
-function itemVal = parseVarargin(item, varargin)
+function itemVal = parseVarargin(item, argsIn)
 %Parse the varargin for specific switches to get the values. 'item' is a
 %string relating to the switch. Possible switches are:
 %       -k for sessionId
@@ -11,9 +11,8 @@ function itemVal = parseVarargin(item, varargin)
 %       id for one or more ids for the objects specified by -t.
 %              These ids should terminate the list of arguments.
 
-varargin = varargin{1};
 
-itemIdFind = strfind(varargin, item);
+itemIdFind = strfind(argsIn, item);
 itemIdx = findIndex(itemIdFind) +1;
 if strcmpi(item, 'id')
     itemVal = varargin{itemIdx:end};
