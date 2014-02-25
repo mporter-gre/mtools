@@ -1,5 +1,22 @@
 function intensityMeasureLaunchpad(handles, credentials)
 
+% Copyright (C) 2013-2014 University of Dundee & Open Microscopy Environment.
+% All rights reserved.
+% 
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License along
+% with this program; if not, write to the Free Software Foundation, Inc.,
+% 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 try
     [segChannel measureChannels measureAroundChannels featherSize saveMasks verifyZ groupObjects minSize selectedSegType threshold imageIds imageNames roiShapes channelLabels pixels datasetNames annulusSize gapSize] = ImageSegmentation(handles, credentials);
 catch ME
@@ -22,6 +39,7 @@ writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segC
 function writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize)
 
 %Find the maximum number of channels needing written out.
+
 maxChannels = 0;
 maxAroundChannels = 0;
 numDs = length(datasetNames);
