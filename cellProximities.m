@@ -1,6 +1,23 @@
 function cellProps = cellProximities(cellProps, gfpSegBWL)
 %Find all cells within 50px of each cell.
 
+% Copyright (C) 2013-2014 University of Dundee & Open Microscopy Environment.
+% All rights reserved.
+% 
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License along
+% with this program; if not, write to the Free Software Foundation, Inc.,
+% 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 %Fish out the cell neighbours
 % cellVals = unique(gfpSegBWL(gfpSegBWL>0));
 numCells = length(cellProps);
@@ -19,7 +36,9 @@ end
 % numCells = length(cellVals);
 for thisCell = 1:numCells
     thisCellPxLoc = [];
-    thisCellVal = gfpSegBWL(centroids(thisCell, 2), centroids(thisCell, 1), centroids(thisCell, 3));
+    %     thisCellVal = gfpSegBWL(centroids(thisCell, 1), centroids(thisCell, 2), centroids(thisCell, 3));
+    %     thisCellPxInd = find(gfpSegBWL==thisCellVal);
+    thisCellVal = cellProps{thisCell}.cellVal;
     thisCellPxInd = find(gfpSegBWL==thisCellVal);
     [thisCellPxLoc(:,1), thisCellPxLoc(:,2), thisCellPxLoc(:,3)] = ind2sub([sizeY sizeX sizeZ], thisCellPxInd);
     thisCellNeighbours = cellNeighbours{thisCell,:};
@@ -30,8 +49,9 @@ for thisCell = 1:numCells
     if numNeighbours > 0
         for thisNeighbour = 1:numNeighbours
             thisNeighbourPxLoc = [];
-            thisNeighbourCentroid = cellProps{thisCellNeighbours(thisNeighbour)}.centroid;
-            thisNeighbourVal = gfpSegBWL(thisNeighbourCentroid(2), thisNeighbourCentroid(1), thisNeighbourCentroid(3));
+            %             thisNeighbourCentroid = cellProps{thisCellNeighbours(thisNeighbour)}.centroid;
+            %             thisNeighbourVal = gfpSegBWL(thisNeighbourCentroid(1), thisNeighbourCentroid(2), thisNeighbourCentroid(3));
+            thisNeighbourVal = cellProps{thisCellNeighbours(thisNeighbour)}.cellVal;
             thisNeighbourPxInd = find(gfpSegBWL==thisNeighbourVal);
             [thisNeighbourPxLoc(:,1), thisNeighbourPxLoc(:,2), thisNeighbourPxLoc(:,3)] = ind2sub([sizeY sizeX sizeZ], thisNeighbourPxInd);
             neighbourPxDist = pdist2(thisCellPxLoc, thisNeighbourPxLoc);
@@ -44,6 +64,9 @@ for thisCell = 1:numCells
             cellProxPxCoord(thisNeighbour,:) = thisCellPxLoc(cellPxIdx,:);
             neighbourProxPxCoord(thisNeighbour,:) = thisNeighbourPxLoc(neighbourPxIdx,:);
             neighbourDist(thisNeighbour) = pdist([cellProxPxCoord(thisNeighbour,:); neighbourProxPxCoord(thisNeighbour,:)]);
+            if neighbourDist(thisNeighbour) == 0
+                disp('zero')
+            end
         end
     else
         neighbourDist(1) = inf;

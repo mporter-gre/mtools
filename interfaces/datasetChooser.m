@@ -395,7 +395,7 @@ else
         groupUserNames{end+1} = groupUserNamesIds{thisUser,1};
         groupUserIds(end+1) = str2double(groupUserNamesIds{thisUser,2});
     end
-    userMatch = strfind(groupUserNames, 'mike');
+    userMatch = strfind(groupUserNames, username);
     userIdx = find(not(cellfun('isempty', userMatch)));
     set(handles.userSelect, 'String', groupUserNames);
     set(handles.userSelect, 'Value', userIdx);

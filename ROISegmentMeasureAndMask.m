@@ -1,6 +1,22 @@
 function [roiShapes, fullMaskImg, data, dataAround, objectCounter, objectData, objectDataAround, numSegPixels, measureSegChannel] = ROISegmentMeasureAndMask(roiShapes, pixels, measureChannels, measureAroundChannels, segChannel, verifyZ, featherSize, groupObjects, minSize, selectedSegType, threshold, channelsToFetch, numROI, annulusSize, gapSize)
 %Author Michael Porter
-%Copyright 2009 University of Dundee. All rights reserved
+
+% Copyright (C) 2009-2014 University of Dundee.
+% All rights reserved.
+% 
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License along
+% with this program; if not, write to the Free Software Foundation, Inc.,
+% 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 global fig1;
 global ROIText;
@@ -88,7 +104,7 @@ for thisROI = 1:numROI
         %channels.
         counter = 1;
         for thisMeasureChannel = measureChannels
-            thisROIIntensityShape{counter} = zeros(height,width,numZ(thisROI));
+            thisROIIntensityShape{counter} = zeros(size(patchMasks));
             ROIEndX = X+width;
             ROIEndY = Y+height;
             if ROIEndX > maxX || ROIEndY > maxY || X < 0 || Y < 0
@@ -104,7 +120,7 @@ for thisROI = 1:numROI
             end
             
             for thisZ = 1:numZ(thisROI)
-                if fix(cropPatch) == 1
+                if floor(cropPatch) == 1
                     for col = 1:width
                         posX = col+X-1;
                         if posX > maxX  %If the ROI was drawn to extend off the image, set the crop to the edge of the image only.
@@ -137,7 +153,7 @@ for thisROI = 1:numROI
         %channels. Detect if the 'around' signal come from an annulus.
         counter = 1;
         for thisMeasureAroundChannel = measureAroundChannels
-            thisAroundROIIntensityShape{counter} = zeros(height,width,numZ(thisROI));
+            thisAroundROIIntensityShape{counter} = zeros(size(patchMasks));
             %for thisZ = 1:numZ(thisROI)
             if annulusSize > 0
                 diskSize = annulusSize + gapSize;
