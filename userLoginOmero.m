@@ -23,7 +23,6 @@ if isnumeric(port)
     port = num2str(port);
 end
 
-warndlg('line 26 userLoginOmero');
 props = java.util.Properties();
 props.setProperty('omero.host', server);
 props.setProperty('omero.user', username);

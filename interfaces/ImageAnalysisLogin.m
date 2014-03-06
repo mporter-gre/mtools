@@ -361,7 +361,6 @@ end
 %will persist and be kept alive until application close.
 try
     if ~isjava(client)
-        warndlg('line 364 of logIn');
         userLoginOmero(credentials{1}, credentials{2}, credentials{3}, credentials{4});
         saveHistory(credentials);
         success = true;
@@ -382,7 +381,6 @@ catch ME
     clear global gateway;
     clear global clientAlive;
     disp(ME.message);
-    msgbox(ME.message);
     warndlg('Could not log on to the server. Check your details and try again.');
     success = false;
     return;
