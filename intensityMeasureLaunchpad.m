@@ -18,7 +18,7 @@ function intensityMeasureLaunchpad(handles, credentials)
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 try
-    [segChannel measureChannels measureAroundChannels featherSize saveMasks verifyZ groupObjects minSize selectedSegType threshold imageIds imageNames roiShapes channelLabels pixels datasetNames annulusSize gapSize] = ImageSegmentation(handles, credentials);
+    [segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds, imageNames, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize] = ImageSegmentation(handles, credentials);
 catch ME
     throw(ME)
     return;
