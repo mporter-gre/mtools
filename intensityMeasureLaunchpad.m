@@ -20,7 +20,7 @@ function intensityMeasureLaunchpad(handles, credentials)
 try
     [segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds, imageNames, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize] = ImageSegmentation(handles, credentials);
 catch ME
-    throw(ME)
+    disp(ME.message)
     return;
 end
 numImages = length(roiShapes);
