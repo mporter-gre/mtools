@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration target="target.ezdeploy.standalone" target-name="MATLAB Compiler for Standalone Applications" name="OMEROmtools" location="/Users/matlab/Documents/MATLAB" file="/Users/matlab/Documents/MATLAB/OMEROmtools.prj" preferred-package-type="package.type.app" build-checksum="2871525433" preferred-package-location="/Users/matlab/Documents/MATLAB/Matlab Builds/OMEROmtools/for_redistribution">
+    <param.appname>OMEROmtools</param.appname>
+    <param.authnamewatermark>Michael Porter</param.authnamewatermark>
+    <param.email>m.porter@dundee.ac.uk</param.email>
+    <param.company>University of Dundee</param.company>
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.namespace>OMEROmtools</param.namespace>
+    <param.guid />
+    <param.installpath.string>/OMEROmtools/</param.installpath.string>
+    <param.installpath.combo>option.installpath.systemwideapp</param.installpath.combo>
+    <param.logo />
+    <param.install.notes />
+    <param.intermediate>${PROJECT_ROOT}/Matlab Builds/OMEROmtools/for_testing</param.intermediate>
+    <param.output>${PROJECT_ROOT}/Matlab Builds/OMEROmtools/for_redistribution</param.output>
+    <param.embed.ctf>true</param.embed.ctf>
+    <param.target.type>subtarget.standalone</param.target.type>
+    <param.classorg />
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>false</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>OMEROmtools_1.0.0_Mac_web</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.user.defined.mcr.options />
+    <param.windows.command.prompt>true</param.windows.command.prompt>
+    <param.user.only.registration>false</param.user.only.registration>
+    <param.mads.no.java>false</param.mads.no.java>
+    <param.mads.exclusive.mcr>false</param.mads.exclusive.mcr>
+    <param.net.framework>option.net.framework.default</param.net.framework>
+    <param.assembly.type>false</param.assembly.type>
+    <param.encryption.key.file />
+    <param.net.enable.remoting>false</param.net.enable.remoting>
+    <param.net.tsa.enable>false</param.net.tsa.enable>
+    <param.net.tsa.assembly />
+    <param.net.tsa.interface />
+    <param.net.tsa.namespace>OMEROmtools</param.net.tsa.namespace>
+    <param.net.tsa.superclass />
+    <param.net.tsa.metadata />
+    <param.net.tsa.metadata.assembly>/Users/matlab/Documents/MATLAB</param.net.tsa.metadata.assembly>
+    <param.create.log>true</param.create.log>
+    <param.log.file>errorLog.txt</param.log.file>
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.version />
+      <param.namespace />
+      <param.guid />
+      <param.logo />
+      <param.install.notes />
+      <param.embed.ctf />
+      <param.target.type />
+      <param.classorg />
+      <param.web.mcr />
+      <param.package.mcr />
+      <param.no.mcr />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.windows.command.prompt />
+      <param.user.only.registration />
+      <param.mads.no.java />
+      <param.mads.exclusive.mcr />
+      <param.net.framework />
+      <param.assembly.type />
+      <param.encryption.key.file />
+      <param.net.enable.remoting />
+      <param.net.tsa.enable />
+      <param.net.tsa.assembly />
+      <param.net.tsa.interface />
+      <param.net.tsa.namespace />
+      <param.net.tsa.superclass />
+      <param.net.tsa.metadata />
+      <param.net.tsa.metadata.assembly />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ImageAnalysisLogin.m</file>
+    </fileset.main>
+    <fileset.resources>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/.DS_Store</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/._Launch_Image_Analysis_App.command</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/Launch_Image_Analysis_App.command</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/ROIProforma.mat</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/Thumbs.db</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/addButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/arrowButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/arrowButton.psd</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/arrowButtopn.psd</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/arrowIcon.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/buttonBackground.psd</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/buttonStack.psd</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/crosshairButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/crosshairIcon.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/deletePointButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/loadingImage.JPG</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/newXmlStruct.mat</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/pause.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/pause24.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/pauseButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/play.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/play24.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/playButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/pointers.mat</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/rectButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/rectProforma.mat</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/selectDatasets.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/selectDatasets.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/selectDatasets.tif</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/startImage.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/startImageImage.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/startImagePoints.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/subtractButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/whiteSquare200.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/zoomIn.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/zoomInButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/zoomInIcon.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/zoomOut.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/zoomOutButton.png</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Associated Files/zoomOutIcon.jpg</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/FRAPLaunchpad.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/FRAPMeasure.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/ROISegmentMeasureAndMask.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/ROIs/ROIImageCheck.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/ROIs/createRectObj.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/ROIs/getROIsFromImageId.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/ROIs/getShapeType.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/ROIs/sortROIShapes.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Segmentation/getSegChannel.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Segmentation/getSigmaThreshold.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Segmentation/minUnderMask.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Segmentation/seg2D.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Segmentation/seg2DThresh.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Segmentation/seg3D.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/Segmentation/seg3DThresh.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/bacTracker/DICSeg.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/bacTracker/subtractBackground.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/clickSection.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/createNewImageFromOldPixels.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/createRenderedImage.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/createSpreadsheetFromData.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/cutPatchesFromROI.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/deleteElementsFrom/deleteElementFromCells.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/deleteElementsFrom/deleteElementFromJavaArrayList.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/deleteElementsFrom/deleteElementFromVector.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/ellipseCoords.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/eventTimerAndCrop.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/eventTimerLaunchpad.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/gatewayDisconnect.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/getChannelLabelsFromPixels.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/getChannelMinMax.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/getChannelsFromPixels.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/getImageIdsAndNamesFromDatasetIds.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/getIntensitiesInROI.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/getPlaneFromPixelsId.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/getROITimePoints.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/intensityMeasureLaunchpad.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/FRAPChooser.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/FRAPChooser.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ImageAnalysisLogin.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ImageSegmentation.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ImageSegmentation.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ImageSelector.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ImageSelector.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ROITweak.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/ROITweak.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/batchChooser.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/batchChooser.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/boxIt.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/boxIt.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/boxItObjectChooser.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/boxItObjectChooser.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/bugCounterMain.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/bugCounterMain.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/createKymograph.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/createKymograph.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/datasetChooser.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/datasetChooser.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/defineLabel.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/defineLabel.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/distanceMeasureLaunchpad.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/distanceMeasureLaunchpad.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/eventTimer.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/eventTimer.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/labelMaker.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/labelMaker.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/labelMaker1024.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/labelMaker1024.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/objectSelector.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/objectSelector.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/recordCentreMode.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/recordCentreMode.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/selectUserDefaultGroup.fig</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/interfaces/selectUserDefaultGroup.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/manualCSV.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/max2.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/numberOverlay.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/otsu.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/setMatrixType.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/showmeRaw.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/showmeRawLargeScreenZSections.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/sumIntensitiesAreasFromDICSeg.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/typecastMatrix.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/updateROIMapFile.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/updateTransform.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/userLoginOmero.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/userLogoutOmero.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/volumeIntensityMeasure.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/xml2struct.m</file>
+      <file>${PROJECT_ROOT}/ImageAnalysis/zChooser.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/connectOmero.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/createObjectDictionary.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/findOmero.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/getObjectTypes.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/helper/rint.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/helper/rlong.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/helper/toByteArray.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/helper/toJavaList.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/helper/toMatlabList.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/helper/toMatrix.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/image/getPlane.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/image/getPlaneInfo.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/image/getRawPixelsStore.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/image/getStack.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/io/getDatasets.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/io/getImages.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/io/getObjects.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/io/getProjects.m</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/libs/omero_client.jar</file>
+      <file>${PROJECT_ROOT}/OMEROMatlabApi/libs/slf4j-api-1.7.6.jar</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file name="readme.txt" location="${PROJECT_ROOT}/Matlab Builds/OMEROmtools/for_testing" optional="true">/Users/matlab/Documents/MATLAB/Matlab Builds/OMEROmtools/for_testing/readme.txt</file>
+      <file name="OMEROmtools.app" location="${PROJECT_ROOT}/Matlab Builds/OMEROmtools/for_testing" optional="false">/Users/matlab/Documents/MATLAB/Matlab Builds/OMEROmtools/for_testing/OMEROmtools.app</file>
+      <file name="run_OMEROmtools.sh" location="${PROJECT_ROOT}/Matlab Builds/OMEROmtools/for_testing" optional="false">/Users/matlab/Documents/MATLAB/Matlab Builds/OMEROmtools/for_testing/run_OMEROmtools.sh</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>/Applications/MATLAB_R2013b.app</root>
+      <toolboxes>
+        <toolbox name="fixedpoint" />
+      </toolboxes>
+    </matlab>
+    <platform>
+      <unix>true</unix>
+      <mac>true</mac>
+      <windows>false</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.8.5</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>maci64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
+
