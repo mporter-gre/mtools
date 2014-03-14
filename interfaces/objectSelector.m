@@ -77,7 +77,7 @@ handles.currentPointSeg2 = 0;
 handles.chosenObject1 = 0;
 handles.chosenObject2 = 0;
 handles.zoomLevel = 0;
-%firstChannelLabels = ['Select', handles.channelLabel];
+
 set(handles.channelSelect1, 'String', handles.channelLabel);
 set(handles.channelSelect2, 'String', handles.channelLabel);
 numChannels = length(handles.channelLabel);
@@ -236,19 +236,9 @@ function channelSelect1_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns channelSelect1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from channelSelect1
 
-% chosenChannel = get(hObject, 'String');
-% if strcmpi(chosenChannel(get(hObject, 'Value')), 'Select')
-%     return
-% else
-%     if handles.firstRunSelect1 == 1
-%         channelSelect1Idx = get(hObject, 'Value');
-%         set(handles.channelSelect1, 'String', handles.channelLabel);
-%         set(hObject, 'Value', channelSelect1Idx-1);
-%         handles.firstRunSelect1 = 0;
-%     end
-    setappdata(handles.objectSelector, 'chosenObject1',0);
-    changeSeg1(hObject, eventdata, handles);
-%end
+setappdata(handles.objectSelector, 'chosenObject1',0);
+changeSeg1(hObject, eventdata, handles);
+
 guidata(hObject, handles);
 
 
@@ -276,19 +266,10 @@ function channelSelect2_Callback(hObject, eventdata, handles)
 % Hints: contents = get(hObject,'String') returns channelSelect2 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from channelSelect2
 
-% chosenChannel = get(hObject, 'String');
-% if strcmpi(chosenChannel(get(hObject, 'Value')), 'Select')
-%     return
-% else
-%     if handles.firstRunSelect2 == 1
-%         channelSelect2Idx = get(hObject, 'Value');
-%         set(handles.channelSelect2, 'String', handles.channelLabel);
-%         set(hObject, 'Value', channelSelect2Idx-1);
-%         handles.firstRunSelect2 = 0;
-%     end
-    setappdata(handles.objectSelector, 'chosenObject2',0);
-    changeSeg2(hObject, eventdata, handles);
-%end
+
+setappdata(handles.objectSelector, 'chosenObject2',0);
+changeSeg2(hObject, eventdata, handles);
+
 guidata(hObject, handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -332,7 +313,6 @@ chosenObject1 = getappdata(handles.objectSelector, 'chosenObject1');
 if X<=pX && Y<=pY
     chosenObject1 = patchBWLn{selectedChannel}(Y,X,Z);
     if chosenObject1 > 0
-%         handles.chosenObject1 = chosenObject1;
         handles.displayPatch1(:,:,1) = patchBWLn{selectedChannel}(:,:,Z);
         handles.displayPatch1(:,:,2) = patchBWLn{selectedChannel}(:,:,Z);
         handles.displayPatch1(:,:,3) = patchBWLn{selectedChannel}(:,:,Z);
@@ -360,7 +340,6 @@ chosenObject2 = getappdata(handles.objectSelector, 'chosenObject2');
 if X<=pX && Y<=pY 
     chosenObject2 = patchBWLn{selectedChannel}(Y,X,Z);
     if chosenObject2 > 0
-%         handles.chosenObject2 = chosenObject2;
         handles.displayPatch2(:,:,1) = patchBWLn{selectedChannel}(:,:,Z);
         handles.displayPatch2(:,:,2) = patchBWLn{selectedChannel}(:,:,Z);
         handles.displayPatch2(:,:,3) = patchBWLn{selectedChannel}(:,:,Z);
@@ -686,29 +665,6 @@ zoomProjection = renderedProjection(minZoomY:maxZoomY, minZoomX:maxZoomX,:);
 axes(handles.projectionAxes);
 handles.projectionHandle = imshow(zoomProjection);
 
-%newROICentroid = [handles.ROICentroid(1)-minZ];
-% ROIX = handles.roishapeIdx.X(1)*2;
-% ROIY = handles.roishapeIdx.Y(1)*2;
-% ROIwidth = handles.roishapeIdx.Width(1);
-% ROIheight = handles.roishapeIdx.Height(1);
-% topLineY = [];
-% bottomLineY = [];
-% leftLineX = [];
-% rightLineX = [];
-% lineX = ROIX:ROIX+ROIwidth;
-% lineY = ROIY:ROIY+ROIheight;
-% for i = 1:ROIwidth+1
-%     topLineY = [topLineY ROIY];
-%     bottomLineY = [bottomLineY ROIY+ROIheight];
-% end
-% for i = 1:ROIheight+1
-%     leftLineX = [leftLineX ROIX];
-%     rightLineX = [rightLineX ROIX+ROIwidth];
-% end
-% line(lineX, topLineY, 'color', 'white');
-% line(lineX, bottomLineY, 'color', 'white');
-% line(leftLineX, lineY, 'color', 'white');
-% line(rightLineX, lineY, 'color', 'white');
 guidata(hObject, handles);
 clear renderedProjection;
 clear zoomProjection;
@@ -767,28 +723,6 @@ if ~isempty(chosenObject2)
     drawnow
     handles.chosenObject2 = chosenObject2
 end
-% 
-% if isfield(handles, 'displayPatch1')
-%     [displayPatch1SelectionBlueY, displayPatch1SelectionBlueX] = find(handles.displayPatch1(:,:,1))
-%     [displayPatch1SelectionGreenY, displayPatch1SelectionGreenX] = find(handles.displayPatch1(:,:,2)==0)
-%     displayPatch1SelectionIntersection = intersect(displayPatch1SelectionBlueX, displayPatch1SelectionGreenX)
-%     if ~isempty(displayPatch1SelectionIntersection)
-%         patch1Z = get(handles.zSlider1, 'Value');
-%         patch1Channel = get(handles.channelSelect1, 'Value')
-%         handles.chosenObject1 = handles.patchBWLn{patch1Channel}(displayPatch1SelectionBlueY(1), displayPatch1SelectionBlueX(1), patch1Z+1)
-%     end
-% end
-% 
-% if isfield(handles, 'displayPatch2')
-%     [displayPatch2SelectionBlueY, displayPatch2SelectionBlueX] = find(handles.displayPatch2(:,:,1))
-%     [displayPatch2SelectionGreenY, displayPatch2SelectionGreenX] = find(handles.displayPatch2(:,:,2)==0)
-%     displayPatch2SelectionIntersection = intersect(displayPatch2SelectionBlueX, displayPatch2SelectionGreenX)
-%     if ~isempty(displayPatch2SelectionIntersection)
-%         patch2Z = get(handles.zSlider2, 'Value');
-%         patch2Channel = get(handles.channelSelect2, 'Value')
-%         handles.chosenObject2 = handles.patchBWLn{patch2Channel}(displayPatch2SelectionBlueY(1), displayPatch2SelectionBlueX(1), patch2Z+1)
-%     end
-% end
 
 guidata(handles.objectSelector, handles);
 drawnow;

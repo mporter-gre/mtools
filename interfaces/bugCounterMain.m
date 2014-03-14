@@ -103,7 +103,6 @@ selectedDsIds = getappdata(handles.bugCounterMain, 'selectedDsIds');
 images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
 imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
 imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
-%roiShapes = deleteElementFromCells(imageIdxNoROIs, roiShapes);
 datasetNames = deleteElementFromCells(imageIdxNoROIs, datasetNames);
 
 if isempty(imageIds)
@@ -131,7 +130,6 @@ delete(gcf);
 
 function countBugs(handles)
 
-global gateway;
 global session;
 
 progressBar = waitbar(0,'Ready to process images') ;

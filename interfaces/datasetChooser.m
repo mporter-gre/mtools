@@ -254,9 +254,6 @@ function okButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% handles.output{1} = getappdata(handles.datasetChooser, 'selectedDsNames');
-% handles.output{2} = getappdata(handles.datasetChooser, 'selectedDsIds');
-
 selectedDsNames = getappdata(handles.datasetChooser, 'selectedDsNames');
 selectedDsIds = getappdata(handles.datasetChooser, 'selectedDsIds');
 setappdata(handles.parentHandles.(handles.parentFigureName), 'selectedDsNames', selectedDsNames);
@@ -290,7 +287,6 @@ for thisProj = 1:numProj
     projIdList(thisProj) = str2double(projNameId{thisProj, 2});
 end
 set(handles.projectsSelect, 'String', [{'Select a project'} projNameList]);
-%set(handles.datasetsList, 'String', 'Select a dataset');
 setappdata(handles.datasetChooser, 'projNameList', projNameList);
 setappdata(handles.datasetChooser, 'projIdList', projIdList);
 

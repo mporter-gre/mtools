@@ -2,17 +2,17 @@ function intensityMeasureLaunchpad(handles, credentials)
 
 % Copyright (C) 2013-2014 University of Dundee & Open Microscopy Environment.
 % All rights reserved.
-% 
+%
 % This program is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
 % the Free Software Foundation; either version 2 of the License, or
 % (at your option) any later version.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License along
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -71,7 +71,6 @@ for thisImage = 1:numImages
         numT = length(timePoints);
         for thisT = 1:numT
             %Output is variable in number of columns. Do the sums...
-            %numROI = length(ROIIdx{thisImage}{thisROI});
             if ~isempty(data{thisImage}{thisROI}{1}{1}.channel)
                 numMeasureChannels = length(data{thisImage}{thisROI}{1});
             else
@@ -86,7 +85,6 @@ for thisImage = 1:numImages
             %Write a header line for each image
             dataOut3 = [];
             emptyLine = [];
-            %for thisROI = 1:numROI
             thisChannelsHeader = [];
             thisChannelsAroundHeader = [];
             if numMeasureChannels > 0
@@ -146,7 +144,6 @@ for thisImage = 1:numImages
             dataOut3 = [dataOut3; [dataOut1 dataOut2 dataAroundOut2]];
             %end
             %Make an empty line to separate image data
-            %totalCols = 5 + numMeasureChannels + numMeasureAroundChannels;
             [~, totalCols] = size(dataOut3);
             for thisCol = 1:totalCols
                 emptyLine = [emptyLine, {' '}];
@@ -191,11 +188,9 @@ for thisImage = 1:numImages
                 end
                 
                 if numMeasureChannels > 0
-                    %numObjects = length(objectData{thisImage}{thisROI}{thisChannel});
                     numObjects = objectCounter{thisImage}{thisROI}{thisT}.numObjects;
                     objectDataOut1 = [];
                     for thisObject = 1:numObjects
-                        %numMeasureChannels = length(objectData{thisImage}{thisROI}{thisObject}{thisChannel});
                         for thisChannel = 1:numMeasureChannels
                             if isfield(objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}, 'numPix')
                                 numSegObjectPixels = objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.numPix;
@@ -260,9 +255,6 @@ while isnumeric(saveFile) && isnumeric(savePath)
     [saveFile savePath] = uiputfile('*.xls','Save Results','/VolumeIntensityMeasurements.xls');
     display(counter)
     counter = counter + 1;
-    %if isnumeric(saveFile) && isnumeric(savePath)
-    %return;
-    %end
 end
 
 try
@@ -316,6 +308,3 @@ catch
         fclose(fid);
     end
 end
-
-
-%datasetChooser(credentials, handles);

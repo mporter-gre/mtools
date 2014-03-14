@@ -62,7 +62,6 @@ handles.conditionsPaths = '';
 handles.conditionsFiles = '';
 handles.currDir = cd;
 set(handles.passwordText, 'KeyPressFcn', {@passKeyPress, handles});
-%set(handles.newConditionText, 'KeyPressFcn', {@newConditionTextKeyPress, handles});
 uicontrol(handles.usernameText);
 checkLoginHistory(handles)
 
@@ -378,7 +377,6 @@ try
 catch ME
     clear global client;
     clear global session;
-    clear global gateway;
     clear global clientAlive;
     disp(ME.message);
     warndlg('Could not log on to the server. Check your details and try again.');

@@ -70,27 +70,7 @@ set(handles.CreateKymograph, 'WindowButtonUpFcn', {@imageAnchor_ButtonUpFcn, han
 set(handles.CreateKymograph, 'keypressfcn', {@currentWindowKeypress, handles});
 handles.output = hObject;
 handles.imageObj = varargin{1};
-%imageId = handles.imageObj.getId.getValue;
-%handles.pixels = gateway.getPixelsFromImage(imageId);
-% if strcmp(class(handles.pixels), 'java.util.ArrayList');
-%     handles.pixels = handles.pixels.get(0);
-% end
-% handles.pixelsId = handles.pixels.getId.getValue;
-% handles.numC = handles.pixels.getSizeC.getValue;
-%handles.fullImage = varargin{2};
-% imageName = native2unicode(handles.imageObj.getName.getValue.getBytes');
-% handles.imageName = imageName;
-% set(handles.imageNameLabel, 'String', imageName);
-% numT = handles.pixels.getSizeT.getValue;
-% sizeX = handles.pixels.getSizeX.getValue;
-% sizeY = handles.pixels.getSizeY.getValue;
-% handles.numZ = handles.pixels.getSizeZ.getValue;
-% settingsThisPixels = renderSettingsService.getRenderingSettings(handles.pixelsId);
-% defaultZ = settingsThisPixels.getDefaultZ.getValue;
 
-% anchorPos{numT} = [];
-% rectPos{numT} = [];
-% alignPos{numT} = [];
 setappdata(handles.CreateKymograph, 'setAnchor', 0);
 setappdata(handles.CreateKymograph, 'setAlignment', 0);
 setappdata(handles.CreateKymograph, 'recordAnchor', 0);
@@ -98,9 +78,7 @@ setappdata(handles.CreateKymograph, 'recordAlignment', 0);
 setappdata(handles.CreateKymograph, 'drawRect', 0);
 setappdata(handles.CreateKymograph, 'firstAnchor', 1);
 setappdata(handles.CreateKymograph, 'firstAlign', 1);
-% setappdata(handles.CreateKymograph, 'anchorPos', anchorPos);
-% setappdata(handles.CreateKymograph, 'rectPos', rectPos);
-% setappdata(handles.CreateKymograph, 'alignPos', alignPos);
+
 setappdata(handles.CreateKymograph, 'includeROI', []);
 setappdata(handles.CreateKymograph, 'hideAnchor', 0);
 setappdata(handles.CreateKymograph, 'recording', 0);
@@ -111,9 +89,7 @@ setappdata(handles.CreateKymograph, 'rotationView', 0);
 setappdata(handles.CreateKymograph, 'movingAnchor', 0);
 setappdata(handles.CreateKymograph, 'movingAlign', 0);
 setappdata(handles.CreateKymograph, 'hideROI', 0);
-% setappdata(handles.CreateKymograph, 'numT', numT);
-% setappdata(handles.CreateKymograph, 'numZ', handles.numZ);
-% setappdata(handles.CreateKymograph, 'defaultZ', defaultZ);
+
 setappdata(handles.CreateKymograph, 'projectionType', 'max');
 setappdata(handles.CreateKymograph, 'diamondPointer', diamondPointer);
 setappdata(handles.CreateKymograph, 'squarePointer', squarePointer);
@@ -123,19 +99,10 @@ setappdata(handles.CreateKymograph, 'zoomLevel', 1);
 setappdata(handles.CreateKymograph, 'projectId', []);
 setappdata(handles.CreateKymograph, 'datasetId', []);
 setappdata(handles.CreateKymograph, 'clearAnswer', []);
-%setappdata(handles.CreateKymograph, 'imageSize', [sizeX sizeY]);
+
 handles.parentWindowName = 'createKymograph';
 
 enableDisableControls(handles, 'off');
-
-
-% setTSlider(handles);
-% setZSlider(handles);
-% set(handles.stopZText, 'String', num2str(handles.numZ));
-% 
-% getPlane(handles, defaultZ, 0)
-% refreshDisplay(handles);
-
 
 % Update handles structure
 guidata(hObject, handles);
@@ -517,13 +484,7 @@ end
 if ~isempty(alignPos{t}) && rotationView == 1
     rotateImage(handles)
 end
-%     displayImage = getappdata(handles.CreateKymograph, 'rotatedImage');
-% else
-%     displayImage = getappdata(handles.CreateKymograph, 'renderedImage');
-% end
-% axes(handles.imageAxes);
-% handles.imageHandle = imshow(displayImage);
-% set(handles.imageHandle, 'ButtonDownFcn', {@imageAnchor_ButtonDownFcn, handles});
+
 refreshDisplay(handles);
 
 
@@ -590,7 +551,6 @@ if setAnchor == 1 && ismember(thisT, includeROI)
     end
     if firstAnchor == 1
         anchorPos{thisT} = [currentPoint(1)+posModifierX, currentPoint(3)+posModifierY];
-        %anchorPos{thisT}
         setappdata(handles.CreateKymograph, 'firstAnchor', 0);
         for t = 1:numT
             anchorPos{t} = anchorPos{thisT};
@@ -639,7 +599,6 @@ if setAlignment == 1 && ismember(thisT, includeROI)
         setappdata(handles.CreateKymograph, 'setAlignment', 0);
     end
 end
-%set(gcf,'Pointer','arrow');
 
     
 
@@ -892,7 +851,6 @@ end
 numT = getappdata(handles.CreateKymograph, 'numT');
 firstT = round(get(handles.tSlider, 'Value'));
 frameDelay = str2double(get(handles.delayText, 'String'));
-%alignPos = getappdata(handles.CreateKymograph, 'alignPos');
 rotationView = getappdata(handles.CreateKymograph, 'rotationView');
 includeROI = getappdata(handles.CreateKymograph, 'includeROI');
 if frameDelay < 0.01
@@ -917,11 +875,6 @@ for thisT = firstT:numT
         rotateImage(handles);
     end
     refreshDisplay(handles);
-%     redrawImage(handles);
-%     redrawRect(handles);
-%     redrawAnchor(handles);
-%     redrawAlign(handles);
-    %drawnow expose;
     pause(frameDelay);
 end
 setappdata(handles.CreateKymograph, 'playing', 0);
@@ -1514,7 +1467,7 @@ for thisT = includeROI
             projectionThisC(:,:,thisC) = mean(planesThisC, 3);
         end
     end
-    %projection(:,:,thisT) = max(planesThisC, [], 3);
+
     renderedProjection = createRenderedImage(projectionThisC, pixels);
     set(handles.tSlider, 'Value', thisT);
     setappdata(handles.CreateKymograph, 'renderedImage', renderedProjection);
@@ -1681,12 +1634,9 @@ stopRecording = getappdata(handles.CreateKymograph, 'stopRecording');
 renderedImage = getappdata(handles.CreateKymograph, 'renderedImage');
 zoomClick = getappdata(handles.CreateKymograph, 'zoomClick');
 
-if zoomClick == 1
-    % if playing == 1
-    %     currentPoint = getappdata(handles.CreateKymograph, 'zoomCentre');
-    % else
+if zoomClick == 1   
     currentPoint = get(gca, 'CurrentPoint');
-    %end
+
     if ~isempty(zoomMinMax) && (stopRecording == 0 || playing == 0)
         minZoomX = zoomMinMax(1);
         minZoomY = zoomMinMax(2);
@@ -1757,7 +1707,6 @@ imageId = getappdata(handles.CreateKymograph, 'imageId');
 imageObj = getappdata(handles.CreateKymograph, 'newImageObj');
 pixels = imageObj.getPrimaryPixels;
 pixelsId = pixels.getId.getValue;
-%handles.fullImage = varargin{2};
 imageName = native2unicode(imageObj.getName.getValue.getBytes');
 set(handles.imageNameLabel, 'String', imageName);
 numT = pixels.getSizeT.getValue;

@@ -385,7 +385,6 @@ for thisT = firstT:numT
     thisZ = round(get(handles.zSlider, 'Value'));
     getPlane(handles, thisZ-1, thisT-1)
     redrawImage(handles);
-    %refreshDisplay(handles);
     pause(0.05);
 end
 setappdata(handles.boxIt, 'playing', 0);
@@ -489,8 +488,7 @@ imageId = getappdata(handles.boxIt, 'imageId');
 dsId = getappdata(handles.boxIt, 'datasetId');
 datasetId = java.util.ArrayList;
 datasetId.add(java.lang.Long(dsId));
-%datasetContainer = omero.api.ContainerClass.Dataset;
-images = getImages(session, 'dataset', dsId); %= gateway.getImages(datasetContainer,datasetId);
+images = getImages(session, 'dataset', dsId); 
 numImages = length(images);
 for thisImage = 1:numImages
     imageIds(thisImage) = images(thisImage).getId.getValue;
@@ -594,10 +592,6 @@ function saveROIsItem_Callback(hObject, eventdata, handles)
 
 ROIsToServer(handles);
 msgbox('ROIs saved to server.', 'Saved', 'modal');
-%ROIsToXml(handles);
-
-
-
 setappdata(handles.boxIt, 'modified', 0);
 
 
@@ -850,7 +844,6 @@ refreshDisplay(handles);
 
 function getMetadata(handles)
 
-global gateway
 global session
 
 theImage = getappdata(handles.boxIt, 'theImage');
@@ -1093,81 +1086,7 @@ for thisROI = 1:numROIs
     if ismember(thisZ, zRange) && t == thisT
         rectangle('Position', rect, 'edgecolor', 'white', 'HitTest', 'off');
     end
-end
-        
-
-function ROIsToXml(handles)
-
-ROIs = getappdata(handles.boxIt, 'ROIs');
-savePath = getappdata(handles.boxIt, 'savePath');
-xmlStruct = load('newXmlStruct.mat');
-ROIProforma = load('ROIProforma.mat');
-rectProforma = load('rectProforma.mat');
-xmlStruct = xmlStruct.newXmlStruct;
-ROIProforma = ROIProforma.ROIProforma;
-rectProforma = rectProforma.rectProforma;
-
-newXmlStruct = xmlStruct;
-numROIs = length(ROIs);
-for thisROI = 1:numROIs
-    newROI = ROIProforma;
-    newROI.attributes(1).value = num2str(ROIs{thisROI}.id); %ROI id.
-    numROIZ = length(ROIs{thisROI}.zRange);
-    for thisROIZ = 1:numROIZ
-        roiShape = rectProforma;
-        %Fill out the 'annotation' section.
-        roiShape.attributes(1).value = num2str(ROIs{thisROI}.t-1); %t
-        roiShape.attributes(2).value = num2str(ROIs{thisROI}.zRange(thisROIZ)-1); %z
-        roiShape.children(2).children(2).attributes(2).value = num2str(round(ROIs{thisROI}.rect(1) + (ROIs{thisROI}.rect(3)/2))); %cx
-        roiShape.children(2).children(4).attributes(2).value = num2str(round(ROIs{thisROI}.rect(2) + (ROIs{thisROI}.rect(4)/2))); %cy
-        roiShape.children(2).children(6).attributes(2).value = num2str(ROIs{thisROI}.rect(4)); %Height
-        roiShape.children(2).children(8).attributes(2).value = num2str((ROIs{thisROI}.rect(3)*2)+(ROIs{thisROI}.rect(4)*2)); %Perimeter
-        roiShape.children(2).children(10).attributes(2).value = num2str(ROIs{thisROI}.rect(3)*ROIs{thisROI}.rect(4)); %Area
-        roiShape.children(2).children(12).attributes(2).value = num2str(ROIs{thisROI}.rect(3)); %Width
-        %Fill out the 'svg' section.
-        roiShape.children(4).children(2).attributes(6).value = num2str(ROIs{thisROI}.rect(4)); %Height
-        roiShape.children(4).children(2).attributes(14).value = num2str(ROIs{thisROI}.rect(3)); %Width
-        roiShape.children(4).children(2).attributes(15).value = num2str(ROIs{thisROI}.rect(1)); %x
-        roiShape.children(4).children(2).attributes(16).value = num2str(ROIs{thisROI}.rect(2)); %y
-        %Fill out the 'svg text' section.
-        roiShape.children(4).children(4).attributes(8).value = num2str(ROIs{thisROI}.rect(1)); %x
-        roiShape.children(4).children(4).attributes(9).value = num2str(ROIs{thisROI}.rect(2)); %y
-        %Add this roiShape to the current ROI.
-        newROI.children((thisROIZ*2)-1) = ROIProforma.children(1);
-        newROI.children(thisROIZ*2) = roiShape;
-    end
-    %Attach roi to xmlStruct.
-    newXmlStruct.children((thisROI*2)+ 1) = xmlStruct.children(4).children(1);
-    newXmlStruct.children((thisROI*2)+ 2) = newROI;
-end
-
-%Create the document and write the xml.
-imageNameFull = getappdata(handles.boxIt, 'imageName');
-imageNameScanned = textscan(imageNameFull, '%s', 'Delimiter', '/');
-imageNameNoPaths = imageNameScanned{1}{end};
-[imageName remain] = strtok(imageNameNoPaths, '.');
-imageNameXml = [imageName '.xml'];
-[fileName filePath] = uiputfile('*.xml','Save ROI File', [savePath imageNameXml]);
-if fileName == 0
-    return;
-end
-DocNode = struct2xml(newXmlStruct);
-xmlwrite([filePath fileName], DocNode);
-setappdata(handles.boxIt, 'savePath', filePath);
-setappdata(handles.boxIt, 'saveFileName', fileName);
-
-%Update RoiMapFile
-answer = questdlg([{'Would you like to have these ROIs viewable in OMERO.insight?'} {'Any previous ROI file will be unlinked from the image'}], 'Show ROIs in OMERO.insight?', 'Yes', 'No', 'No');
-if strcmp(answer, 'Yes')
-    server = getappdata(handles.boxIt, 'server');
-    username = getappdata(handles.boxIt, 'username');
-    pixelsId = getappdata(handles.boxIt, 'pixelsId');
-    filePath = getappdata(handles.boxIt, 'savePath');
-    fileName = getappdata(handles.boxIt, 'saveFileName');
-    updateROIMapFile(username, server, pixelsId, [filePath fileName]);
-end
-setappdata(handles.boxIt, 'modified', 0);
-        
+end        
 
 
 

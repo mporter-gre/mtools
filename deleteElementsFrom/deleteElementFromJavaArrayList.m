@@ -28,24 +28,21 @@ if isempty(elementsForDeletion)
     return;
 end
 numToBeDeleted = length(elementsForDeletion);
-%for thisDelete = 1:numToBeDeleted
-    element = elementsForDeletion(end);
-    numElements = arrayList.size;
-    newArrayList = java.util.ArrayList;
-    if numElements < 2
-        arrayListOut = java.util.ArrayList;
-        return;
+
+element = elementsForDeletion(end);
+numElements = arrayList.size;
+newArrayList = java.util.ArrayList;
+if numElements < 2
+    arrayListOut = java.util.ArrayList;
+    return;
+end
+
+for thisElement = 0:numElements-1
+    if ~isempty(find(elementsForDeletion == thisElement+1))
+        
+        continue;
     end
-    %if element ~= numElements
-        for thisElement = 0:numElements-1
-            if ~isempty(find(elementsForDeletion == thisElement+1))
-            %if ismember(thisElement, elementsForDeletion)
-                continue;
-            end
-            newArrayList.add(arrayList.get(thisElement));
-        end
-    %end
-    %arrayList = newArrayList;
-    %elementsForDeletion = elementsForDeletion(1:end-1);
-%end
+    newArrayList.add(arrayList.get(thisElement));
+end
+
 arrayListOut = newArrayList;

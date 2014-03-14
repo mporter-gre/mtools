@@ -69,41 +69,8 @@ setappdata(handles.ImageSegmentation, 'segmentationType', 'Otsu');
 handles.parentHandles = varargin{1};
 handles.credentials = varargin{2};
 guidata(hObject, handles);
-%set(handles.channelSelect, 'String', varargin{1});
-% counter = 1;
-% handles.numConditions = length(varargin{1});
-% for thisCondition = 1:handles.numConditions
-%     numFiles = length(varargin{1}{thisCondition});
-%     for thisFile = 1:numFiles
-%         handles.channelLabel{counter} = varargin{1}{thisCondition}{thisFile};
-%         handles.pixels{counter} = varargin{2}{thisCondition}{thisFile};
-%         handles.roishapeIdx{counter} = varargin{3}{thisCondition}{thisFile};
-%         handles.imageNames{counter} = varargin{4}{thisCondition}{thisFile};
-%         counter = counter + 1;
-%     end
-% end
 
-% handles.numImages = length(handles.imageNames);
-% handles.selectedROI = 1;
-% %Set the first image's segPatches structure
-% numChannels = handles.pixels{1}.getSizeC.getValue;
-% numROI = length(handles.roishapeIdx{1});
-% for thisROI = 1:numROI
-%     segPatches{thisROI}{numChannels} = [];
-%     segmentationType{thisROI}{numChannels} = [];
-% end
-% setappdata(handles.ImageSegmentation, 'segPatches', []);
-% setappdata(handles.ImageSegmentation, 'segmentationType', []);
-% 
-%set(handles.imageSelect, 'String', 'Choose datasets from File menu'); %handles.imageNames);
-set(handles.channelSelect, 'String', 'Channel'); %handles.channelLabel{1});
-% 
-% showChannelCheckBoxes(handles);
-% displayLoadingImage(handles);
-% displayImage(handles);
-% drawROIs(handles);
-% segmentROI(handles);
-% guidata(hObject, handles);
+set(handles.channelSelect, 'String', 'Channel');
 axes(handles.imageAxes);
 imshow(handles.selectDatasetsImage);
 drawnow;
@@ -430,7 +397,6 @@ function thresholdSlider_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 %Update the threshold text box and re-run segmentation.
-%displayLoadingImage(handles);
 sliderThreshold = round(get(hObject, 'Value'));
 set(handles.thresholdText, 'String', num2str(sliderThreshold));
 set(handles.absoluteThresholdLabel, 'String', num2str(sliderThreshold));
@@ -445,12 +411,6 @@ set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
 
 handles.sigmaChanged = 1;
 guidata(hObject, handles);
-
-%resegment(handles);
-
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 
 % --- Executes during object creation, after setting all properties.
@@ -526,10 +486,6 @@ sigmaMultiplier = getSigmaMultiplier(handles, patches);
 set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
 handles.sigmaChanged = 1;
 guidata(hObject, handles);
-
-%Delete the segPatch and re-do the segmentation.
-% displayLoadingImage(handles);
-% resegment(handles)
 
 % Hints: get(hObject,'String') returns contents of thresholdText as text
 %        str2double(get(hObject,'String')) returns contents of thresholdText as a double
@@ -607,8 +563,8 @@ if ~measureSelected
 end
 
 channelChoice = get(handles.channelSelect, 'Value');
-handles.remember = 1; %get(handles.rememberCheck, 'Value');
-handles.rememberScope = 'all'; %get(get(handles.rememberPanel, 'SelectedObject'), 'Tag');
+handles.remember = 1; 
+handles.rememberScope = 'all'; 
 
 guidata(hObject, handles);
 uiresume;
@@ -656,9 +612,6 @@ numROI = length(roiShapes{selectedImageIdx});
 axes(handles.imageAxes);
 
 for thisROI = 1:numROI
-%     if ~strcmpi(roiShapes{selectedImageIdx}{thisROI}.shapeType, 'rect')
-%         continue;
-%     end
     X = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getX.getValue);
     Y = round(roiShapes{selectedImageIdx}{thisROI}.shape1.getY.getValue);
     
@@ -812,12 +765,6 @@ patches = zeros(ROIMaxY-Y+1, ROIMaxX-X+1, numROIZ);
 %download the Zs for this ROI if needed. Check if segmentation type
 %is the same as before
 segmentationType = getappdata(handles.ImageSegmentation, 'segmentationType');
-% if ~isempty(segmentationType{selectedROI}{selectedChannel+1})
-%     if ~strcmp(segmentationType{selectedROI}{selectedChannel+1}, selectedSegType)
-%         segPatches{selectedROI}{selectedChannel+1} = [];
-%     end
-% end
-
 lowestValue = getappdata(handles.ImageSegmentation, 'lowestValue');
 if isempty(segPatches{selectedROI}{selectedChannel+1})
     counter = 1;
@@ -840,15 +787,11 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3D(patches, featherSize, 0, minSize);
         sigmaMultiplier = getSigmaMultiplier(handles, patches);
         set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
-        %segmentationType{selectedROI}{selectedChannel+1} = 'Otsu';
-        %setappdata(handles.ImageSegmentation, 'segmentationType', segmentationType);
     elseif useAbsolute == 1
         threshold = str2double(get(handles.thresholdText, 'String'));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});
         sigmaMultiplier = getSigmaMultiplier(handles, patches);
         set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
-        %segmentationType{selectedROI}{selectedChannel+1} = 'Absolute';
-        %setappdata(handles.ImageSegmentation, 'segmentationType', segmentationType);
     elseif useSigma == 1
         if handles.sigmaChanged == 1
             sigmaMultiplier = getSigmaMultiplier(handles, patches);
@@ -858,8 +801,6 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
         threshold = getSigmaThreshold(patches, sigmaMultiplier);
         set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});
-        %segmentationType{selectedROI}{selectedChannel+1} = 'Sigma';
-        %setappdata(handles.ImageSegmentation, 'segmentationType', segmentationType);
     end
     setappdata(handles.ImageSegmentation, 'segPatches', segPatches);
     setappdata(handles.ImageSegmentation, 'lowestValue', lowestValue);

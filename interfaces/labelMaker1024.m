@@ -277,13 +277,6 @@ function playButton_Callback(hObject, eventdata, handles)
 
 numT = getappdata(handles.labelMaker, 'numT');
 firstT = round(get(handles.tSlider, 'Value'));
-%frameDelay = str2double(get(handles.delayText, 'String'));
-%alignPos = getappdata(handles.labelMaker1024, 'alignPos');
-%rotationView = getappdata(handles.labelMaker1024, 'rotationView');
-%includeROI = getappdata(handles.labelMaker1024, 'includeROI');
-% if frameDelay < 0.01
-%     frameDelay = 0.01;
-% end
 if getappdata(handles.labelMaker, 'playing') == 1
     return;
 end
@@ -568,7 +561,6 @@ function labelSelect_Callback(hObject, eventdata, handles)
 
 labelIdx = get(hObject, 'Value');
 labelString = get(hObject, 'String');
-%labelText = labelString{labelIdx};
 if ~strcmp(labelString, 'Add a label')
     labelColour = getappdata(handles.labelMaker, 'labelColour');
     thisColour = labelColour{labelIdx};
@@ -895,8 +887,6 @@ function openPointsItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway
-
 modified = getappdata(handles.labelMaker, 'modified');
 if modified == 1
     answer = questdlg([{'The current set of points has been modified.'} {'Discard changes and open a new points file?'}], 'Discard Changes?', 'Yes', 'No', 'No');
@@ -1020,7 +1010,6 @@ setappdata(handles.labelMaker, 'labelsName', labelsName);
 
 function getMetadata(handles)
 
-global gateway
 global session
 
 theImage = getappdata(handles.labelMaker, 'theImage');
@@ -1028,8 +1017,7 @@ if isempty(theImage)
     return;
 end
 imageId = theImage.getId.getValue;
-pixels = gateway.getPixelsFromImage(imageId);
-pixels = pixels.get(0);
+pixels = theImage.getPrimaryPixels;
 pixelsId = pixels.getId.getValue;
 
 numC = pixels.getSizeC.getValue;
@@ -1484,7 +1472,7 @@ for thisCondition = 1:numConditions
     for thisFile = 1:numFiles
         numPoints = length(points{thisCondition}{thisFile});
         for thisPoint = 1:numPoints
-            currPoint = points{thisCondition}{thisFile}{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
+            currPoint = points{thisCondition}{thisFile}{thisPoint}; 
             pointT = currPoint.Position(4);
             if pointT > maxT
                 maxT = pointT;
@@ -1508,7 +1496,7 @@ for thisLabel = 1:numLabels
             numPoints = length(points{thisCondition}{thisFile});
             tCounter(1:maxT, 1:numLabels) = 0;
             for thisPoint = 1:numPoints
-                currPoint = points{thisCondition}{thisFile}{thisPoint}; % = [currentPoint(1) currentPoint(3) thisZ thisT];
+                currPoint = points{thisCondition}{thisFile}{thisPoint};
                 for thisT = 1:maxT
                     if strcmp(currPoint.label, uniqueLabels{thisLabel})
                         pointT = currPoint.Position(4);

@@ -53,8 +53,6 @@ actualZ{numROI} = [];
 
 
 for thisROI = 1:numROI
-    %set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
-    %drawnow;
     allZ = [];
     allT = [];
     numShapes = roiShapes{thisROI}.numShapes;
@@ -100,8 +98,8 @@ for thisROI = 1:numROI
    
     firstPlaneInfo = getPlaneInfo(session, imageId, 0, 0, roiShapes{thisROI}.shape1.getTheT.getValue);
     secondPlaneInfo = getPlaneInfo(session, imageId, 0, 0, roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue);
-    firstDeltaT = firstPlaneInfo.getDeltaT.getValue; %planeInfoForPixels.get(roiShapes{thisROI}.shape1.getTheT.getValue).getDeltaT.getValue;
-    lastDeltaT = secondPlaneInfo.getDeltaT.getValue; %planeInfoForPixels.get(roiShapes{thisROI}.(['shape' num2str(numShapes)]).getTheT.getValue).getDeltaT.getValue;
+    firstDeltaT = firstPlaneInfo.getDeltaT.getValue;
+    lastDeltaT = secondPlaneInfo.getDeltaT.getValue;
     roiShapes{thisROI}.deltaT = lastDeltaT - firstDeltaT;
     roiShapes{thisROI}.name = [origImageName '_event_' num2str(thisROI)];
     roiShapes{thisROI}.origName = origImageName;
@@ -115,8 +113,8 @@ if saveMasks == 1
     for thisROI = 1:numROI
         for thisT = 1:numT(thisROI)
             for thisZ = 1:numZ(thisROI)
-                X = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getX.getValue + 1; %X = roishapeIdx{thisROI}.X(thisT*thisZ)+1;    %svg entry in xml file indexes from (0, 0) instead of (1, 1), so +1
-                Y = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getY.getValue + 1; %Y = roishapeIdx{thisROI}.Y(thisT*thisZ)+1;
+                X = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getX.getValue + 1; 
+                Y = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getY.getValue + 1; 
                 width = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getWidth.getValue;
                 height = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getHeight.getValue;
                 ROIMaxX = X+width;

@@ -31,9 +31,6 @@ for thisFullT = 1:fullT
     fullMaskImg{thisFullT} = uint8(zeros(maxY,maxX,fullZ));
 end
 
-%numChannels = length(patches);
-%numROI = length(patches{segChannel});
-
 for thisROI = 1:numROI
     timePoints = getROITimePoints(roiShapes{thisROI});
     numShapes = roiShapes{thisROI}.numShapes;
@@ -154,7 +151,6 @@ for thisROI = 1:numROI
         counter = 1;
         for thisMeasureAroundChannel = measureAroundChannels
             thisAroundROIIntensityShape{counter} = zeros(size(patchMasks));
-            %for thisZ = 1:numZ(thisROI)
             if annulusSize > 0
                 diskSize = annulusSize + gapSize;
                 se = strel('disk', diskSize);
@@ -163,14 +159,10 @@ for thisROI = 1:numROI
                 patchMasksBkgDil = imdilate(patchMasksBkg, se);
                 patchMasksSigPlusGap = imdilate(patchMasksBkg, seGap);
                 patchMasksBkgDil(patchMasksSigPlusGap>0) = 0;
-                %patchMasksBkgBwl = bwlabeln(patchMasksBkg);
-                %patchMasksBkgBwlDil = imdilate(patchMasksBkgBwl, se);
-                %patchMasksBkgBwlDil(patchMasks>0) = 0;
                 thisAroundROIIntensityShape{counter}(logical(patchMasksBkgDil)) = patches{thisMeasureAroundChannel}(logical(patchMasksBkgDil));
             else
                 thisAroundROIIntensityShape{counter}(~patchMasks) = patches{thisMeasureAroundChannel}(~patchMasks);
             end
-            %end
             counter = counter + 1;
         end
         
@@ -195,7 +187,7 @@ for thisROI = 1:numROI
                     [row, col, objectValues] = find(unique(patchMasks));
                     numObjects = length(objectValues);
                     objectCounter{thisROI}{thisT}.numObjects = numObjects;
-                    %roiShapes{thisROI}{thisT}.numObjects = numObjects;
+
                     %If there are no segmented pixels per object enter zero.
                     if isempty(objectValues)
                         objectData{thisROI}{thisT}{1}{counter}.sumPix = 0;
@@ -216,7 +208,7 @@ for thisROI = 1:numROI
                     end
                 else
                     objectData = [];
-                    %roiShapes{thisROI}.numObjects = 1;
+
                     objectCounter{thisROI}{thisT}.numObjects = 1;
                 end
                 
@@ -268,13 +260,13 @@ for thisROI = 1:numROI
             dataAround{thisROI}{thisT}{counter}.meanPix = [];
             dataAround{thisROI}{thisT}{counter}.stdPix = [];
             dataAround{thisROI}{thisT}{counter}.channel = [];
-            %        if groupObjects == 1
+
             objectDataAround = [];
-            %        end
+
         end
     end
 end
-%fullMaskImg = fullMaskImg.*255;
+
 clear('patchMasks');
 clear('intensityVector');
 clear('partMaskImg');

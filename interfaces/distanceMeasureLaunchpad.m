@@ -61,8 +61,8 @@ handles.output = hObject;
 handles.credentials = varargin{2};
 datasetChooser(handles, 'distanceMeasureLaunchpad');
 selectedDsIds = getappdata(handles.distanceMeasureLaunchpad, 'selectedDsIds');
-[images imageIds imageNames datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
-[imageIdxNoROIs roiShapes] = ROIImageCheck(imageIds, 'rect');
+[images, imageIds, imageNames, datasetNames] = getImageIdsAndNamesFromDatasetIds(selectedDsIds);
+[imageIdxNoROIs, roiShapes] = ROIImageCheck(imageIds, 'rect');
 images = deleteElementFromJavaArrayList(imageIdxNoROIs, images);
 imageIds = deleteElementFromVector(imageIdxNoROIs, imageIds);
 imageNames = deleteElementFromCells(imageIdxNoROIs, imageNames);
@@ -81,11 +81,6 @@ for thisImage = 1:numImages
 end
 
 
-
-% set(handles.imageSelect, 'Value', 1);
-% set(handles.imageSelect, 'String', imageNames);
-% set(handles.channelSelect, 'Value', 1);
-% set(handles.channelSelect, 'String', channelLabels{1});
 setappdata(handles.distanceMeasureLaunchpad, 'imageIds', imageIds);
 setappdata(handles.distanceMeasureLaunchpad, 'imageNames', imageNames);
 setappdata(handles.distanceMeasureLaunchpad, 'roiShapes', roiShapes);

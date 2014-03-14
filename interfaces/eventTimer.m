@@ -72,8 +72,6 @@ function varargout = eventTimer_OutputFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Get default command line output from handles structure
-%varargout{1} = handles.output;
 varargout{1} = getappdata(handles.eventTimer, 'images');
 varargout{2} = getappdata(handles.eventTimer, 'imageIds');
 varargout{3} = getappdata(handles.eventTimer, 'imageNames');
