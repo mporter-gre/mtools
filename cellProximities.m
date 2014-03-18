@@ -64,6 +64,13 @@ for thisCell = 1:numCells
             cellProxPxCoord(thisNeighbour,:) = thisCellPxLoc(cellPxIdx,:);
             neighbourProxPxCoord(thisNeighbour,:) = thisNeighbourPxLoc(neighbourPxIdx,:);
             neighbourDist(thisNeighbour) = pdist([cellProxPxCoord(thisNeighbour,:); neighbourProxPxCoord(thisNeighbour,:)]);
+            
+            %Discount neighbours with a distance greater than 8px. These
+            %cells are not touching.
+            if neighbourDist(thisNeighbour) > 8
+                neighbourDist(1) = inf;
+                cellProxPxCoord = [inf inf inf];
+            end
             if neighbourDist(thisNeighbour) == 0
                 disp('zero')
             end
@@ -91,23 +98,3 @@ for thisCell = 1:numCells
     end
     cellProps{thisCell}.proxToFocusDist = proxToFocusDist;
 end
-        
-    
-    
-%     workImg = zeros(sizeY, sizeX, numZ);
-%     workImg(gfpSegBWL==cellVals(thisCell)) = 1;
-%     [row, col] = find(workImg);
-%     numPx = length(row);
-%     if numPx < 200 || numPx > 1800
-%         continue;
-%     end
-
-%     
-% end
-% 
-% for thisCell = 1:numCells
-%     thisCentroid = cellCentroids(thisCell, :);
-%     cellDistances = pdist2(thisCentroid, cellCentroids);
-%     idx = find(cellDistances>0.001 & cellDistances<50);
-%     cellProps{thisCell}.neighbours = idx;
-% end
