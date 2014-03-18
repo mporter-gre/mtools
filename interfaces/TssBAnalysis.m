@@ -22,7 +22,7 @@ function varargout = TssBAnalysis(varargin)
 
 % Edit the above text to modify the response to help TssBAnalysis
 
-% Last Modified by GUIDE v2.5 12-Feb-2014 22:32:49
+% Last Modified by GUIDE v2.5 18-Mar-2014 21:16:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -232,3 +232,36 @@ catch ME
     success = false;
     return;
 end
+
+
+% --- Executes on button press in summariseBtn.
+function summariseBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to summariseBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+[fileNames, filePaths] = uigetfile('*.xls', 'Select .xls files for summary', 'MultiSelect', 'on');
+
+numFiles = length(fileNames);
+cellData = [];
+neighbourData = [];
+focusData = [];
+focusNeighbourData = [];
+
+for thisFile = 1:numFiles
+    cellData = [cellData; xlsread([filePaths fileNames{thisFile}], 'Cell Data')];
+    neighbourData = [neighbourData; xlsread([filePaths fileNames{thisFile}], 'Neighbour Data')];
+    focusData = [focusData; xlsread([filePaths fileNames{thisFile}], 'Focus Data')];
+    focusNeighbourData = [focusNeighbourData; xlsread([filePaths fileNames{thisFile}], 'Focus Neighbour Data')];
+end
+
+
+
+
+
+
+
+
+
+
+

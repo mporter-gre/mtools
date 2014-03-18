@@ -68,8 +68,8 @@ for thisCell = 1:numCells
             %Discount neighbours with a distance greater than 8px. These
             %cells are not touching.
             if neighbourDist(thisNeighbour) > 8
-                neighbourDist(1) = inf;
-                cellProxPxCoord = [inf inf inf];
+                neighbourDist(thisNeighbour) = inf;
+                cellProxPxCoord(thisNeighbour,:) = [inf inf inf];
             end
             if neighbourDist(thisNeighbour) == 0
                 disp('zero')

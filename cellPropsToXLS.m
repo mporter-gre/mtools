@@ -37,7 +37,7 @@ for thisCell = 1:numCells
     if numNeighbours > 0
         for thisNeighbour = 1:numNeighbours
             
-            cellData = [cellData; {0, thisCell, numNeighbours, cellProps{thisCell}.numFoci, cellProps{thisCell}.neighbourDist(thisNeighbour)}];
+            neighbourData = [neighbourData; {imageName, thisCell, props.neighbourDist(thisNeighbour)}];
         end
     else
         neighbourData = [neighbourData; {imageName, thisCell, 0}];
