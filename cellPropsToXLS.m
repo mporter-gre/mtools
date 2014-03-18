@@ -19,13 +19,12 @@ function cellPropsToXLS(cellProps, imageName)
 
 numCells = length(cellProps);
 rowCounter = 1;
-<<<<<<< HEAD
 cellData = {};
 %cellData = {'Image Name', 'Cell Num', 'Num Neighbours', 'Num Foci', 'Neighbour Distance'};
-=======
+
 cellData = {'Image name', 'Cell', 'Size', 'Length', 'Num foci', 'Num Neighbours', 'Neighbours with foci', '% Neighbours with foci'};
 
->>>>>>> FETCH_HEAD
+
 for thisCell = 1:numCells
     props = cellProps{thisCell};
     cellData = [cellData; {imageName, thisCell, props.numPx, props.props.MajorAxisLength, props.numFoci, props.numNeighbours, props.neighboursWithFoci, props.perCentNeighboursWithFoci}];
@@ -37,17 +36,11 @@ for thisCell = 1:numCells
     numNeighbours = props.numNeighbours;
     if numNeighbours > 0
         for thisNeighbour = 1:numNeighbours
-<<<<<<< HEAD
+            
             cellData = [cellData; {0, thisCell, numNeighbours, cellProps{thisCell}.numFoci, cellProps{thisCell}.neighbourDist(thisNeighbour)}];
         end
     else
-        cellData = [cellData; {0, thisCell, numNeighbours, cellProps{thisCell}.numFoci, 0}];
-=======
-            neighbourData = [neighbourData; {imageName, thisCell, props.neighbourDist(thisNeighbour)}];
-        end
-    else
         neighbourData = [neighbourData; {imageName, thisCell, 0}];
->>>>>>> FETCH_HEAD
     end
 end
 
