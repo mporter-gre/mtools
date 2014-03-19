@@ -21,6 +21,7 @@ global session;
 global savePath;
 
 msgbox('Please choose/make a folder to save your data to');
+uiwait;
 savePath = uigetdir;
 
 pixServ = session.getPixelsService;

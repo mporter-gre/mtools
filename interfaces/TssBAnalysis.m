@@ -241,7 +241,7 @@ function summariseBtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 [fileNames, filePaths] = uigetfile('*.xls', 'Select .xls files for summary', 'MultiSelect', 'on');
-
+progress = waitbar(0, 'Loading data');
 numFiles = length(fileNames);
 cellData = [];
 neighbourData = [];
@@ -269,6 +269,7 @@ for thisFile = 1:numFiles
     neighbourData = [neighbourData; thisNeighbourData];
     focusData = [focusData; thisFocusData];
     focusNeighbourData = [focusNeighbourData; thisFocusNeighbourData];
+    waitbar(thisFile/numFiles, progress, 'Loading data');
 end
 
 %Index of cells with x foci.
@@ -335,18 +336,19 @@ fociYNeighboursX(8,4) = fociYNeighboursX(4,4)/sum(fociYNeighboursX(:,4))*100;
 
 
 %Output to spreadsheet.
+waitbar(0, progress, 'Saving data');
 output1 = {'% Cells with x numFoci', ' ', ' ', ' '};
 output1 = [output1; {'0 Foci', '1 Focus', '2 Foci', '3+ Foci'}];
 output1 = [output1; {foci0PC, foci1PC, foci2PC, foci3pPC}];
 xlswrite([filePaths 'AnalysisSumary'], output1, '% Cells with x numFoci');
 
-
+waitbar(1/5, progress, 'Saving data');
 output2 = {'Focus location, % from centre'};
 output2 = [output2; num2cell(focusData(:,6))];
 xlswrite([filePaths 'AnalysisSumary'], output2, 'Focus location');
 
 
-
+waitbar(2/5, progress, 'Saving data');
 output3 = {'numNeighbours vs. numFoci', ' ', ' ', ' ', ' '};
 output3 = [output3; {'Counts', '0 Neighbours', '1 Neighbour', '2 Neighbours', '3+ Neighbours'}];
 output3 = [output3; {'0 Foci'}, num2cell(fociYNeighboursX(1,:))];
@@ -364,7 +366,7 @@ output3 = [output3; {'3+ Foci'}, num2cell(fociYNeighboursX(8,:))];
 
 xlswrite([filePaths 'AnalysisSumary'], output3, 'numNeighbours vs. numFoci');
 
-
+waitbar(3/5, progress, 'Saving data');
 focusNeighbourDistance = focusNeighbourData(:,3);
 focusNeighbourDistance(focusNeighbourDistance==65535) = [];
 output4 = {'Focus distance to touching point'};
@@ -373,13 +375,15 @@ output4 = [output4; num2cell(focusNeighbourDistance)];
 xlswrite([filePaths 'AnalysisSumary'], output4, 'Focus Touch Distance');
 
 
-
+waitbar(4/5, progress, 'Saving data');
 output5 = {'Size of Foci'};
 output5 = [output5; num2cell(focusData(:,3))];
 
 xlswrite([filePaths 'AnalysisSumary'], output5, 'Focus Size');
 
-
+waitbar(1, progress, 'Saving data');
+close(progress);
+msgbox([{'Analysis complete. File saved to'} {[filePaths, ' ', 'AnalysisSummary']}]);
 
 
 
