@@ -342,7 +342,7 @@ xlswrite('AnalysisSumary', output1, '% Cells with x numFoci');
 
 
 output2 = {'Focus location, % from centre'};
-output2 = [output2; num2cell(focusData(:,6)];
+output2 = [output2; num2cell(focusData(:,6))];
 xlswrite('AnalysisSummary', output2, 'Focus location');
 
 
