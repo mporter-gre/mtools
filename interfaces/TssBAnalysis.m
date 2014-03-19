@@ -247,13 +247,139 @@ cellData = [];
 neighbourData = [];
 focusData = [];
 focusNeighbourData = [];
+cellCounter = 0;
 
 for thisFile = 1:numFiles
-    cellData = [cellData; xlsread([filePaths fileNames{thisFile}], 'Cell Data')];
-    neighbourData = [neighbourData; xlsread([filePaths fileNames{thisFile}], 'Neighbour Data')];
-    focusData = [focusData; xlsread([filePaths fileNames{thisFile}], 'Focus Data')];
-    focusNeighbourData = [focusNeighbourData; xlsread([filePaths fileNames{thisFile}], 'Focus Neighbour Data')];
+    %Read the worksheets from the selected files.
+    thisCellData = xlsread([filePaths fileNames{thisFile}], 'Cell Data');
+    thisNeighbourData = xlsread([filePaths fileNames{thisFile}], 'Neighbour Data');
+    thisFocusData = xlsread([filePaths fileNames{thisFile}], 'Focus Data');
+    thisFocusNeighbourData = xlsread([filePaths fileNames{thisFile}], 'Focus Neighbour Data');
+    numCells = length(thisCellData);
+    
+    %Re-assign cell numbers to keep them unique after loading another file.
+    thisCellData(:,1) = thisCellData(:,1) + cellCounter;
+    thisNeighbourData(:,1) = thisNeighbourData(:,1) + cellCounter;
+    thisFocusData(:,1) = thisFocusData(:,1) + cellCounter;
+    thisFocusNeighbourData(:,1) = thisFocusNeighbourData(:,1) + cellCounter;
+    cellCounter = cellCounter + numCells;
+    
+    %Collate the data.
+    cellData = [cellData; thisCellData];
+    neighbourData = [neighbourData; thisNeighbourData];
+    focusData = [focusData; thisFocusData];
+    focusNeighbourData = [focusNeighbourData; thisFocusNeighbourData];
 end
+
+%Index of cells with x foci.
+foci0 = find(cellData(:,4) == 0);
+foci1 = find(cellData(:,4) == 1);
+foci2 = find(cellData(:,4) == 2);
+foci3p = find(cellData(:,4) > 2);
+
+%Percentage of cells with x foci.
+foci0PC = (length(foci0)/cellCounter)*100;
+foci1PC = (length(foci1)/cellCounter)*100;
+foci2PC = (length(foci2)/cellCounter)*100;
+foci3pPC = (length(foci3p)/cellCounter)*100;
+
+%Index of cells with x neighbours.
+cell0Neighbours = find(cellData(:,5) == 0);
+cell1Neighbours = find(cellData(:,5) == 1);
+cell2Neighbours = find(cellData(:,5) == 2);
+cell3pNeighbours = find(cellData(:,5) > 2);
+
+%Permutations of intersection of numFoci and numNeighbours.
+foci0Neighbours0 = intersect(foci0, cell0Neighbours);
+foci1Neighbours0 = intersect(foci1, cell0Neighbours);
+foci2Neighbours0 = intersect(foci2, cell0Neighbours);
+foci3pNeighbours0 = intersect(foci3p, cell0Neighbours);
+
+foci0Neighbours1 = intersect(foci0, cell1Neighbours);
+foci1Neighbours1 = intersect(foci1, cell1Neighbours);
+foci2Neighbours1 = intersect(foci2, cell1Neighbours);
+foci3pNeighbours1 = intersect(foci3p, cell1Neighbours);
+
+foci0Neighbours2 = intersect(foci0, cell2Neighbours);
+foci1Neighbours2 = intersect(foci1, cell2Neighbours);
+foci2Neighbours2 = intersect(foci2, cell2Neighbours);
+foci3pNeighbours2 = intersect(foci3p, cell2Neighbours);
+
+foci0Neighbours3p = intersect(foci0, cell3pNeighbours);
+foci1Neighbours3p = intersect(foci1, cell3pNeighbours);
+foci2Neighbours3p = intersect(foci2, cell3pNeighbours);
+foci3pNeighbours3p = intersect(foci3p, cell3pNeighbours);
+
+fociYNeighboursX = [length(foci0Neighbours0) length(foci0Neighbours1) length(foci0Neighbours2) length(foci0Neighbours3p);...
+    length(foci1Neighbours0) length(foci1Neighbours1) length(foci1Neighbours2) length(foci1Neighbours3p);...
+    length(foci2Neighbours0) length(foci2Neighbours1) length(foci2Neighbours2) length(foci2Neighbours3p);...
+    length(foci3pNeighbours0) length(foci3pNeighbours1) length(foci0Neighbours2) length(foci0Neighbours3p)];
+
+%Percent chance of numNeighbours Vs numFoci
+fociYNeighboursX(5,1) = fociYNeighboursX(1,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursX(6,1) = fociYNeighboursX(2,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursX(7,1) = fociYNeighboursX(3,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursX(8,1) = fociYNeighboursX(4,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursX(5,2) = fociYNeighboursX(1,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursX(6,2) = fociYNeighboursX(2,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursX(7,2) = fociYNeighboursX(3,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursX(8,2) = fociYNeighboursX(4,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursX(5,3) = fociYNeighboursX(1,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursX(6,3) = fociYNeighboursX(2,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursX(7,3) = fociYNeighboursX(3,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursX(8,3) = fociYNeighboursX(4,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursX(5,4) = fociYNeighboursX(1,4)/sum(fociYNeighboursX(:,4))*100;
+fociYNeighboursX(6,4) = fociYNeighboursX(2,4)/sum(fociYNeighboursX(:,4))*100;
+fociYNeighboursX(7,4) = fociYNeighboursX(3,4)/sum(fociYNeighboursX(:,4))*100;
+fociYNeighboursX(8,4) = fociYNeighboursX(4,4)/sum(fociYNeighboursX(:,4))*100;
+
+
+%Output to spreadsheet.
+output1 = {'% Cells with x numFoci', ' ', ' ', ' '};
+output1 = [output1; {'0 Foci', '1 Focus', '2 Foci', '3+ Foci'}];
+output1 = [output1; {foci0PC, foci1PC, foci2PC, foci3pPC}];
+xlswrite('AnalysisSumary', output1, '% Cells with x numFoci');
+
+
+output2 = {'Focus location, % from centre'};
+output2 = [output2; num2cell(focusData(:,6)];
+xlswrite('AnalysisSummary', output2, 'Focus location');
+
+
+
+output3 = {'numNeighbours vs. numFoci', ' ', ' ', ' ', ' '};
+output3 = [output3; {'Counts', '0 Neighbours', '1 Neighbour', '2 Neighbours', '3+ Neighbours'}];
+output3 = [output3; {'0 Foci'}, num2cell(fociYNeighboursX(1,:))];
+output3 = [output3; {'1 Focus'}, num2cell(fociYNeighboursX(2,:))];
+output3 = [output3; {'2 Foci'}, num2cell(fociYNeighboursX(3,:))];
+output3 = [output3; {'3+ Foci'}, num2cell(fociYNeighboursX(4,:))];
+
+output3 = [output3; {' ',' ',' ',' ',' '}];
+
+output3 = [output3; {'% of Cells', '0 Neighbours', '1 Neighbour', '2 Neighbours', '3+ Neighbours'}];
+output3 = [output3; {'0 Foci'}, num2cell(fociYNeighboursX(5,:))];
+output3 = [output3; {'1 Focus'}, num2cell(fociYNeighboursX(6,:))];
+output3 = [output3; {'2 Foci'}, num2cell(fociYNeighboursX(7,:))];
+output3 = [output3; {'3+ Foci'}, num2cell(fociYNeighboursX(8,:))];
+
+xlswrite('AnalysisSummary', output3, 'numNeighbours vs. numFoci');
+
+
+focusNeighbourDistance = focusNeighbourData(:,3);
+focusNeighbourDistance(focusNeighbourDistance==65535) = [];
+output4 = {'Focus distance to touching point'};
+output4 = [output4; num2cell(focusNeighbourDistance)];
+
+xlswrite('AnalysisSummary', output4, 'Focus Touch Distance');
+
+
+
+output5 = {'Size of Foci'};
+output5 = [output5; num2cell(focusData(:,3))];
+
+xlswrite('AnalysisSummary', output5, 'Focus Size');
+
+
 
 
 
