@@ -17,6 +17,8 @@ function cellPropsToXLS(cellProps, imageName)
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+global savePath
+
 numCells = length(cellProps);
 rowCounter = 1;
 cellData = {};
@@ -70,10 +72,10 @@ for thisCell = 1:numCells
     end
 end
 
-xlswrite([imageName '.xls'], cellData, 'Cell Data');
-xlswrite([imageName '.xls'], neighbourData, 'Neighbour Data');
-xlswrite([imageName '.xls'], focusData, 'Focus Data');
-xlswrite([imageName '.xls'], focusNeighbourData, 'Focus Neighbour Data');
+xlswrite([savePath imageName '.xls'], cellData, 'Cell Data');
+xlswrite([savePath imageName '.xls'], neighbourData, 'Neighbour Data');
+xlswrite([savePath imageName '.xls'], focusData, 'Focus Data');
+xlswrite([savePath imageName '.xls'], focusNeighbourData, 'Focus Neighbour Data');
 
 
 end

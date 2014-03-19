@@ -338,12 +338,12 @@ fociYNeighboursX(8,4) = fociYNeighboursX(4,4)/sum(fociYNeighboursX(:,4))*100;
 output1 = {'% Cells with x numFoci', ' ', ' ', ' '};
 output1 = [output1; {'0 Foci', '1 Focus', '2 Foci', '3+ Foci'}];
 output1 = [output1; {foci0PC, foci1PC, foci2PC, foci3pPC}];
-xlswrite('AnalysisSumary', output1, '% Cells with x numFoci');
+xlswrite([filePaths 'AnalysisSumary'], output1, '% Cells with x numFoci');
 
 
 output2 = {'Focus location, % from centre'};
 output2 = [output2; num2cell(focusData(:,6))];
-xlswrite('AnalysisSummary', output2, 'Focus location');
+xlswrite([filePaths 'AnalysisSumary'], output2, 'Focus location');
 
 
 
@@ -362,7 +362,7 @@ output3 = [output3; {'1 Focus'}, num2cell(fociYNeighboursX(6,:))];
 output3 = [output3; {'2 Foci'}, num2cell(fociYNeighboursX(7,:))];
 output3 = [output3; {'3+ Foci'}, num2cell(fociYNeighboursX(8,:))];
 
-xlswrite('AnalysisSummary', output3, 'numNeighbours vs. numFoci');
+xlswrite([filePaths 'AnalysisSumary'], output3, 'numNeighbours vs. numFoci');
 
 
 focusNeighbourDistance = focusNeighbourData(:,3);
@@ -370,14 +370,14 @@ focusNeighbourDistance(focusNeighbourDistance==65535) = [];
 output4 = {'Focus distance to touching point'};
 output4 = [output4; num2cell(focusNeighbourDistance)];
 
-xlswrite('AnalysisSummary', output4, 'Focus Touch Distance');
+xlswrite([filePaths 'AnalysisSumary'], output4, 'Focus Touch Distance');
 
 
 
 output5 = {'Size of Foci'};
 output5 = [output5; num2cell(focusData(:,3))];
 
-xlswrite('AnalysisSummary', output5, 'Focus Size');
+xlswrite([filePaths 'AnalysisSumary'], output5, 'Focus Size');
 
 
 

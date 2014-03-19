@@ -18,6 +18,10 @@ function TssBAnalysisQueue(dsIds)
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 global session;
+global savePath;
+
+msgbox('Please choose/make a folder to save your data to');
+savePath = uigetdir;
 
 pixServ = session.getPixelsService;
 
