@@ -72,10 +72,10 @@ for thisCell = 1:numCells
     end
 end
 
-xlswrite([savePath imageName '.xls'], cellData, 'Cell Data');
-xlswrite([savePath imageName '.xls'], neighbourData, 'Neighbour Data');
-xlswrite([savePath imageName '.xls'], focusData, 'Focus Data');
-xlswrite([savePath imageName '.xls'], focusNeighbourData, 'Focus Neighbour Data');
+xlswrite([savePath '\' imageName '.xls'], cellData, 'Cell Data');
+xlswrite([savePath '\' imageName '.xls'], neighbourData, 'Neighbour Data');
+xlswrite([savePath '\' imageName '.xls'], focusData, 'Focus Data');
+xlswrite([savePath '\' imageName '.xls'], focusNeighbourData, 'Focus Neighbour Data');
 
 
 end

@@ -317,22 +317,22 @@ fociYNeighboursX = [length(foci0Neighbours0) length(foci0Neighbours1) length(foc
     length(foci3pNeighbours0) length(foci3pNeighbours1) length(foci0Neighbours2) length(foci0Neighbours3p)];
 
 %Percent chance of numNeighbours Vs numFoci
-fociYNeighboursX(5,1) = fociYNeighboursX(1,1)/sum(fociYNeighboursX(:,1))*100;
-fociYNeighboursX(6,1) = fociYNeighboursX(2,1)/sum(fociYNeighboursX(:,1))*100;
-fociYNeighboursX(7,1) = fociYNeighboursX(3,1)/sum(fociYNeighboursX(:,1))*100;
-fociYNeighboursX(8,1) = fociYNeighboursX(4,1)/sum(fociYNeighboursX(:,1))*100;
-fociYNeighboursX(5,2) = fociYNeighboursX(1,2)/sum(fociYNeighboursX(:,2))*100;
-fociYNeighboursX(6,2) = fociYNeighboursX(2,2)/sum(fociYNeighboursX(:,2))*100;
-fociYNeighboursX(7,2) = fociYNeighboursX(3,2)/sum(fociYNeighboursX(:,2))*100;
-fociYNeighboursX(8,2) = fociYNeighboursX(4,2)/sum(fociYNeighboursX(:,2))*100;
-fociYNeighboursX(5,3) = fociYNeighboursX(1,3)/sum(fociYNeighboursX(:,3))*100;
-fociYNeighboursX(6,3) = fociYNeighboursX(2,3)/sum(fociYNeighboursX(:,3))*100;
-fociYNeighboursX(7,3) = fociYNeighboursX(3,3)/sum(fociYNeighboursX(:,3))*100;
-fociYNeighboursX(8,3) = fociYNeighboursX(4,3)/sum(fociYNeighboursX(:,3))*100;
-fociYNeighboursX(5,4) = fociYNeighboursX(1,4)/sum(fociYNeighboursX(:,4))*100;
-fociYNeighboursX(6,4) = fociYNeighboursX(2,4)/sum(fociYNeighboursX(:,4))*100;
-fociYNeighboursX(7,4) = fociYNeighboursX(3,4)/sum(fociYNeighboursX(:,4))*100;
-fociYNeighboursX(8,4) = fociYNeighboursX(4,4)/sum(fociYNeighboursX(:,4))*100;
+fociYNeighboursXPC(1,1) = fociYNeighboursX(1,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursXPC(2,1) = fociYNeighboursX(2,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursXPC(3,1) = fociYNeighboursX(3,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursXPC(4,1) = fociYNeighboursX(4,1)/sum(fociYNeighboursX(:,1))*100;
+fociYNeighboursXPC(1,2) = fociYNeighboursX(1,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursXPC(2,2) = fociYNeighboursX(2,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursXPC(3,2) = fociYNeighboursX(3,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursXPC(4,2) = fociYNeighboursX(4,2)/sum(fociYNeighboursX(:,2))*100;
+fociYNeighboursXPC(1,3) = fociYNeighboursX(1,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursXPC(2,3) = fociYNeighboursX(2,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursXPC(3,3) = fociYNeighboursX(3,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursXPC(4,3) = fociYNeighboursX(4,3)/sum(fociYNeighboursX(:,3))*100;
+fociYNeighboursXPC(1,4) = fociYNeighboursX(1,4)/sum(fociYNeighboursX(:,4))*100;
+fociYNeighboursXPC(2,4) = fociYNeighboursX(2,4)/sum(fociYNeighboursX(:,4))*100;
+fociYNeighboursXPC(3,4) = fociYNeighboursX(3,4)/sum(fociYNeighboursX(:,4))*100;
+fociYNeighboursXPC(4,4) = fociYNeighboursX(4,4)/sum(fociYNeighboursX(:,4))*100;
 
 
 %Output to spreadsheet.
@@ -359,10 +359,10 @@ output3 = [output3; {'3+ Foci'}, num2cell(fociYNeighboursX(4,:))];
 output3 = [output3; {' ',' ',' ',' ',' '}];
 
 output3 = [output3; {'% of Cells', '0 Neighbours', '1 Neighbour', '2 Neighbours', '3+ Neighbours'}];
-output3 = [output3; {'0 Foci'}, num2cell(fociYNeighboursX(5,:))];
-output3 = [output3; {'1 Focus'}, num2cell(fociYNeighboursX(6,:))];
-output3 = [output3; {'2 Foci'}, num2cell(fociYNeighboursX(7,:))];
-output3 = [output3; {'3+ Foci'}, num2cell(fociYNeighboursX(8,:))];
+output3 = [output3; {'0 Foci'}, num2cell(fociYNeighboursXPC(1,:))];
+output3 = [output3; {'1 Focus'}, num2cell(fociYNeighboursXPC(2,:))];
+output3 = [output3; {'2 Foci'}, num2cell(fociYNeighboursXPC(3,:))];
+output3 = [output3; {'3+ Foci'}, num2cell(fociYNeighboursXPC(4,:))];
 
 xlswrite([filePaths 'AnalysisSumary'], output3, 'numNeighbours vs. numFoci');
 
