@@ -593,6 +593,9 @@ if physX == 1 && physY == 1
     physZ = 1;
 end
 handles.distance = sqrt( ((x1-x2)*physX)^2 + ((y1-y2)*physY)^2 + ((z1-z2)*physZ)^2);
+zHeight = sqrt(((z1-z2)*physZ)^2);
+sinA = zHeight/(handles.distance/sin(90));
+handles.angle = rad2deg(asin(sinA));
 
 global selectorOutput;
 
@@ -612,6 +615,7 @@ if physX == 1 && physY == 1
 else
     selectorOutput{10} = 'um';
 end
+selectorOutput{11} = handles.angle;
 handles.output = selectorOutput;
 
 guidata(handles.objectSelector, handles);

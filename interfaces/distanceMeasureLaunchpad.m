@@ -150,8 +150,8 @@ varargout{1} = handles.output;
 
 function writeDataOut(data, roiShapes, datasetNames)
 
-mainHeader = {'Original Image', 'Dataset', 'ROI number', 'Object 1 Channel', 'Object 2 Channel', 'Centroid 1 (xyz)', 'Centroid 2 (xyz)', 'Distance', 'Units'};
-emptyLine = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+mainHeader = {'Original Image', 'Dataset', 'ROI number', 'Object 1 Channel', 'Object 2 Channel', 'Centroid 1 (xyz)', 'Centroid 2 (xyz)', 'Distance', 'Units', 'Angle'};
+emptyLine = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
 dataOut = mainHeader;
 numImages = length(roiShapes);
 
@@ -159,7 +159,7 @@ numImages = length(roiShapes);
 for thisImage = 1:numImages
     numROI = length(roiShapes{thisImage});
     for thisROI = 1:numROI
-        dataOut = [dataOut; {roiShapes{thisImage}{thisROI}.origName datasetNames{thisImage} num2str(thisROI) data{thisImage}{thisROI}{1}{1} data{thisImage}{thisROI}{2}{1} num2str(data{thisImage}{thisROI}{7}.Centroid) num2str(data{thisImage}{thisROI}{8}.Centroid) data{thisImage}{thisROI}{9}} data{thisImage}{thisROI}{10}];
+        dataOut = [dataOut; {roiShapes{thisImage}{thisROI}.origName datasetNames{thisImage} num2str(thisROI) data{thisImage}{thisROI}{1}{1} data{thisImage}{thisROI}{2}{1} num2str(data{thisImage}{thisROI}{7}.Centroid) num2str(data{thisImage}{thisROI}{8}.Centroid) data{thisImage}{thisROI}{9}} data{thisImage}{thisROI}{10} data{thisImage}{thisROI}{11}];
     end
 end
 
