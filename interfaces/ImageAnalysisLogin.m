@@ -59,7 +59,9 @@ handles.exitApplication = 0;
 numArgs = nargin-3;
 if numArgs > 0
     global session;
-    
+    argFig = figure;
+    argTextBox = uicontrol('style', 'text');
+    set(argTextBox, 'String', varargin);
     argStrings = strsplit(args);
     
     server = parseVarargin('-s', argStrings);
