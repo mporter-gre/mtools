@@ -42,10 +42,10 @@ for thisImage = 1:numImages
         ch = pixDesc.getChannel(thisC-1);
         chLog = ch.getLogicalChannel;
         chName = char(chLog.getName.getValue.getBytes');
-        if strcmpi(chName, 'FITC')
+        if strcmpi(chName, 'FITC') || strcmpi(chName, 'GFP')
             greenIdx = thisC-1;
         end
-        if strcmpi(chName, 'TRITC')
+        if strcmpi(chName, 'TRITC') || strcmpi(chName, 'mCherry')
             redIdx = thisC-1;
         end
     end
