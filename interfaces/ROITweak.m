@@ -1161,8 +1161,8 @@ end
 %For server-side ROIs:
 updatedTransform = 'none';
 roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setTransform(omero.rtypes.rstring(updatedTransform))
-roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCx(omero.rtypes.rdouble(zoomX + currentPoint(1)));
-roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCy(omero.rtypes.rdouble(zoomY + currentPoint(3)));
+roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCx(omero.rtypes.rdouble(zoomX + currentPoint(1)-1));
+roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCy(omero.rtypes.rdouble(zoomY + currentPoint(3)-1));
 
         
 % numROIShapes = length(xmlStruct.children(ROIToUpdate).children);
@@ -1518,8 +1518,8 @@ else
     minZoomX = round(ROIx - (imageWidth/(2*zoomLevel)));
     minZoomY = round(ROIy - (imageHeight/(2*zoomLevel)));
 
-    cx = imageWidth/(zoomLevel*2);
-    cy = imageHeight/(zoomLevel*2);
+    cx = imageWidth/(zoomLevel*2)+2;
+    cy = imageHeight/(zoomLevel*2)+2;
 
     if maxZoomX > imageWidth
         xDiff = maxZoomX - imageWidth;
