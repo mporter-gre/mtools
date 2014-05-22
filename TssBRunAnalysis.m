@@ -61,47 +61,57 @@ for thisCell = 1:numCells
     overlap = TssBSegBWL.*workImg;
     TssBOutsideCells = TssBSegBWL-overlap;
     fociIds = unique(overlap(overlap>0));
-    numFoci = length(fociIds);
-    cellProps{cellCounter}.numFoci = numFoci;
-    numFocusPxInCell = [];
-    numFocusPxOutsideCell = [];
-    numFocusPx = [];
-    focusCentroid = [];
-    fDist = [];
-    
-    %Properties of foci associated with this cell
-    for thisFocus = 1:numFoci
-        %numPx...
-        numFocusPxInCell(thisFocus) = length(find(overlap==fociIds(thisFocus)));
-        numFocusPxOutsideCell(thisFocus) = length(find(TssBOutsideCells==fociIds(thisFocus)));
-        numFocusPx(thisFocus) = numFocusPxInCell(thisFocus) + numFocusPxOutsideCell(thisFocus);
+    if ~isempty(fociIds)
+        numFoci = length(fociIds);
+        cellProps{cellCounter}.numFoci = numFoci;
+        numFocusPxInCell = [];
+        numFocusPxOutsideCell = [];
+        numFocusPx = [];
+        focusCentroid = [];
+        fDist = [];
         
-        %Get the centroid of the focus....
-        focusImg = zeros(sizeY, sizeX, numZ);
-        focusImg(TssBSegBWL==fociIds(thisFocus)) = 1;
-        zProj = logical(sum(focusImg, 3));
-        yProj = logical(squeeze(sum(focusImg,1)));
-        [Y, X] = find(zProj);
-        [~, Z] = find(yProj);
-        meanX = int16(mean(X));
-        meanY = int16(mean(Y));
-        meanZ = int16(mean(Z));
-        focusCentroid(thisFocus,:) = double([meanY meanX meanZ]);
+        %Properties of foci associated with this cell
+        for thisFocus = 1:numFoci
+            %numPx...
+            numFocusPxInCell(thisFocus) = length(find(overlap==fociIds(thisFocus)));
+            numFocusPxOutsideCell(thisFocus) = length(find(TssBOutsideCells==fociIds(thisFocus)));
+            numFocusPx(thisFocus) = numFocusPxInCell(thisFocus) + numFocusPxOutsideCell(thisFocus);
+            
+            %Get the centroid of the focus....
+            focusImg = zeros(sizeY, sizeX, numZ);
+            focusImg(TssBSegBWL==fociIds(thisFocus)) = 1;
+            zProj = logical(sum(focusImg, 3));
+            yProj = logical(squeeze(sum(focusImg,1)));
+            [Y, X] = find(zProj);
+            [~, Z] = find(yProj);
+            meanX = int16(mean(X));
+            meanY = int16(mean(Y));
+            meanZ = int16(mean(Z));
+            focusCentroid(thisFocus,:) = double([meanY meanX meanZ]);
+            
+            %Distance of the focus from cell centroid
+            fDist(thisFocus) = pdist([cellCentroid; focusCentroid(thisFocus,:)]);
+            majorAxis = cellProps{cellCounter}.props.MajorAxisLength;
+            halfLength = majorAxis/2;
+            focusPosition(thisFocus) = (fDist(thisFocus)/halfLength)*100;
+            
+        end
         
-        %Distance of the focus from cell centroid
-        fDist(thisFocus) = pdist([cellCentroid; focusCentroid(thisFocus,:)]);
-        majorAxis = cellProps{cellCounter}.props.MajorAxisLength;
-        halfLength = majorAxis/2;
-        focusPosition(thisFocus) = (fDist(thisFocus)/halfLength)*100;
-        
+        cellProps{cellCounter}.numFocusPxInCell = numFocusPxInCell;
+        cellProps{cellCounter}.numFocusPxOutsideCell = numFocusPxOutsideCell;
+        cellProps{cellCounter}.numFocusPx = numFocusPx;
+        cellProps{cellCounter}.focusCentroid = focusCentroid;
+        cellProps{cellCounter}.focusDistance = fDist;
+        cellProps{cellCounter}.focusPosition = focusPosition;
+    else
+        cellProps{cellCounter}.numFoci = 0;
+        cellProps{cellCounter}.numFocusPxInCell = 0;
+        cellProps{cellCounter}.numFocusPxOutsideCell = 0;
+        cellProps{cellCounter}.numFocusPx = 0;
+        cellProps{cellCounter}.focusCentroid = 0;
+        cellProps{cellCounter}.focusDistance = 0;
+        cellProps{cellCounter}.focusPosition = 0;
     end
-    
-    cellProps{cellCounter}.numFocusPxInCell = numFocusPxInCell;
-    cellProps{cellCounter}.numFocusPxOutsideCell = numFocusPxOutsideCell;
-    cellProps{cellCounter}.numFocusPx = numFocusPx;
-    cellProps{cellCounter}.focusCentroid = focusCentroid;
-    cellProps{cellCounter}.focusDistance = fDist;
-    cellProps{cellCounter}.focusPosition = focusPosition;
     
     cellCounter = cellCounter + 1;
 end

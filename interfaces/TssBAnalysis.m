@@ -257,6 +257,20 @@ for thisFile = 1:numFiles
     thisFocusNeighbourData = xlsread([filePaths fileNames{thisFile}], 'Focus Neighbour Data');
     numCells = length(thisCellData);
     
+    %Fudge
+    if isempty(thisCellData)
+        thisCellData = [0 0 0 0 0 0 0];
+    end
+    if isempty(thisNeighbourData)
+        thisNeighbourData = [0 0];
+    end
+    if isempty(thisFocusData)
+        thisFocusData = [0 0 0 0 0 0];
+    end
+    if isempty(thisFocusNeighbourData)
+        thisFocusNeighbourData = [0 0 0];
+    end    
+    
     %Re-assign cell numbers to keep them unique after loading another file.
     thisCellData(:,1) = thisCellData(:,1) + cellCounter;
     thisNeighbourData(:,1) = thisNeighbourData(:,1) + cellCounter;
