@@ -520,8 +520,8 @@ end
             shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue;
             shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue;
             if shapeT == thisT-1 && shapeZ == thisZ-1
-                cx = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue;
-                cy = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue;
+                cx = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue+1;
+                cy = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue+1;
                 width = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getWidth.getValue;
                 height = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getHeight.getValue;
                 continue;
@@ -582,8 +582,8 @@ end
     if strcmpi(thisROIShape, 'point')
         numShapes = roiShapes{thisROIIdx}.numShapes;
         for thisShape = 1:numShapes
-            shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue;
-            shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue;
+            shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue+1;
+            shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue+1;
             if shapeT == thisT-1 && shapeZ == thisZ-1
                 cx = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue;
                 cy = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue;

@@ -49,6 +49,11 @@ for thisT = 1:fullT
                     break;
                 end
             end
+            if thisT ~= TForThisShape + 1
+                excludeT = [excludeT thisT];
+            else
+                includeT = [includeT thisT];
+            end
             frapIdx = thisROI;
             frapMask = zeros(maxY, maxX);
             try
@@ -62,7 +67,6 @@ for thisT = 1:fullT
                 excludeT = [excludeT thisT];
                 continue;
             end
-            includeT = [includeT thisT];
             mapX = round(sub2ind([maxY maxX], maskLocationsX));
             mapY = round(sub2ind([maxY maxX], maskLocationsY));
             for thisLocation = 1:length(mapX)
@@ -83,11 +87,16 @@ for thisT = 1:fullT
                     break;
                 end
             end
+            if thisT ~= TForThisShape + 1
+                excludeT = [excludeT thisT];
+            else
+                includeT = [includeT thisT];
+            end
             baseIdx = thisROI;
             baseMask = zeros(maxY, maxX);
             try
-                cx = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCx.getValue);
-                cy = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCy.getValue);
+                cx = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCx.getValue)+1;
+                cy = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCy.getValue)+1;
                 rx = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getRx.getValue);
                 ry = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getRy.getValue);
                 transform = char(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
@@ -115,7 +124,6 @@ for thisT = 1:fullT
                 excludeT = [excludeT thisT];
                 continue;
             end
-            includeT = [includeT thisT];
             mapX = round(sub2ind([maxY maxX], maskLocationsX));
             mapY = round(sub2ind([maxY maxX], maskLocationsY));
             for thisLocation = 1:length(mapX)
@@ -125,6 +133,7 @@ for thisT = 1:fullT
             baseROI = find(baseMaskFilled);
             roiShapes{thisROI}.baseData(thisT) = mean(thisPlane(baseROI));
         end
+        
         if strcmpi(char(roiShapes{thisROI}.shape1.getTextValue.getValue.getBytes'), 'Whole')
             numShapes = roiShapes{thisROI}.numShapes;
             for thisShape = 1:numShapes
@@ -133,11 +142,16 @@ for thisT = 1:fullT
                     break;
                 end
             end
+            if thisT ~= TForThisShape + 1
+                excludeT = [excludeT thisT];
+            else
+                includeT = [includeT thisT];
+            end
             wholeIdx = thisROI;
             wholeMask = zeros(maxY, maxX);
             try
-                cx = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCx.getValue);
-                cy = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCy.getValue);
+                cx = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCx.getValue)+1;
+                cy = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getCy.getValue)+1;
                 rx = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getRx.getValue);
                 ry = round(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getRy.getValue);
                 transform = char(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
@@ -165,7 +179,6 @@ for thisT = 1:fullT
                 excludeT = [excludeT thisT];
                 continue;
             end
-            includeT = [includeT thisT];
             mapX = round(sub2ind([maxY maxX], maskLocationsX));
             mapY = round(sub2ind([maxY maxX], maskLocationsY));
             for thisLocation = 1:length(mapX)
