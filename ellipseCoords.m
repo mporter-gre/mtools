@@ -1,4 +1,4 @@
-function [xInd yInd] = ellipseCoords(ellipseVec)
+function [xInd, yInd] = ellipseCoords(ellipseVec)
 
 % Copyright (C) 2013-2014 University of Dundee & Open Microscopy Environment.
 % All rights reserved.
@@ -19,11 +19,11 @@ function [xInd yInd] = ellipseCoords(ellipseVec)
 
 centreX = ellipseVec(1);
 centreY = ellipseVec(2);
-radiusX = ellipseVec(3)/2;
-radiusY = ellipseVec(4)/2;
+radiusX = ellipseVec(3);
+radiusY = ellipseVec(4);
 rotAngle = ellipseVec(5);
 
-increments = 0:pi/800:2*pi;
+increments = 0:pi/1600:2*pi;
 
 xu = radiusX*cos(increments);
 yv = radiusY*sin(increments);
