@@ -361,7 +361,7 @@ end
 set(gcf,'Pointer','arrow');
 
 
-    
+
 
 function redrawROIs(handles)
 
@@ -384,7 +384,7 @@ rTransY = getappdata(handles.ROITweak, 'rTransY');
 
 if strcmp(roiSelectString{roiSelectValue}, 'All')
     %for thisROI = 1:length(roiSelectString);
-        ROIsToDraw = ROIIdx;
+    ROIsToDraw = ROIIdx;
     %end
 else
     ROIsToDraw = ROIIdx(roiSelectValue-1);
@@ -413,38 +413,38 @@ for thisROI = 1:numROIs
                 cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue)+1;
                 rx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getRx.getValue);
                 ry = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getRy.getValue);
-%                 transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
-%                 if ~strcmp(transform, 'none') || ~isempty(transform)
-%                     if strncmp(transform, 'trans', 5)
-%                         closeBracket = findstr(transform, ')');
-%                         openBracket = findstr(transform, '(');
-%                         transformData = transform(openBracket+1:closeBracket-1);
-%                         spaceChar = findstr(transformData, ' ');
-%                         if isempty(spaceChar)
-%                             firstTranslate = str2double(transformData(1:end));
-%                             secondTranslate = 0;
-%                         else
-%                             firstTranslate = str2double(transformData(1:spaceChar-1));
-%                             secondTranslate = str2double(transformData(spaceChar+1:end));
-%                         end
-%                         cx = cx + firstTranslate;
-%                         cy = cy + secondTranslate;
-%                         else
-%                     end
-%                 end
-%                 if strncmp(transform, 'matrix', 6)
-%                     affMat = parseAffineMatrix(transform);
-%                     coords = [cx cy 0]
-%                     coords = coords * affMat'
-%                     cx = coords(1);
-%                     cy = coords(2);
-% %                     cx = cx + affMat(1,3);
-% %                     cy = cy + affMat(2,3);
-%                     
-%                     %cx = cx + transX;
-%                     %cy = cy + transY;
-%               end
-                continue;
+                %                 transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
+                %                 if ~strcmp(transform, 'none') || ~isempty(transform)
+                %                     if strncmp(transform, 'trans', 5)
+                %                         closeBracket = findstr(transform, ')');
+                %                         openBracket = findstr(transform, '(');
+                %                         transformData = transform(openBracket+1:closeBracket-1);
+                %                         spaceChar = findstr(transformData, ' ');
+                %                         if isempty(spaceChar)
+                %                             firstTranslate = str2double(transformData(1:end));
+                %                             secondTranslate = 0;
+                %                         else
+                %                             firstTranslate = str2double(transformData(1:spaceChar-1));
+                %                             secondTranslate = str2double(transformData(spaceChar+1:end));
+                %                         end
+                %                         cx = cx + firstTranslate;
+                %                         cy = cy + secondTranslate;
+                %                         else
+                %                     end
+                %                 end
+                %                 if strncmp(transform, 'matrix', 6)
+                %                     affMat = parseAffineMatrix(transform);
+                %                     coords = [cx cy 0]
+                %                     coords = coords * affMat'
+                %                     cx = coords(1);
+                %                     cy = coords(2);
+                % %                     cx = cx + affMat(1,3);
+                % %                     cy = cy + affMat(2,3);
+                %
+                %                     %cx = cx + transX;
+                %                     %cy = cy + transY;
+                %               end
+                
             end
         end
         if zoomLevel ~=1
@@ -459,60 +459,12 @@ for thisROI = 1:numROIs
                 cy = round(zoomROICentre(2));
             end
         end
+        [xInd yInd] = ellipseCoords([cx cy rx*rTransX ry*rTransY 0]);
+        line(xInd, yInd, 'Color', 'w');
     end
     
-    [xInd yInd] = ellipseCoords([cx cy rx*rTransX ry*rTransY 0]);
-    line(xInd, yInd, 'Color', 'w');
-%     ellipse(rx, ry, 0, cx, cy, 'w');
-    %Ucomment this bit when you work out what it does :-P
-    %         if thisZ-1 == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(2).value)
-    %             line(xInd, yInd, 'Color', 'w');
-    %             break;
-    %         else
-    %             line(xInd, yInd, 'Color', 'r');
-    %         end
-
-
-    %         numROIShapes = length(xmlStruct.children(thisROIIdx).children);
-    %         for thisROIShape = 2:2:numROIShapes
-    %             if thisT == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(1).value)+1;
-    %                 numFields = length(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children);
-    %                 for thisField = 1:numFields
-    %                     thisFieldName = xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).name;
-    %                     if strcmpi(thisFieldName, 'measurementCentreX')
-    %                         cx = round(str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value))+1;
-    %                     elseif strcmpi(thisFieldName, 'measurementCentreY')
-    %                         cy = round(str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value))+1;
-    %                     elseif strcmpi(thisFieldName, 'measurementWidth')
-    %                         rx = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-    %                     elseif strcmpi(thisFieldName, 'measurementHeight')
-    %                         ry = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-    %                     end
-    %                 end
-    %                 if zoomLevel ~=1
-    %                     if playing == 1
-    %                         topLeftZoom = getappdata(handles.ROITweak, 'zoomMinMax');
-    %                         zoomX = topLeftZoom(1);
-    %                         zoomY = topLeftZoom(2);
-    %                         cx = round(cx-zoomX);
-    %                         cy = round(cy-zoomY);
-    %                     else
-    %                         cx = round(zoomROICentre(1));
-    %                         cy = round(zoomROICentre(2));
-    %                     end
-    %                 end
-    %                 [xInd yInd] = ellipseCoords([cx cy rx ry 0]);
-    %                 if thisZ-1 == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(2).value)
-    %                     line(xInd, yInd, 'Color', 'w');
-    %                     break;
-    %                 else
-    %                     line(xInd, yInd, 'Color', 'r');
-    %                 end
-    %             end
-end
-
-
-
+    
+    
     %Then the rectangles:
     if strcmpi(thisROIShape, 'rect')
         numShapes = roiShapes{thisROIIdx}.numShapes;
@@ -520,15 +472,15 @@ end
             shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue;
             shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue;
             if shapeT == thisT-1 && shapeZ == thisZ-1
-                cx = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue+1;
-                cy = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue+1;
+                x = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getX.getValue+1;
+                y = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getY.getValue+1;
                 width = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getWidth.getValue;
                 height = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getHeight.getValue;
-                continue;
+                
             end
         end
-        x = cx - round(width/2);
-        y = cy - round(height/2);
+        %x = cx - round(width/2);
+        %y = cy - round(height/2);
         if zoomLevel ~=1
             if playing == 1
                 topLeftZoom = getappdata(handles.ROITweak, 'zoomMinMax');
@@ -537,57 +489,23 @@ end
                 x = round(x-zoomX);
                 y = round(y-zoomY);
             else
-                x = round(zoomROICentre(1) - round(width/2));
-                y = round(zoomROICentre(2) - round(height/2));
+                x = round(zoomROICentre(1));
+                y = round(zoomROICentre(2));
             end
         end
         rectangle('Position', [x y width height], 'edgecolor', 'white');
-        
-%         numROIShapes = length(xmlStruct.children(thisROIIdx).children);
-%         for thisROIShape = 2:2:numROIShapes
-%             if thisT == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(1).value)+1;
-%                 numFields = length(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children);
-%                 for thisField = 1:numFields
-%                     thisFieldName = xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).name;
-%                     if strcmpi(thisFieldName, 'measurementCentreX')
-%                         cx = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value)+1;
-%                     elseif strcmpi(thisFieldName, 'measurementCentreY')
-%                         cy = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value)+1;
-%                     elseif strcmpi(thisFieldName, 'measurementWidth')
-%                         width = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                     elseif strcmpi(thisFieldName, 'measurementHeight')
-%                         height = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                     end
-%                 end
-%                 x = cx - round(width/2);
-%                 y = cy - round(height/2);
-%                 if zoomLevel ~=1
-%                     if playing == 1
-%                         topLeftZoom = getappdata(handles.ROITweak, 'zoomMinMax');
-%                         zoomX = topLeftZoom(1);
-%                         zoomY = topLeftZoom(2);
-%                         x = round(x-zoomX);
-%                         y = round(y-zoomY);
-%                     else
-%                         x = round(zoomROICentre(1) - round(width/2));
-%                         y = round(zoomROICentre(2) - round(height/2));
-%                     end
-%                 end
-%                 rectangle('Position', [x y width height], 'edgecolor', 'white');
-%             end
-%         end
     end
     
     %Then the points:
     if strcmpi(thisROIShape, 'point')
         numShapes = roiShapes{thisROIIdx}.numShapes;
         for thisShape = 1:numShapes
-            shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue+1;
-            shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue+1;
+            shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue;
+            shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue;
             if shapeT == thisT-1 && shapeZ == thisZ-1
-                cx = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue;
-                cy = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue;
-                continue;
+                cx = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue+1;
+                cy = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue+1;
+                
             end
         end
         if zoomLevel ~=1
@@ -603,40 +521,9 @@ end
             end
         end
         point = impoint(handles.imageAxes, cx, cy);
-        
-        
-%         numROIShapes = length(xmlStruct.children(thisROIIdx).children);
-%         for thisROIShape = 2:2:numROIShapes
-%             if thisT == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(1).value)+1;
-%                 numFields = length(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children);
-%                 for thisField = 1:numFields
-%                     thisFieldName = xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).name;
-%                     if strcmpi(thisFieldName, 'measurementCentreX')
-%                         cx = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value)+1;
-%                     elseif strcmpi(thisFieldName, 'measurementCentreY')
-%                         cy = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value)+1;
-%                     end
-%                 end
-%                 if zoomLevel ~=1
-%                     if playing == 1
-%                         topLeftZoom = getappdata(handles.ROITweak, 'zoomMinMax');
-%                         zoomX = topLeftZoom(1);
-%                         zoomY = topLeftZoom(2);
-%                         cx = round(cx-zoomX);
-%                         cy = round(cy-zoomY);
-%                     else
-%                         cx = round(zoomROICentre(1));
-%                         cy = round(zoomROICentre(2));
-%                     end
-%                 end
-%                 point = impoint(handles.imageAxes, cx, cy);
-%                 api = iptgetapi(point);
-%                 fcn = makeConstrainToRectFcn('impoint', [cx cx], [cy cy]);
-%                 api.setPositionConstraintFcn(fcn);
-%             end
-%         end
     end
-     
+end
+    
 
 
 
@@ -1109,118 +996,47 @@ end
 thisT = round(get(handles.tSlider, 'Value'));
 thisZ = round(get(handles.zSlider, 'Value'));
 currentPoint = round(get(handles.imageAxes, 'CurrentPoint'));
-% currentPoint(1) = currentPoint(1)/rTransX;
-% currentPoint(3) = currentPoint(3)/rTransY;
 
-% currentPoint = getappdata(handles.ROITweak, 'currentPoint')
 numShapes = roiShapes{thisROIIdx}.numShapes;
 for thisShape = 1:numShapes
+    thisShapeType = roiShapes{thisROIIdx}.shapeType;
     shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue;
     shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue;
     if shapeT == thisT-1 && shapeZ == thisZ-1
-        cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue);
-        cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue);
-        transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
+        if strcmpi(thisShapeType, 'rect')
+            cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getX.getValue);
+            cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getY.getValue);
+            width = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getWidth.getValue;
+            height = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getHeight.getValue;
+        else
+            cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue);
+            cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue);
+        end
+        try
+            transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
+        catch
+            transform = 'none';
+        end
         transX = currentPoint(1) - cx;
         transY = currentPoint(3) - cy;
         updatedTransform = updateTransform(transform, 'translate', [], [], [], num2str(transX), num2str(transY));
         break;
-       % if isempty(transform) ||  strncmp(transform, 'trans', 5) || strncmp(transform, 'none')
-%                 closeBracket = findstr(transform, ')');
-%                 openBracket = findstr(transform, '(');
-%                 transformData = transform(openBracket+1:closeBracket-1);
-%                 spaceChar = findstr(transformData, ' ');
-%                 if isempty(spaceChar)
-%                     firstTranslate = str2double(transformData(1:end));
-%                     secondTranslate = 0;
-%                 else
-%                     firstTranslate = str2double(transformData(1:spaceChar-1));
-%                     secondTranslate = str2double(transformData(spaceChar+1:end));
-%                 end
-                
-                %newTransform = ['translate(' num2str(transX) ' ' num2str(transY) ')']
-%                 cx = cx + firstTranslate;
-%                 cy = cy + secondTranslate;
-        %end
     end
 end
-% if cx ~= currentPoint(1);
-%     transX = currentPoint(1) - round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue);
-% else
-%     transX = 0;
-% end
-% if cy ~= currentPoint(3);
-%     transY = currentPoint(3) - round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue);
-% else
-%     transY = 0;
-% end
-%For xml-based ROIs:
-%transform = omero.rtypes.rstring(java.lang.String(['translate(' num2str(transX) ' ' num2str(transY) ')']));
-%roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setTransform(transform);
+
 
 %For server-side ROIs:
 updatedTransform = 'none';
 roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setTransform(omero.rtypes.rstring(updatedTransform))
-roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCx(omero.rtypes.rdouble(zoomX + currentPoint(1)-1));
-roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCy(omero.rtypes.rdouble(zoomY + currentPoint(3)-1));
+if strcmpi(thisShapeType, 'rect')
+    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setX(omero.rtypes.rdouble(zoomX + currentPoint(1)-1-round(width/2)));
+    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setY(omero.rtypes.rdouble(zoomY + currentPoint(3)-1-round(height/2)));
+else
+    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCx(omero.rtypes.rdouble(zoomX + currentPoint(1)-1));
+    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCy(omero.rtypes.rdouble(zoomY + currentPoint(3)-1));
+end
 
-        
-% numROIShapes = length(xmlStruct.children(ROIToUpdate).children);
-% for thisROIShape = 2:2:numROIShapes
-%     if thisT == str2double(xmlStruct.children(ROIToUpdate).children(thisROIShape).attributes(1).value);
-%         %Annotation section:
-%         for thisChild = 1:length(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children)
-%             if strcmpi(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).name, 'measurementCentreX')
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).attributes(2).value = num2str(currentPoint(1)+zoomX-1);
-%             elseif strcmpi(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).name, 'measurementCentreY')
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).attributes(2).value = num2str(currentPoint(3)+zoomY-1);
-%             elseif strcmpi(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).name, 'measurementHeight')
-%                 thisMeasurementHeight = str2double(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).attributes(2).value);
-%             elseif strcmpi(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).name, 'measurementWidth')
-%                 thisMeasurementWidth = str2double(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(2).children(thisChild).attributes(2).value);
-%             end
-%         end
-%         clickPointX = currentPoint(1)+zoomX;
-%         clickPointY = currentPoint(3)+zoomY;
-%         %SVG section: First check for ellipse transforms, then update coords.
-%         xTransform = 0;
-%         yTransform = 0;
-%         for thisAttribute = 1:length(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes)
-%             if strcmpi('transform', xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).name)
-%                 %Fix this in the future!!! Can't handle transforms for now,
-%                 %so setting them to 'none'
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).value = 'none';
-% %                 transform = xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).value;
-% %                 compare = strncmp(transform, 'translate', 9);
-% %                 if compare == 1
-% %                     numbersBrackets = transform(11:end);
-% %                     numbersBrackets = numbersBrackets(1:end-1);
-% %                     [cx cy] = strtok(numbersBrackets, ' ');
-% %                     xTransform = str2double(cx);
-% %                     yTransform = str2double(cy);
-% %                 end
-%             end
-%         end
-%         %Also set transform attribute of 'text' element of SVG to 'none'
-%         for thisAttribute = 1:length(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(4).attributes)
-%             if strcmpi('transform', xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(4).attributes(thisAttribute).name)
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(4).attributes(thisAttribute).value = 'none';
-%             end
-%         end
-%                 
-%         for thisAttribute = 1:length(xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes)
-%             if strcmpi('cx', xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).name)
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).value = num2str(currentPoint(1)+zoomX-1);
-%             elseif strcmpi('cy', xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).name)
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).value = num2str(currentPoint(3)+zoomY-1);
-%             elseif strcmpi('rx', xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).name)
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).value = num2str(thisMeasurementWidth/2);
-%             elseif strcmpi('ry', xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).name)
-%                 xmlStruct.children(ROIToUpdate).children(thisROIShape).children(4).children(2).attributes(thisAttribute).value = num2str(thisMeasurementHeight/2);
-%             end
-%         end
-%     end
-% end
+  
 setappdata(handles.ROITweak, 'zoomROICentre', [currentPoint(1) currentPoint(3)]);
 setappdata(handles.ROITweak, 'modified', 1);
 setappdata(handles.ROITweak, 'roiShapes', roiShapes);
