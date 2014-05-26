@@ -167,9 +167,9 @@ else
 end
 %Make sure the window is activated
 %mouseClick;
-set(gcf,'Pointer','crosshair');
+set(gcf,'Pointer','fullcross');
 for thisT = firstT:lastT
-    set(gcf,'Pointer','crosshair');
+    set(gcf,'Pointer','fullcross');
     if thisT == firstT
         setROICentre(handles);
     end
@@ -947,7 +947,7 @@ function recentreROIButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-set(gcf,'Pointer','crosshair');
+set(gcf,'Pointer','fullcross');
 setappdata(handles.ROITweak, 'recentreROI', 1);
 redrawImage(handles);
 

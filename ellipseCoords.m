@@ -19,8 +19,8 @@ function [xInd, yInd] = ellipseCoords(ellipseVec)
 
 centreX = ellipseVec(1);
 centreY = ellipseVec(2);
-radiusX = ellipseVec(3);
-radiusY = ellipseVec(4);
+radiusX = ellipseVec(3)/2;
+radiusY = ellipseVec(4)/2;
 rotAngle = ellipseVec(5);
 
 increments = 0:pi/1600:2*pi;
