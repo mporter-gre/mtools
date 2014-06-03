@@ -55,7 +55,7 @@ function labelMaker_OpeningFcn(hObject, eventdata, handles, varargin)
 global gateway;
 warning off MATLAB:xlswrite:NoCOMServer
 %Set up the play and pause buttons
-startImage = imread('startImagePoints.jpg', 'jpg');
+startImage = imread('startImageImage.jpg', 'jpg');
 playIcon = imread('playButton.png', 'png');
 pauseIcon = imread('pauseButton.png', 'png');
 arrowIcon = imread('arrowButton.png', 'png');

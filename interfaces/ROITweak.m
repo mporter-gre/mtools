@@ -52,9 +52,8 @@ function ROITweak_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to roitweak (see VARARGIN)
 
-global gateway;
 %Set up the play and pause buttons
-startImage = imread('startImage.jpg', 'jpg');
+startImage = imread('startImageImage.jpg', 'jpg');
 playIcon = imread('playButton.png', 'png');
 pauseIcon = imread('pauseButton.png', 'png');
 zoomInIcon = imread('zoomInButton.png', 'png');
@@ -759,7 +758,6 @@ function openImageItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway;
 global session;
 
 % currDir = getappdata(handles.ROITweak, 'currDir');
@@ -1206,7 +1204,7 @@ gatewayDisconnect;
 delete(handles.ROITweak);
 
 
-function [cx cy] = getROICentre(handles)
+function [cx, cy] = getROICentre(handles)
 
 roiShapes = getappdata(handles.ROITweak, 'roiShapes');
 %xmlStruct = getappdata(handles.ROITweak, 'xmlStruct');
@@ -1248,69 +1246,8 @@ for thisShape = 1:numShapes
         end
     end
 end
-%                 
-%                 
-% numROIShapes = length(xmlStruct.children(thisROIIdx).children);
-% for thisROIShape = 2:2:numROIShapes
-%     if thisT == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(1).value)+1;
-%         numFields = length(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children);
-%         for thisField = 1:numFields
-%             thisFieldName = xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).name;
-%             if strcmpi(thisFieldName, 'measurementCentreX')
-%                 cx = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value)+1;
-%             elseif strcmpi(thisFieldName, 'measurementCentreY')
-%                 cy = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value)+1;
-%             end
-%         end
-%     end
-% end
 
-% %Then the rectangles:
-% if strcmpi(thisROIShape, 'rect')
-%     numROIShapes = length(xmlStruct.children(thisROIIdx).children);
-%     for thisROIShape = 2:2:numROIShapes
-%         if thisT == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(1).value)+1;
-%             numFields = length(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children);
-%             for thisField = 1:numFields
-%                 thisFieldName = xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).name;
-%                 if strcmpi(thisFieldName, 'measurementCentreX')
-%                     cx = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                 elseif strcmpi(thisFieldName, 'measurementCentreY')
-%                     cy = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                 elseif strcmpi(thisFieldName, 'measurementWidth')
-%                     width = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                 elseif strcmpi(thisFieldName, 'measurementHeight')
-%                     height = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                 end
-%             end
-%             x = cx - round(width/2);
-%             y = cy - round(height/2);
-%             rectangle('Position', [x y width height], 'edgecolor', 'white');
-%         end
-%     end
-% end
-% 
-% %Then the points:
-% if strcmpi(thisROIShape, 'point')
-%     numROIShapes = length(xmlStruct.children(thisROIIdx).children);
-%     for thisROIShape = 2:2:numROIShapes
-%         if thisT == str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).attributes(1).value)+1;
-%             numFields = length(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children);
-%             for thisField = 1:numFields
-%                 thisFieldName = xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).name;
-%                 if strcmpi(thisFieldName, 'measurementCentreX')
-%                     cx = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                 elseif strcmpi(thisFieldName, 'measurementCentreY')
-%                     cy = str2double(xmlStruct.children(thisROIIdx).children(thisROIShape).children(2).children(thisField).attributes(2).value);
-%                 end
-%             end
-%             point = impoint(handles.imageAxes, cx, cy);
-%             api = iptgetapi(point);
-%             fcn = makeConstrainToRectFcn('impoint', [cx cx], [cy cy]);
-%             api.setPositionConstraintFcn(fcn);
-%         end
-%     end
-% end
+
 
 function zoomImage(handles)
 

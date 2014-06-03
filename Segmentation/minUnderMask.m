@@ -17,7 +17,7 @@ function minValue = minUnderMask(img, mask)
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-logicalMaskLinear = reshape(logical(mask), 1, []);
+logicalMaskLinear = (reshape(logical(mask), 1, []));
 imgLinear = reshape(img, 1, []);
 linearCombined = sort(unique(imgLinear .* logicalMaskLinear));
 if max(linearCombined) == 0
