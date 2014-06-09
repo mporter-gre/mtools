@@ -282,7 +282,7 @@ if numT == 1
     set(handles.tSlider, 'Max', numT);
     set(handles.tSlider, 'Min', 0);
     set(handles.tSlider, 'Value', 1);
-    set(handles.tSlider, 'Enable', 0);
+    set(handles.tSlider, 'Enable', 'off');
 else
     sliderSmallStep = 1/numT;
     set(handles.tSlider, 'Max', numT);
@@ -760,26 +760,6 @@ function openImageItem_Callback(hObject, eventdata, handles)
 
 global session;
 
-% currDir = getappdata(handles.ROITweak, 'currDir');
-% modified = getappdata(handles.ROITweak, 'modified');
-% if modified == 1
-%     answer = questdlg([{'The current ROI set has been modified.'} {'Discard changes and open a new file?'}], 'Discard Changes?', 'Yes', 'No', 'No');
-%     if strcmp(answer, 'No')
-%         return;
-%     end
-% end
-% [fileName filePath] = uigetfile('*.xml', 'Select an ROI file to open', currDir);
-% if fileName == 0
-%     return;
-% end
-% xmlStruct = xml2struct([filePath fileName]);
-% username = getappdata(handles.ROITweak, 'username');
-% server = getappdata(handles.ROITweak, 'server');
-% [pixelsId imageName] = getPixIdFromROIFile([filePath fileName], username, server);
-% if isempty(pixelsId)
-%     warndlg([{'This ROI file is not linked to an image in your Omero account.    '} {'You can link it by opening it in Insight''s measurement tool and saving it again'}], 'No Image ID Found');
-%     return;
-% end
 ImageSelector(handles, 'ROITweak', 1);
 theImage = getappdata(handles.ROITweak, 'newImageObj');
 imageId = theImage.getId.getValue;
@@ -931,10 +911,19 @@ setappdata(handles.ROITweak, 'ROICount', numROIs);
 
 function populateROISelect(handles)
 
+roiShapes = getappdata(handles.ROITweak, 'roiShapes');
 ROIIds = getappdata(handles.ROITweak, 'ROIIds');
 ROIIdStr{1} = 'All';
 for thisROI = 1:length(ROIIds)
-    ROIIdStr{thisROI+1} = ROIIds{thisROI};
+    numShapes = roiShapes{thisROI}.numShapes;
+    for thisShape = 1:numShapes
+        if ~isempty(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getTextValue)
+            ROIIdStr{thisROI+1} = char(roiShapes{thisROI}.(['shape' num2str(thisShape)]).getTextValue.getValue.getBytes');
+            break;
+        else
+            ROIIdStr{thisROI+1} = ROIIds{thisROI};
+        end
+    end
 end
 set(handles.roiSelect, 'String', ROIIdStr);
 
