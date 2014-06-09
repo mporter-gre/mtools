@@ -228,7 +228,6 @@ function okButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway;
 global session;
 
 imagesSelectIdx = get(handles.imagesSelect, 'Value');
@@ -250,7 +249,6 @@ delete(handles.imageSelector);
 
 function populateProjectsSelect(handles)
 
-global gateway
 global session
 
 projects = getProjects(session, [], false); %gateway.getProjects([],0);

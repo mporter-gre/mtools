@@ -22,7 +22,7 @@ function varargout = XYZViewer(varargin)
 
 % Edit the above text to modify the response to help XYZViewer
 
-% Last Modified by GUIDE v2.5 24-Aug-2012 18:37:18
+% Last Modified by GUIDE v2.5 09-Jun-2014 14:07:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,44 +54,22 @@ function XYZViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for XYZViewer
 handles.output = hObject;
-handles.pixels = varargin{1};
-if strcmp(class(handles.pixels), 'java.util.ArrayList');
-    handles.pixels = handles.pixels.get(0);
-end
-setappdata(handles.XYZViewer, 'cached', 0);
-handles.pixelsId = handles.pixels.getId.getValue;
-handles.numC = handles.pixels.getSizeC.getValue;
-handles.numT = handles.pixels.getSizeT.getValue;
-handles.numZ = handles.pixels.getSizeZ.getValue;
-handles.sizeX = handles.pixels.getSizeX.getValue;
-handles.sizeY = handles.pixels.getSizeY.getValue;
-imageId = handles.pixels.getImage.getId.getValue;
-rTransX = 512/handles.sizeX;
-rTransY = 512/handles.sizeY;
-transZ = 60/handles.numZ;
-try
-    roiShapes = getROIsFromImageId(imageId);
-catch
-    roiShapes = [];
-end
-setTSlider(handles);
-set(handles.downloadingLabel, 'Visible', 'on');
-getPlanes(handles, 0)
-set(handles.downloadingLabel, 'Visible', 'off');
-set(handles.tText, 'String', ['T = 1/' num2str(handles.numT)]);
 
-x = round(handles.sizeX/2);
-y = round(handles.sizeY/2);
-z = round(handles.numZ/2);
-setappdata(handles.XYZViewer, 'x', x);
-setappdata(handles.XYZViewer, 'y', y);
-setappdata(handles.XYZViewer, 'z', z);
-setappdata(handles.XYZViewer, 't', 0);
-setappdata(handles.XYZViewer, 'roiShapes', roiShapes);
-setappdata(handles.XYZViewer, 'rTransX', rTransX);
-setappdata(handles.XYZViewer, 'rTransY', rTransY);
-setappdata(handles.XYZViewer, 'transZ', transZ);
-displayImages(handles);
+setappdata(handles.XYZViewer, 'cached', 0);
+
+XZImg = ones(60, 512);
+YZImg = ones(512,60);
+XYImg = ones(512, 512);
+
+axes(handles.imageAxes);
+handles.imageHandle = imshow(XYImg);
+
+axes(handles.YZAxes);
+handles.YZHandle = imshow(YZImg);
+
+axes(handles.XZAxes);
+handles.XZHandle = imshow(XZImg);
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -125,7 +103,7 @@ set(hObject, 'Enable', 'off');
 set(handles.downloadingLabel, 'Visible', 'on');
 drawnow;
 t = round(get(hObject, 'Value'));
-getPlanes(handles, t-1);
+getPlanes(handles, t-1, 0, 0, 0);
 displayImages(handles);
 set(hObject, 'Enable', 'on');
 set(handles.downloadingLabel, 'Visible', 'off');
@@ -161,20 +139,31 @@ set(handles.tSlider, 'SliderStep', [sliderSmallStep, sliderSmallStep*4]);
 
 
 
-function getPlanes(handles, t)
+function getPlanes(handles, t, progBar, numPlanes, numTtoGet)
+global session;
 t = round(t);
 
 cached = getappdata(handles.XYZViewer, 'cached');
 if cached == 0
-    pixelsId = handles.pixelsId;
+    imageId = getappdata(handles.XYZViewer, 'imageId');
+    pixels = getappdata(handles.XYZViewer, 'pixels');
     numC = handles.numC;
     numZ = handles.numZ;
+    currentPlane = 0;
     for thisZ = 1:numZ
         for thisC = 1:numC
-            plane(:,:,thisC) = getPlaneFromPixelsId(pixelsId, thisZ-1, thisC-1, t);
+            plane(:,:,thisC) = getPlane(session, imageId, thisZ-1, thisC-1, t);
+            if progBar ~= 0
+                if numTtoGet == 1;
+                    currentPlane = currentPlane+1;
+                else
+                    currentPlane = t*currentPlane+1;
+                end
+                waitbar(currentPlane/numPlanes, progBar);
+            end
             %renderedImage(:,:,thisZ) = getPlaneFromPixelsId(pixelsId, thisZ-1, thisC-1, t);
         end
-        renderedImage{thisZ} = createRenderedImage(plane, handles.pixels);
+        renderedImage{thisZ} = createRenderedImage(plane, pixels);
     end
 else
     fileVar = load('cacheFile', ['t' num2str(t)]);
@@ -247,23 +236,26 @@ if strcmp(answer, 'Yes')
     sizeX = handles.sizeX;
     sizeY = handles.sizeY;
     numZ = handles.numZ;
+    numC = handles.numC;
     numT = handles.numT;
+    numPlanes = numZ*numC*numT;
     set(handles.tSlider, 'Enable', 'off');
     set(handles.cacheBtn, 'Enable', 'off');
     drawnow;
     progBar = waitbar(0, 'Downloading...');
 
     for thisT = 1:numT
-        getPlanes(handles, thisT-1);
+        getPlanes(handles, thisT-1, progBar, numPlanes, numT);
         renderedImage.(['t' num2str(thisT-1)]) = getappdata(handles.XYZViewer, 'renderedImage');
         save('cacheFile', '-append', '-struct', 'renderedImage');
         clear('renderedImage');
-        waitbar(thisT/numT, progBar);
     end
     close(progBar);
-    set(handles.tSlider, 'Enable', 'on');
-    %currentT = get(handles.tSlider, 'Value');
-    tSlider_Callback(hObject, eventdata, handles)
+    if numT > 1
+        set(handles.tSlider, 'Enable', 'on');
+        set(handles.tSlider, 'Value', 1);
+        tSlider_Callback(hObject, eventdata, handles)
+    end
     setappdata(handles.XYZViewer, 'cached', 1);
 end
         
@@ -366,3 +358,65 @@ transZ = getappdata(handles.XYZViewer, 'transZ');
         end
     end
 %end
+
+
+% --------------------------------------------------------------------
+function fileMenu_Callback(hObject, eventdata, handles)
+% hObject    handle to fileMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function openImageItem_Callback(hObject, eventdata, handles)
+% hObject    handle to openImageItem (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+ImageSelector(handles, 'XYZViewer');
+
+theImage = getappdata(handles.XYZViewer, 'newImageObj');
+pixels = theImage.getPrimaryPixels;
+setappdata(handles.XYZViewer, 'pixels', pixels);
+handles.pixelsId = pixels.getId.getValue;
+handles.numC = pixels.getSizeC.getValue;
+handles.numT = pixels.getSizeT.getValue;
+handles.numZ = pixels.getSizeZ.getValue;
+handles.sizeX = pixels.getSizeX.getValue;
+handles.sizeY = pixels.getSizeY.getValue;
+imageId = pixels.getImage.getId.getValue;
+rTransX = 512/handles.sizeX;
+rTransY = 512/handles.sizeY;
+transZ = 60/handles.numZ;
+try
+    roiShapes = getROIsFromImageId(imageId);
+catch
+    roiShapes = [];
+end
+setTSlider(handles);
+set(handles.downloadingLabel, 'Visible', 'on');
+numPlanes = handles.numZ*handles.numC;
+numTtoGet = 1;
+progBar = waitbar(0, 'Downloading...');
+getPlanes(handles, 0, progBar, numPlanes, numTtoGet);
+close(progBar);
+set(handles.downloadingLabel, 'Visible', 'off');
+set(handles.tText, 'String', ['T = 1/' num2str(handles.numT)]);
+
+x = round(handles.sizeX/2);
+y = round(handles.sizeY/2);
+z = round(handles.numZ/2);
+setappdata(handles.XYZViewer, 'x', x);
+setappdata(handles.XYZViewer, 'y', y);
+setappdata(handles.XYZViewer, 'z', z);
+setappdata(handles.XYZViewer, 't', 0);
+setappdata(handles.XYZViewer, 'roiShapes', roiShapes);
+setappdata(handles.XYZViewer, 'rTransX', rTransX);
+setappdata(handles.XYZViewer, 'rTransY', rTransY);
+setappdata(handles.XYZViewer, 'transZ', transZ);
+if handles.numT == 1
+    set(handles.tSlider, 'Enable', 'off');
+end
+
+guidata(hObject, handles);
+displayImages(handles);
