@@ -19,10 +19,6 @@ function maskStack = blobDetect(stackIn)
 
 [~, sizeX, numZ] = size(stackIn);
 
-for thisZ = 1:numZ
-    otsuThresh(thisZ) = otsu(stackIn(:,:,thisZ));
-end
-
 stackIn = double(stackIn);
 
 %Put the Z stack into a single plane for processing, apply a filter for
