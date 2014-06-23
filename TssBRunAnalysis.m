@@ -54,7 +54,7 @@ for thisCell = 1:numCells
     cellProps{cellCounter}.centroid = cellCentroid;
     
     %Using regoinprops...
-    thisCellProps = regionprops(workImg(:,:,meanZ), 'Area', 'MajorAxisLength', 'MinorAxisLength', 'Orientation', 'Extrema');
+    thisCellProps = regionprops(workImg(:,:,meanZ), 'Area', 'MajorAxisLength', 'MinorAxisLength', 'Orientation');
     cellProps{cellCounter}.props = thisCellProps;
     
     %Find the foci associated with this cell

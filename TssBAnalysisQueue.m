@@ -57,6 +57,7 @@ for thisImage = 1:numImages
     cellProps = TssBRunAnalysis(greenStack, redStack, progress, progressFraction);
     waitbar(progressFraction, progress, 'Saving data');
     cellPropsToXLS(cellProps, imageName);
+    keepProps{thisImage} = cellProps{1}.proxToFocusDist;
 end
 
 close(progress);
