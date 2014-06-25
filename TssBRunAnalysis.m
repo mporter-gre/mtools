@@ -25,6 +25,17 @@ TssBSeg = fpBacteriaSeg3D(TssBStack);
 gfpSegBWL = bwlabeln(gfpSeg);
 TssBSegBWL = bwlabeln(TssBSeg);
 
+%Remove small foci (<21px)
+focusProps = regionprops(TssBSegBWL, 'Area');
+focusVals = unique(TssBSegBWL(TssBSegBWL>0));
+numFoci = length(focusProps);
+for thisFocus = 1:numFoci
+    if focusProps(thisFocus).Area < 21
+        TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
+    end
+end
+        
+
 cellVals = unique(gfpSegBWL(gfpSegBWL>0));
 numCells = length(cellVals);
 
