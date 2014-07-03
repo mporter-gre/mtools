@@ -20,9 +20,67 @@ function cellProps = TssBRunAnalysis(gfpStack, TssBStack, progress, progressFrac
 waitbar(progressFraction, progress, 'Defining cells');
 [sizeY, sizeX, numZ] = size(gfpStack);
 gfpSeg = fpBacteriaSeg3D(gfpStack);
-TssBSeg = fpBacteriaSeg3D(TssBStack);
+
+TssBSeg = zeros(size(TssBStack));
+st = strel('disk', 1);
 
 gfpSegBWL = bwlabeln(gfpSeg);
+gfpSegBWL = imdilate(gfpSegBWL, st);
+gfpSegBWL = imdilate(gfpSegBWL, st);
+gfpSegBWL = imdilate(gfpSegBWL, st);
+
+
+cellVals = unique(gfpSegBWL(gfpSegBWL>0));
+numCells = length(cellVals);
+
+cellProps = regionprops(gfpSegBWL, 'BoundingBox');
+
+for thisCell = 1:numCells
+    x = floor(cellProps(thisCell).BoundingBox(1));
+    y = floor(cellProps(thisCell).BoundingBox(2));
+    z = floor(cellProps(thisCell).BoundingBox(3));
+    w = floor(cellProps(thisCell).BoundingBox(4));
+    h = floor(cellProps(thisCell).BoundingBox(5));
+    d = floor(cellProps(thisCell).BoundingBox(6));
+    
+    if x == 0
+        x = 1;
+    end
+    if y == 0
+        y = 1;
+    end
+    if z == 0
+        z = 1;
+    end
+    
+    
+    cellSegBWL = gfpSegBWL(y:y+h,x:x+w,z:z+d);
+    cellSegBWL(cellSegBWL~=thisCell) = 0;
+    %greenCell = gfpStacl(y:y+h,x:x+w,z:z+d);
+    redCell = TssBStack2(y:y+h,x:x+w,z:z+d);
+    redCellSeg = zeros(size(redCell));
+        
+    redCell(cellSegBWL==0) = mean(redCell(cellSegBWL==thisCell));
+    redCellVals = unique(redCell(cellSegBWL==thisCell));
+    redValsEdge = edge(redCellVals);
+    edgeIdx = find(redValsEdge);
+    numPx = length(redCellVals);
+    numEdgeIdx = length(edgeIdx);
+    if isempty(numEdgeIdx)
+        continue;
+    end
+    for thisIdx = 1:numEdgeIdx
+        if edgeIdx(thisIdx) > numPx/2
+            redCellSeg(redCell>=redCellVals(edgeIdx(thisIdx))) = 1;
+            TssBSeg(y:y+h,x:x+w,z:z+d) = TssBSeg(y:y+h,x:x+w,z:z+d) + redCellSeg;
+            continue;
+        end
+    end    
+end
+    
+    
+
+%TssBSeg = fpBacteriaSeg3D(TssBStack);
 TssBSegBWL = bwlabeln(TssBSeg);
 
 %Remove small foci (<21px)
@@ -36,8 +94,7 @@ for thisFocus = 1:numFoci
 end
         
 
-cellVals = unique(gfpSegBWL(gfpSegBWL>0));
-numCells = length(cellVals);
+
 
 %cellProps = cell(1,numCells);
 cellCounter = 1;
