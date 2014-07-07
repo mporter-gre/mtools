@@ -138,6 +138,7 @@ end
 projectId = projIdList(projectsSelectIdx-1);
 setappdata(handles.datasetChooser, 'projectId', projectId);
 populateDatasetsList(handles)
+set(handles.datasetsList, 'Value', 1);
 
 
 % --- Executes during object creation, after setting all properties.

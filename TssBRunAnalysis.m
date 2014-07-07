@@ -33,15 +33,15 @@ gfpSegBWL = imdilate(gfpSegBWL, st);
 cellVals = unique(gfpSegBWL(gfpSegBWL>0));
 numCells = length(cellVals);
 
-cellProps = regionprops(gfpSegBWL, 'BoundingBox');
+props = regionprops(gfpSegBWL, 'BoundingBox');
 
 for thisCell = 1:numCells
-    x = floor(cellProps(thisCell).BoundingBox(1));
-    y = floor(cellProps(thisCell).BoundingBox(2));
-    z = floor(cellProps(thisCell).BoundingBox(3));
-    w = floor(cellProps(thisCell).BoundingBox(4));
-    h = floor(cellProps(thisCell).BoundingBox(5));
-    d = floor(cellProps(thisCell).BoundingBox(6));
+    x = floor(props(thisCell).BoundingBox(1));
+    y = floor(props(thisCell).BoundingBox(2));
+    z = floor(props(thisCell).BoundingBox(3));
+    w = floor(props(thisCell).BoundingBox(4));
+    h = floor(props(thisCell).BoundingBox(5));
+    d = floor(props(thisCell).BoundingBox(6));
     
     if x == 0
         x = 1;
@@ -54,10 +54,10 @@ for thisCell = 1:numCells
     end
     
     
-    cellSegBWL = gfpSegBWL(y:y+h,x:x+w,z:z+d);
+    cellSegBWL = gfpSegBWL(y:y+h-1,x:x+w-1,z:z+d-1);
     cellSegBWL(cellSegBWL~=thisCell) = 0;
     %greenCell = gfpStacl(y:y+h,x:x+w,z:z+d);
-    redCell = TssBStack2(y:y+h,x:x+w,z:z+d);
+    redCell = TssBStack(y:y+h-1,x:x+w-1,z:z+d-1);
     redCellSeg = zeros(size(redCell));
         
     redCell(cellSegBWL==0) = mean(redCell(cellSegBWL==thisCell));
@@ -72,7 +72,7 @@ for thisCell = 1:numCells
     for thisIdx = 1:numEdgeIdx
         if edgeIdx(thisIdx) > numPx/2
             redCellSeg(redCell>=redCellVals(edgeIdx(thisIdx))) = 1;
-            TssBSeg(y:y+h,x:x+w,z:z+d) = TssBSeg(y:y+h,x:x+w,z:z+d) + redCellSeg;
+            TssBSeg(y:y+h-1,x:x+w-1,z:z+d-1) = TssBSeg(y:y+h-1,x:x+w-1,z:z+d-1) + redCellSeg;
             continue;
         end
     end    
