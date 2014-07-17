@@ -1,4 +1,4 @@
-function cellProps = TssBRunAnalysis(gfpStack, TssBStack, progress, progressFraction)
+function cellProps = TssBRunAnalysis(gfpStack, TssBStack, progress, progressFraction, datasetId, imageName)
 
 % Copyright (C) 2013-2014 University of Dundee & Open Microscopy Environment.
 % All rights reserved.
@@ -16,6 +16,8 @@ function cellProps = TssBRunAnalysis(gfpStack, TssBStack, progress, progressFrac
 % You should have received a copy of the GNU General Public License along
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+global session;
 
 waitbar(progressFraction, progress, 'Defining cells');
 [sizeY, sizeX, numZ] = size(gfpStack);
@@ -77,8 +79,7 @@ for thisCell = 1:numCells
         end
     end    
 end
-    
-    
+   
 
 %TssBSeg = fpBacteriaSeg3D(TssBStack);
 TssBSegBWL = bwlabeln(TssBSeg);
@@ -88,7 +89,7 @@ focusProps = regionprops(TssBSegBWL, 'Area');
 focusVals = unique(TssBSegBWL(TssBSegBWL>0));
 numFoci = length(focusProps);
 for thisFocus = 1:numFoci
-    if focusProps(thisFocus).Area < 21
+    if focusProps(thisFocus).Area < 21 || focusProps(thisFocus).Area > 80
         TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
     end
 end
@@ -162,7 +163,9 @@ for thisCell = 1:numCells
             majorAxis = cellProps{cellCounter}.props.MajorAxisLength;
             halfLength = majorAxis/2;
             focusPosition(thisFocus) = (fDist(thisFocus)/halfLength)*100;
-            
+            if cellVals(thisCell) == 146
+                disp('pause a while');
+            end
         end
         
         cellProps{cellCounter}.numFocusPxInCell = numFocusPxInCell;
@@ -183,6 +186,72 @@ for thisCell = 1:numCells
     
     cellCounter = cellCounter + 1;
 end
+
+%Save the intensity planes PLUS the segmentation planes back to the server.
+store = session.createRawPixelsStore;
+imageName = [imageName '_masks'];
+[newImage, newPixels] = createImage(session, sizeX, sizeY, numZ, 4, 1, 'uint16', 'XYZCT', imageName, datasetId);
+newPixelsId = newPixels.getId.getValue;
+store.setPixelsId(newPixelsId, false);
+
+gfp = gfpSegBWL;
+gfp(gfp>0) = 1000;
+cherry = TssBSegBWL;
+cherry(cherry>0) = 1000;
+
+for thisZ = 1:numZ
+    planeAsBytes = toByteArray(uint16(gfpStack(:,:,thisZ))', newPixels);
+    store.setPlane(planeAsBytes, thisZ-1, 0, 0);
+    planeAsBytes = toByteArray(uint16(TssBStack(:,:,thisZ))', newPixels);
+    store.setPlane(planeAsBytes, thisZ-1, 1, 0);
+    planeAsBytes = toByteArray(uint16(gfp(:,:,thisZ))', newPixels);
+    store.setPlane(planeAsBytes, thisZ-1, 2, 0);
+    planeAsBytes = toByteArray(uint16(cherry(:,:,thisZ))', newPixels);
+    store.setPlane(planeAsBytes, thisZ-1, 3, 0);
+end
+store.save();
+store.close();
+
+%Now set the render settings for each channel
+renderingEngine = session.createRenderingEngine;
+renderingEngine.lookupPixels(newPixelsId);
+renderingEngine.resetDefaults;
+renderingEngine.lookupRenderingDef(newPixelsId);
+renderingEngine.load();
+
+renderingEngine.setActive(0,1);
+renderingEngine.setChannelWindow(0, 120, 1000);
+renderingEngine.setChannelWindow(1, 120, 1000);
+renderingEngine.setChannelWindow(2, 0, 2000);
+renderingEngine.setChannelWindow(3, 0, 2000);
+renderingEngine.setRGBA(0, 0, 255, 0, 255);
+renderingEngine.setRGBA(1, 255, 0, 0, 255);
+renderingEngine.setRGBA(2, 0, 0, 255, 255);
+renderingEngine.setRGBA(3, 0, 0, 255, 255);
+
+renderingEngine.saveCurrentSettings;
+renderingEngine.close();
+
+%Set the channel names
+pixServiceDescription = session.getPixelsService.retrievePixDescription(newPixelsId).getChannel(0).getLogicalChannel();
+pixServiceDescription.setName(omero.rtypes.rstring('gfp'));
+iUpdate = session.getUpdateService();
+iUpdate.saveObject(pixServiceDescription);
+
+pixServiceDescription = session.getPixelsService.retrievePixDescription(newPixelsId).getChannel(1).getLogicalChannel();
+pixServiceDescription.setName(omero.rtypes.rstring('cherry'));
+iUpdate = session.getUpdateService();
+iUpdate.saveObject(pixServiceDescription);
+
+pixServiceDescription = session.getPixelsService.retrievePixDescription(newPixelsId).getChannel(2).getLogicalChannel();
+pixServiceDescription.setName(omero.rtypes.rstring('gfpSeg'));
+iUpdate = session.getUpdateService();
+iUpdate.saveObject(pixServiceDescription);
+
+pixServiceDescription = session.getPixelsService.retrievePixDescription(newPixelsId).getChannel(3).getLogicalChannel();
+pixServiceDescription.setName(omero.rtypes.rstring('cherrySeg'));
+iUpdate = session.getUpdateService();
+iUpdate.saveObject(pixServiceDescription);
 
 cellProps = cellNeighbours(cellProps);
 waitbar(progressFraction, progress, 'Measuring proximities');
