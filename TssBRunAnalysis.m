@@ -85,11 +85,62 @@ end
 TssBSegBWL = bwlabeln(TssBSeg);
 
 %Remove small foci (<21px)
-focusProps = regionprops(TssBSegBWL, 'Area');
+focusProps = regionprops(TssBSegBWL, 'Area', 'BoundingBox');
 focusVals = unique(TssBSegBWL(TssBSegBWL>0));
 numFoci = length(focusProps);
+axisLengths = [];
 for thisFocus = 1:numFoci
-    if focusProps(thisFocus).Area < 21 || focusProps(thisFocus).Area > 80
+    
+    
+    if focusProps(thisFocus).Area < 21 %|| focusProps(thisFocus).Area > 100
+        TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
+        %disp('continued');
+        continue;
+    end
+    
+    x = floor(focusProps(thisFocus).BoundingBox(1));
+    y = floor(focusProps(thisFocus).BoundingBox(2));
+    z = floor(focusProps(thisFocus).BoundingBox(3));
+    w = floor(focusProps(thisFocus).BoundingBox(4));
+    h = floor(focusProps(thisFocus).BoundingBox(5));
+    d = floor(focusProps(thisFocus).BoundingBox(6));
+    
+    if x == 0
+        x = 1;
+    end
+    if y == 0
+        y = 1;
+    end
+    if z == 0
+        z = 1;
+    end
+    
+    if focusProps(thisFocus).BoundingBox(6) < 3 % || focusProps(thisFocus).BoundingBox(4) > 11 || focusProps(thisFocus).BoundingBox(5) > 11
+        TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
+        continue;
+    end
+
+    
+    redCellSeg = TssBSegBWL(y:y+h-1,x:x+w-1,z:z+d-1);
+    redCellSeg(redCellSeg~=focusVals(thisFocus)) = 0;
+    redCellSegProj = sum(redCellSeg, 3);
+    boxProps = regionprops(logical(redCellSegProj), 'MajorAxisLength', 'MinorAxisLength', 'Eccentricity');
+    
+    if isempty(boxProps)
+        continue;
+    end
+    numBlobs = length(boxProps);
+    majAxis = [];
+    if numBlobs > 1
+        for thisBlob = 1:numBlobs
+            majAxis(end+1) = boxProps(thisBlob).MajorAxisLength;
+        end
+        MajorAxisLength = max(majAxis);
+    else
+        MajorAxisLength = boxProps.MajorAxisLength;
+    end
+    axisLengths(end+1) = MajorAxisLength;
+    if MajorAxisLength > 8
         TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
     end
 end
