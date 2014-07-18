@@ -1,12 +1,9 @@
-function [patches, measureSegChannel] = cutPatchesFromROI(roiShapes, channels, channelsToFetch, pixels, thisROI)
+function [patches, measureSegChannel] = cutPatchesFromROI(roiShapes, channels, channelsToFetch, pixels, thisROI, zctStack)
 global session;
 
 measureSegChannel = 1;
 
-if ~ismember(channels, channelsToFetch)
-    channelsToFetch = [channels channelsToFetch];
-    measureSegChannel = 0;
-end
+
 for thisFetchChannel = channelsToFetch
     %for thisROI = 1:numROI
     
@@ -83,7 +80,8 @@ for thisFetchChannel = channelsToFetch
     
     for thisZ = 1:numZ
         for thisT = 1
-            thisPlane = getPlane(session, imageId, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue, thisFetchChannel-1, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheT.getValue);
+            thisPlane = zctStack(:,:,roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue+1,thisFetchChannel);
+            %thisPlane = getPlane(session, imageId, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue, thisFetchChannel-1, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheT.getValue);
             patch(:,:, thisPatch) = zeros(height,width);
             
             %Check for the ROI going outwith the image. If it does

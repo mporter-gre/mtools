@@ -22,14 +22,30 @@ global fig1;
 global ROIText;
 global sectionClicked;
 global sectionFigure;
+global session;
 
 maxX = pixels.getSizeX.getValue;
 maxY = pixels.getSizeY.getValue;
 fullZ = pixels.getSizeZ.getValue;
 fullT = pixels.getSizeT.getValue;
+imageId = pixels.getImage.getId.getValue;
 for thisFullT = 1:fullT
     fullMaskImg{thisFullT} = uint8(zeros(maxY,maxX,fullZ));
 end
+
+if ~ismember(segChannel, channelsToFetch)
+    channelsToFetch = [segChannel channelsToFetch];
+    measureSegChannel = 0;
+end
+
+for thisZ = 1:fullZ
+    for thisC = channelsToFetch
+        for thisT = 1:fullT
+            zctStack(:,:,thisZ,thisC,thisT) = getPlane(session, imageId, thisZ-1, thisC-1, thisT-1);
+        end
+    end
+end
+
 
 for thisROI = 1:numROI
     timePoints = getROITimePoints(roiShapes{thisROI});
@@ -47,7 +63,7 @@ for thisROI = 1:numROI
         end
         roiShapesThisT{1}.numShapes = numZthisT - 1;
         roiShapesThisT{1}.shapeType = roiShapes{thisROI}.shapeType;
-        [patches measureSegChannel] = cutPatchesFromROI(roiShapesThisT, segChannel, channelsToFetch, pixels, 1); %The 1 at the end == thisROI in cutPatches...
+        [patches measureSegChannel] = cutPatchesFromROI(roiShapesThisT, segChannel, channelsToFetch, pixels, 1, zctStack); %The 1 at the end == thisROI in cutPatches...
         set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
         drawnow;
         baseZ = roiShapes{thisROI}.shape1.getTheZ.getValue;
