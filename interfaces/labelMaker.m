@@ -1197,11 +1197,12 @@ for thisCondition = 1:numConditions
         thisStep = thisStep + 1;
         [points{thisCondition}{thisFile} imageId{thisCondition}{thisFile}] = getPointsAndImageId([conditionsPaths{thisCondition} conditionsFiles{thisCondition}{thisFile}]);
         if analyseIndividualFiles == 1
-            imageObj = gateway.getImage(imageId{thisCondition}{thisFile});
-            imageNameFull = char(imageObj.getName.getValue.getBytes');
-            imageNameScanned = textscan(imageNameFull, '%s', 'Delimiter', '/');
-            imageNameNoPaths = imageNameScanned{1}{end};
-            [imageName remain] = strtok(imageNameNoPaths, '.');
+%             imageObj = gateway.getImage(imageId{thisCondition}{thisFile});
+%             imageNameFull = char(imageObj.getName.getValue.getBytes');
+%             imageNameScanned = textscan(imageNameFull, '%s', 'Delimiter', '/');
+%             imageNameNoPaths = imageNameScanned{1}{end};
+%             [imageName remain] = strtok(imageNameNoPaths, '.');
+            imageName = conditionsFiles{thisCondition}{thisFile}(1:end-4);
             imageNameXls = [imageName '.xls'];
             summaryByImage = pointsSummaryByImage(points{thisCondition}{thisFile}, imageName);
             summaryByT = pointsSummaryByT(points{thisCondition}{thisFile}, imageName, handles);
