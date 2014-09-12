@@ -248,6 +248,7 @@ neighbourData = [];
 focusData = [];
 focusNeighbourData = [];
 cellCounter = 0;
+numCells = zeros(numFiles,1);
 
 for thisFile = 1:numFiles
     %Read the worksheets from the selected files.
@@ -255,7 +256,9 @@ for thisFile = 1:numFiles
     thisNeighbourData = xlsread([filePaths fileNames{thisFile}], 'Neighbour Data');
     thisFocusData = xlsread([filePaths fileNames{thisFile}], 'Focus Data');
     thisFocusNeighbourData = xlsread([filePaths fileNames{thisFile}], 'Focus Neighbour Data');
-    numCells = length(thisCellData);
+    numCells(thisFile) = length(thisCellData);
+    imageNumCells{thisFile,1} = fileNames{thisFile};
+    imageNumCells{thisFile,2} = numCells(thisFile);
     
     %Fudge
     if isempty(thisCellData)
@@ -276,7 +279,7 @@ for thisFile = 1:numFiles
     thisNeighbourData(:,1) = thisNeighbourData(:,1) + cellCounter;
     thisFocusData(:,1) = thisFocusData(:,1) + cellCounter;
     thisFocusNeighbourData(:,1) = thisFocusNeighbourData(:,1) + cellCounter;
-    cellCounter = cellCounter + numCells;
+    cellCounter = cellCounter + numCells(thisFile);
     
     %Collate the data.
     cellData = [cellData; thisCellData];
@@ -351,6 +354,7 @@ fociYNeighboursXPC(4,4) = fociYNeighboursX(4,4)/sum(fociYNeighboursX(:,4))*100;
 
 %Output to spreadsheet.
 waitbar(0, progress, 'Saving data');
+xlswrite([filePaths 'AnalysisSumary'], imageNumCells, 'Number of cells');
 output1 = {'% Cells with x numFoci', ' ', ' ', ' '};
 output1 = [output1; {'0 Foci', '1 Focus', '2 Foci', '3+ Foci'}];
 output1 = [output1; {foci0PC, foci1PC, foci2PC, foci3pPC}];

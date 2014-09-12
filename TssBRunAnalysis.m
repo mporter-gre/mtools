@@ -27,9 +27,9 @@ TssBSeg = zeros(size(TssBStack));
 st = strel('disk', 1);
 
 gfpSegBWL = bwlabeln(gfpSeg);
-gfpSegBWL = imdilate(gfpSegBWL, st);
-gfpSegBWL = imdilate(gfpSegBWL, st);
-gfpSegBWL = imdilate(gfpSegBWL, st);
+% gfpSegBWL = imdilate(gfpSegBWL, st);
+% gfpSegBWL = imdilate(gfpSegBWL, st);
+% gfpSegBWL = imdilate(gfpSegBWL, st);
 
 
 cellVals = unique(gfpSegBWL(gfpSegBWL>0));
