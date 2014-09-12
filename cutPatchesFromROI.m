@@ -1,4 +1,4 @@
-function [patches, measureSegChannel] = cutPatchesFromROI(roiShapes, channels, channelsToFetch, pixels, thisROI, zctStack)
+function [patches, measureSegChannel] = cutPatchesFromROI(roiShapes, channels, channelsToFetch, pixels, thisROI, zctStack, thisT)
 global session;
 
 measureSegChannel = 1;
@@ -79,8 +79,8 @@ for thisFetchChannel = channelsToFetch
     imageId = pixels.getImage.getId.getValue;
     
     for thisZ = 1:numZ
-        for thisT = 1
-            thisPlane = zctStack(:,:,roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue+1,thisFetchChannel);
+        %for thisT = 1
+            thisPlane = zctStack(:,:,roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue+1,thisFetchChannel,thisT);
             %thisPlane = getPlane(session, imageId, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheZ.getValue, thisFetchChannel-1, roiShapes{thisROI}.(['shape' num2str(thisZ)]).getTheT.getValue);
             patch(:,:, thisPatch) = zeros(height,width);
             
@@ -123,7 +123,7 @@ for thisFetchChannel = channelsToFetch
             thisPatch = thisPatch + 1;
             patches{thisFetchChannel} = patch;
             
-        end
+        %end %for thisT = 1
     end
     patch = [];
     

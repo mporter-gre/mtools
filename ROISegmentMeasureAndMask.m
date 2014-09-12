@@ -63,7 +63,7 @@ for thisROI = 1:numROI
         end
         roiShapesThisT{1}.numShapes = numZthisT - 1;
         roiShapesThisT{1}.shapeType = roiShapes{thisROI}.shapeType;
-        [patches measureSegChannel] = cutPatchesFromROI(roiShapesThisT, segChannel, channelsToFetch, pixels, 1, zctStack); %The 1 at the end == thisROI in cutPatches...
+        [patches measureSegChannel] = cutPatchesFromROI(roiShapesThisT, segChannel, channelsToFetch, pixels, 1, zctStack, thisT); %The 1 at the end == thisROI in cutPatches...
         set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
         drawnow;
         baseZ = roiShapes{thisROI}.shape1.getTheZ.getValue;
@@ -107,7 +107,7 @@ for thisROI = 1:numROI
         numZ(thisROI) = stopZ-startZ+1;
         
         patchMasks = patchMasks(:,:,startZ:stopZ);
-        numSegPixels{thisROI} = length(find(reshape((patchMasks>0),1,[])));
+        numSegPixels{thisROI}(thisT) = length(find(reshape((patchMasks>0),1,[])));
         
         X = roiShapes{thisROI}.shape1.getX.getValue+1;    %svg entry in xml file indexes from (0, 0) instead of (1, 1), so +1
         Y = roiShapes{thisROI}.shape1.getY.getValue+1;
