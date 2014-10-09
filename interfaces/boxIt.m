@@ -624,6 +624,7 @@ function rectButton_Callback(hObject, eventdata, handles)
 rect = getrect(handles.imageAxes);
 setappdata(handles.boxIt, 'rect', rect);
 segmentPatch(handles);
+setappdata(handles.boxIt, 'modified', 1);
 
 
 
@@ -648,6 +649,7 @@ for thisProp = 1:numProps
     segmentPatch(handles);
 end
 setappdata(handles.boxIt, 'autodraw', 0);
+setappdata(handles.boxIt, 'modified', 1);
     
     
 
