@@ -40,6 +40,7 @@ for thisDs = 1:numDs
         imageName = char(theImage.getName.getValue.getBytes');
         pixels = theImage.getPrimaryPixels;
         numC = pixels.getSizeC.getValue;
+        numZ = pixels.getSizeZ.getValue;
         
         for thisC = 1:numC
             pixDesc = pixServ.retrievePixDescription(pixels.getId.getValue);
@@ -55,8 +56,20 @@ for thisDs = 1:numDs
         end
         progressFraction = thisImage/numImagesTotal;
         waitbar(progressFraction, progress, 'Downloading images');
+        
+        %This is a modification from the original workflow to limit
+        %segmentation to the middle ofthe stack. This is a measure to
+        %'de-clump' some of the images that had hazy intensities towards
+        %the bottom of the cells. Uncomment the 'getStack' lines to revert.
         greenStack = getStack(session, imageId, greenIdx, 0);
         redStack = getStack(session, imageId, redIdx, 0);
+%         middleZ = round(numZ/2);
+%         counter = 1;
+%         for thisZ = middleZ-1:middleZ+1
+%             greenStack(:,:,counter) = getPlane(session, imageId, thisZ-1, greenIdx, 0);
+%             redStack(:,:,counter) = getPlane(session, imageId, thisZ-1, redIdx, 0);
+%         end
+%         
         
         cellProps = TssBRunAnalysis(greenStack, redStack, progress, progressFraction, dsIds(thisDs), imageName);
         waitbar(progressFraction, progress, 'Saving data');

@@ -21,10 +21,13 @@ global session;
 
 waitbar(progressFraction, progress, 'Defining cells');
 [sizeY, sizeX, numZ] = size(gfpStack);
-gfpSeg = fpBacteriaSeg3D(gfpStack);
+middleZ = round(numZ/2);
+gfpSeg = zeros(sizeY, sizeX, numZ);
+gfpSeg(:,:,middleZ-1:middleZ+1) = fpBacteriaSeg3D(gfpStack(:,:,middleZ-1:middleZ+1));
 
 TssBSeg = zeros(size(TssBStack));
-st = strel('disk', 1);
+
+%st = strel('disk', 1);
 
 gfpSegBWL = bwlabeln(gfpSeg);
 % gfpSegBWL = imdilate(gfpSegBWL, st);
