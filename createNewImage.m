@@ -1,4 +1,4 @@
-function newImage = createNewImage(imageName, channelList, pixelsType, physSizeX, physSizeY, physSizeZ, sizeX, sizeY, sizeZ, sizeT)
+function newImage = createNewImage(session, imageName, channelList, pixelsType, physSizeX, physSizeY, physSizeZ, sizeX, sizeY, sizeZ, sizeT)
 %Matlab inplementation of createImage as found
 %http://trac.openmicroscopy.org.uk/omero/browser/trunk/components/common/sr
 %c/ome/api/IPixels.java
@@ -55,10 +55,11 @@ newPixels.setSha1(omero.rtypes.rstring('Pending...'));
 newPixels.setDimensionOrder(dimOrder);
 
 %Construct channel info
+javaChannelList = java.util.ArrayList;
 for thisChannel = 1:length(channelList)
     channel = omero.model.ChannelI;
     logicalChannel = omero.model.LogicalChannelI;
-    channel.setLogicalChannel(logicalChannel);
+    
     statsInfo = omero.model.StatsInfoI;
     switch pixelsType
         case 'uint8'
@@ -80,15 +81,17 @@ for thisChannel = 1:length(channelList)
 
     channel.setStatsInfo(statsInfo);
     logicalChannel.setEmissionWave(omero.rtypes.rint(channelList{thisChannel}));
+    channel.setLogicalChannel(logicalChannel);
+    %javaChannelList.add(channel);
     newPixels.addChannel(channel);
 end
+%newPixels.addAllChannelSet(javaChannelList);
 newImage.addPixels(newPixels);
 
 %Save and return our newly created Image Id
-[client session gateway] = blitzkriegBop;
+%[client session gateway] = blitzkriegBop;
 iUpdate = session.getUpdateService();
 newImage = iUpdate.saveAndReturnObject(newImage);
-gatewayDisconnect(client, session, gateway);
 
 
 end

@@ -23,7 +23,7 @@ global session;
 
 numChannels = pixels.getSizeC.getValue;
 pixelsId = pixels.getId.getValue;
-fakeChannelNum = 0;
+fakeChannelNum = 1;
 for thisChannel = 1:numChannels
     try
         channelLabel{thisChannel} = session.getPixelsService.retrievePixDescription(pixelsId).getChannel(thisChannel-1).getLogicalChannel.getEmissionWave.getValue;
