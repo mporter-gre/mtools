@@ -109,8 +109,8 @@ for thisROI = 1:numROI
         patchMasks = patchMasks(:,:,startZ:stopZ);
         numSegPixels{thisROI}(thisT) = length(find(reshape((patchMasks>0),1,[])));
         
-        X = roiShapes{thisROI}.shape1.getX.getValue+1;    %svg entry in xml file indexes from (0, 0) instead of (1, 1), so +1
-        Y = roiShapes{thisROI}.shape1.getY.getValue+1;
+        X = floor(roiShapes{thisROI}.shape1.getX.getValue)+1;    %svg entry in xml file indexes from (0, 0) instead of (1, 1), so +1
+        Y = floor(roiShapes{thisROI}.shape1.getY.getValue)+1;
         partMaskImg = uint8(zeros(maxY,maxX,numZ(thisROI)));
         
         %Measure intensities under the segmentation mask for the intended
