@@ -23,7 +23,8 @@ waitbar(progressFraction, progress, 'Defining cells');
 [sizeY, sizeX, numZ] = size(gfpStack);
 middleZ = round(numZ/2);
 gfpSeg = zeros(sizeY, sizeX, numZ);
-gfpSeg(:,:,middleZ-1:middleZ+1) = fpBacteriaSeg3D(gfpStack(:,:,middleZ-1:middleZ+1));
+%gfpSeg(:,:,middleZ-1:middleZ+1) = fpBacteriaSeg3D(gfpStack(:,:,middleZ-1:middleZ+1));
+gfpSeg = fpBacteriaSeg3D(gfpStack);
 
 TssBSeg = zeros(size(TssBStack));
 
@@ -39,52 +40,67 @@ cellVals = unique(gfpSegBWL(gfpSegBWL>0));
 numCells = length(cellVals);
 
 props = regionprops(gfpSegBWL, 'BoundingBox');
-
+zStarts = [];
+zEnds = [];
 for thisCell = 1:numCells
-    x = floor(props(thisCell).BoundingBox(1));
-    y = floor(props(thisCell).BoundingBox(2));
-    z = floor(props(thisCell).BoundingBox(3));
-    w = floor(props(thisCell).BoundingBox(4));
-    h = floor(props(thisCell).BoundingBox(5));
-    d = floor(props(thisCell).BoundingBox(6));
-    
-    if x == 0
-        x = 1;
-    end
-    if y == 0
-        y = 1;
-    end
-    if z == 0
-        z = 1;
-    end
-    
-    
-    cellSegBWL = gfpSegBWL(y:y+h-1,x:x+w-1,z:z+d-1);
-    cellSegBWL(cellSegBWL~=thisCell) = 0;
-    %greenCell = gfpStacl(y:y+h,x:x+w,z:z+d);
-    redCell = TssBStack(y:y+h-1,x:x+w-1,z:z+d-1);
-    redCellSeg = zeros(size(redCell));
-        
-    redCell(cellSegBWL==0) = mean(redCell(cellSegBWL==thisCell));
-    redCellVals = unique(redCell(cellSegBWL==thisCell));
-    redValsEdge = edge(redCellVals);
-    edgeIdx = find(redValsEdge);
-    numPx = length(redCellVals);
-    numEdgeIdx = length(edgeIdx);
-    if isempty(numEdgeIdx)
-        continue;
-    end
-    for thisIdx = 1:numEdgeIdx
-        if edgeIdx(thisIdx) > numPx/2
-            redCellSeg(redCell>=redCellVals(edgeIdx(thisIdx))) = 1;
-            TssBSeg(y:y+h-1,x:x+w-1,z:z+d-1) = TssBSeg(y:y+h-1,x:x+w-1,z:z+d-1) + redCellSeg;
-            continue;
-        end
-    end    
+    zStarts(end+1) = props(thisCell).BoundingBox(3);
+    zEnds(end+1) = zStarts(end) + props(thisCell).BoundingBox(6);
 end
+
+minZ = ceil(min(zStarts));
+maxZ = floor(max(zEnds));
+    
+
+
+% for thisCell = 1:numCells
+%     x = floor(props(thisCell).BoundingBox(1));
+%     y = floor(props(thisCell).BoundingBox(2));
+%     z = floor(props(thisCell).BoundingBox(3));
+%     w = floor(props(thisCell).BoundingBox(4));
+%     h = floor(props(thisCell).BoundingBox(5));
+%     d = floor(props(thisCell).BoundingBox(6));
+%     
+%     if x == 0
+%         x = 1;
+%     end
+%     if y == 0
+%         y = 1;
+%     end
+%     if z == 0
+%         z = 1;
+%     end
+%     
+%     
+%     cellSegBWL = gfpSegBWL(y:y+h-1,x:x+w-1,z:z+d-1);
+%     cellSegBWL(cellSegBWL~=thisCell) = 0;
+%     %greenCell = gfpStacl(y:y+h,x:x+w,z:z+d);
+%     redCell = TssBStack(y:y+h-1,x:x+w-1,z:z+d-1);
+%     redCellSeg = zeros(size(redCell));
+%         
+%     redCell(cellSegBWL==0) = mean(redCell(cellSegBWL==thisCell));
+%     redCellVals = unique(redCell(cellSegBWL==thisCell));
+%     redValsEdge = edge(redCellVals);
+%     edgeIdx = find(redValsEdge);
+%     numPx = length(redCellVals);
+%     numEdgeIdx = length(edgeIdx);
+%     if isempty(numEdgeIdx)
+%         continue;
+%     end
+%     for thisIdx = 1:numEdgeIdx
+%         if edgeIdx(thisIdx) > numPx/2
+%             redCellSeg(redCell>=redCellVals(edgeIdx(thisIdx))) = 1;
+%             TssBSeg(y:y+h-1,x:x+w-1,z:z+d-1) = TssBSeg(y:y+h-1,x:x+w-1,z:z+d-1) + redCellSeg;
+%             continue;
+%         end
+%     end    
+% end
    
 
 %TssBSeg = fpBacteriaSeg3D(TssBStack);
+for thisZ = minZ:maxZ
+    TssBSeg(:,:,thisZ) = logical(LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 1000));
+    %TssBSeg(:,:,thisZ) = logical(TssBSeg(:,:,thisZ) + LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 1000));
+end
 TssBSegBWL = bwlabeln(TssBSeg);
 
 %Remove small foci (<21px)
@@ -92,14 +108,15 @@ focusProps = regionprops(TssBSegBWL, 'Area', 'BoundingBox');
 focusVals = unique(TssBSegBWL(TssBSegBWL>0));
 numFoci = length(focusProps);
 axisLengths = [];
+ecces = [];
 for thisFocus = 1:numFoci
     
     
-    if focusProps(thisFocus).Area < 21 %|| focusProps(thisFocus).Area > 100
-        TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
-        %disp('continued');
-        continue;
-    end
+%     if focusProps(thisFocus).Area < 21 || focusProps(thisFocus).Area > 1000
+%         TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
+%         %disp('continued');
+%         continue;
+%     end
     
     x = floor(focusProps(thisFocus).BoundingBox(1));
     y = floor(focusProps(thisFocus).BoundingBox(2));
@@ -118,13 +135,14 @@ for thisFocus = 1:numFoci
         z = 1;
     end
     
-    if focusProps(thisFocus).BoundingBox(6) < 3 % || focusProps(thisFocus).BoundingBox(4) > 11 || focusProps(thisFocus).BoundingBox(5) > 11
-        TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
-        continue;
-    end
+%     if focusProps(thisFocus).BoundingBox(6) < 3 % || focusProps(thisFocus).BoundingBox(4) > 11 || focusProps(thisFocus).BoundingBox(5) > 11
+%         TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
+%         continue;
+%     end
 
-    
-    redCellSeg = TssBSegBWL(y:y+h-1,x:x+w-1,z:z+d-1);
+    %Filter out cases where high background in the cell segments out the
+    %width of the cell
+    redCellSeg = TssBSegBWL(y:y+h-1,x:x+w-1,:);
     redCellSeg(redCellSeg~=focusVals(thisFocus)) = 0;
     redCellSegProj = sum(redCellSeg, 3);
     boxProps = regionprops(logical(redCellSegProj), 'MajorAxisLength', 'MinorAxisLength', 'Eccentricity');
@@ -137,13 +155,16 @@ for thisFocus = 1:numFoci
     if numBlobs > 1
         for thisBlob = 1:numBlobs
             majAxis(end+1) = boxProps(thisBlob).MajorAxisLength;
+            ecces(end+1) = boxProps(thisBlob).Eccentricity;
         end
         MajorAxisLength = max(majAxis);
+        Eccentricity = max(ecces);
     else
         MajorAxisLength = boxProps.MajorAxisLength;
+        Eccentricity = boxProps.Eccentricity;
     end
     axisLengths(end+1) = MajorAxisLength;
-    if MajorAxisLength > 8
+    if MajorAxisLength > 15 || Eccentricity > 0.9
         TssBSegBWL(TssBSegBWL==focusVals(thisFocus)) = 0;
     end
 end
@@ -217,9 +238,7 @@ for thisCell = 1:numCells
             majorAxis = cellProps{cellCounter}.props.MajorAxisLength;
             halfLength = majorAxis/2;
             focusPosition(thisFocus) = (fDist(thisFocus)/halfLength)*100;
-            if cellVals(thisCell) == 146
-                disp('pause a while');
-            end
+            
         end
         
         cellProps{cellCounter}.numFocusPxInCell = numFocusPxInCell;

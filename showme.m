@@ -25,7 +25,11 @@ numPlanes = length(image(1,1,:));
 if numPlanes == 1
     image = double(image);
     figure;
-    imshow(image, [0 ceil(max2(image))]);
+    if islogical(image)
+        imshow(image, [0 1]);
+    else
+        imshow(image, [0 ceil(max2(image))]);
+    end
 else
     rootClasses = sqrt(numPlanes);
     rootStr = num2str(rootClasses);
@@ -45,8 +49,15 @@ else
     end
 
     figure;
-    for thisPlane = 1:numPlanes;
-        subplot(subRows, subCols, thisPlane); imshow(image(:,:,thisPlane), [0 ceil(max2(image(:,:,thisPlane)))]);
+    
+    if islogical(image)
+        for thisPlane = 1:numPlanes;
+            subplot(subRows, subCols, thisPlane); imshow(image(:,:,thisPlane), [0 1]);
+        end
+    else
+        for thisPlane = 1:numPlanes;
+            subplot(subRows, subCols, thisPlane); imshow(image(:,:,thisPlane), [0 ceil(max2(image(:,:,thisPlane)))]);
+        end
     end
 end
     

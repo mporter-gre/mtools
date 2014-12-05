@@ -38,6 +38,10 @@ for thisDs = 1:numDs
         imageId = images(thisImage).getId.getValue;
         theImage = getImages(session, imageId);
         imageName = char(theImage.getName.getValue.getBytes');
+        ans = strfind(imageName, '_masks');
+        if ~isempty(ans)
+            continue;
+        end
         pixels = theImage.getPrimaryPixels;
         numC = pixels.getSizeC.getValue;
         numZ = pixels.getSizeZ.getValue;
