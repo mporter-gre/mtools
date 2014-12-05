@@ -37,7 +37,7 @@ omeroPixelsType = omero.model.PixelsTypeI;
 if strcmpi(pixelsType, '12bitCam')
     omeroPixelsType.setValue((omero.rtypes.rstring('uint16')));
 else
-    omeroPixelsType.setValue((omero.rtypes.rstring('uint16')));
+    omeroPixelsType.setValue((omero.rtypes.rstring(pixelsType)));
 end
 dimOrder = omero.model.DimensionOrderI;
 dimOrder.setValue(omero.rtypes.rstring('XYZCT'));
