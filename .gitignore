@@ -216,3 +216,7 @@ pip-log.txt
 
 # Matlab temp files
 *.asv
+
+.DS_Store
+
+.DS_Store
