@@ -59,12 +59,22 @@ populateProjectsSelect(handles);
 
 setappdata(handles.copyROIs, 'fromImageSelected', 0);
 setappdata(handles.copyROIs, 'toImageSelected', 0);
+setappdata(handles.copyROIs, 'fromX', 0);
+setappdata(handles.copyROIs, 'toX', 1);
+setappdata(handles.copyROIs, 'fromY', 0);
+setappdata(handles.copyROIs, 'toY', 1);
+setappdata(handles.copyROIs, 'fromZ', 0);
+setappdata(handles.copyROIs, 'toZ', 1);
+setappdata(handles.copyROIs, 'fromT', 0);
+setappdata(handles.copyROIs, 'toT', 1);
+setappdata(handles.copyROIs, 'fromROIs', []);
+
 
 % Update handles structure
 guidata(hObject, handles);
 
 % UIWAIT makes copyROIs wait for user response (see UIRESUME)
-% uiwait(handles.copyROIs);
+uiwait(handles.copyROIs);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -75,7 +85,7 @@ function varargout = copyROIs_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = handles.output;
+%varargout{1} = handles.output;
 
 
 % --- Executes on selection change in projectsFromSelect.
@@ -98,6 +108,7 @@ projId = projIdList(projIdx);
 populateDatasetsSelect(handles, projId, 'From');
 
 set(handles.dsFromSelect, 'Enable', 'on');
+set(handles.infoFromLbl, 'String', '');
 setappdata(handles.copyROIs, 'projFromId', projId);
 setappdata(handles.copyROIs, 'fromImageSelected', 0);
 checkReady(handles)
@@ -137,6 +148,7 @@ projId = projIdList(projIdx);
 populateDatasetsSelect(handles, projId, 'To');
 
 set(handles.dsToSelect, 'Enable', 'on');
+set(handles.infoToLbl, 'String', '');
 setappdata(handles.copyROIs, 'projToId', projId);
 setappdata(handles.copyROIs, 'toImageSelected', 0);
 
@@ -176,6 +188,7 @@ dsId = dsIdList(dsIdx);
 populateImagesSelect(handles, dsId, 'From');
 
 set(handles.imagesFromSelect, 'Enable', 'on');
+set(handles.infoFromLbl, 'String', '');
 setappdata(handles.copyROIs, 'dsFromId', dsId);
 
 
@@ -212,6 +225,7 @@ dsId = dsIdList(dsIdx);
 populateImagesSelect(handles, dsId, 'To');
 
 set(handles.imagesToSelect, 'Enable', 'on');
+set(handles.infoToLbl, 'String', '');
 setappdata(handles.copyROIs, 'dsToId', dsId);
 
 
@@ -265,10 +279,17 @@ fromNumROIs = length(rois);
 set(handles.infoFromLbl, 'String', [{fromImageName} {['number of ROIs: ' num2str(fromNumROIs)]} {['Size X/Y: ' num2str(fromSizeX) '/' num2str(fromSizeY)]} {['Size Z/T: ' num2str(fromNumZ) '/' num2str(fromNumT)]}]);
 
 if fromNumROIs > 0
-    setappdata(handles.copyROIs, 'fromImageSelected', 1);
+    setappdata(handles.copyROIs, 'fromX', fromSizeX);
+    setappdata(handles.copyROIs, 'fromY', fromSizeY);
+    setappdata(handles.copyROIs, 'fromZ', fromNumZ);
+    setappdata(handles.copyROIs, 'fromT', fromNumT);
+    setappdata(handles.copyROIs, 'fromROIs', rois);
+    setappdata(handles.copyROIs, 'imageFromId', imageFromId);
 else
+    setappdata(handles.copyROIs, 'fromROIs', []);
     setappdata(handles.copyROIs, 'fromImageSelected', 0);
 end
+setappdata(handles.copyROIs, 'fromImageSelected', 1);
 checkReady(handles)
 
 
@@ -325,6 +346,12 @@ toNumROIs = length(rois);
 
 set(handles.infoToLbl, 'String', [{toImageName} {['number of ROIs: ' num2str(toNumROIs)]} {['Size X/Y: ' num2str(toSizeX) '/' num2str(toSizeY)]} {['Size Z/T: ' num2str(toNumZ) '/' num2str(toNumT)]}]);
 setappdata(handles.copyROIs, 'toImageSelected', 1);
+setappdata(handles.copyROIs, 'toX', toSizeX);
+setappdata(handles.copyROIs, 'toY', toSizeY);
+setappdata(handles.copyROIs, 'toZ', toNumZ);
+setappdata(handles.copyROIs, 'toT', toNumT);
+setappdata(handles.copyROIs, 'toROIs', rois);
+setappdata(handles.copyROIs, 'imageToId', imageToId);
 
 checkReady(handles)
 
@@ -347,6 +374,21 @@ function copyBtn_Callback(hObject, eventdata, handles)
 % hObject    handle to copyBtn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+global session
+
+iUpdate = session.getUpdateService();
+fromROIs = getappdata(handles.copyROIs, 'fromROIs');
+imageToId = getappdata(handles.copyROIs, 'imageToId');
+numROIs = length(fromROIs);
+
+for thisROI = 1:numROIs
+    ROIcopy = createROIObjFromStruct(fromROIs{thisROI});
+    ROIcopy.setImage(omero.model.ImageI(imageToId, false));
+    iUpdate.saveObject(ROIcopy);
+end
+
+uiwait(msgbox('All ROIs copied successfully','Complete','modal'));
 
 
 
@@ -486,10 +528,48 @@ function checkReady(handles)
 
 fromImageSelected = getappdata(handles.copyROIs, 'fromImageSelected');
 toImageSelected = getappdata(handles.copyROIs, 'toImageSelected');
+fromROIs = getappdata(handles.copyROIs, 'fromROIs');
+fromString = get(handles.infoFromLbl, 'String');
+toString = get(handles.infoToLbl, 'String');
+fromX = getappdata(handles.copyROIs, 'fromX');
+toX = getappdata(handles.copyROIs, 'toX');
+fromY = getappdata(handles.copyROIs, 'fromY');
+toY = getappdata(handles.copyROIs, 'toY');
+fromZ = getappdata(handles.copyROIs, 'fromZ');
+toZ = getappdata(handles.copyROIs, 'toZ');
+fromT = getappdata(handles.copyROIs, 'fromT');
+toT = getappdata(handles.copyROIs, 'toT');
 
+mismatch = '';
 if fromImageSelected == 1 && toImageSelected == 1
-    set(handles.copyBtn, 'Enable', 'on');
-else
-    set(handles.copyBtn, 'Enable', 'off');
+    if fromX ~= toX
+       mismatch = [mismatch 'size X ']; 
+    end
+    if fromY ~= toY
+        mismatch = [mismatch 'size Y '];
+    end
+    if fromZ ~= toZ
+        mismatch = [mismatch 'size Z '];
+    end
+    if fromT ~= toT
+        mismatch = [mismatch 'size T '];
+    end
+    if ~strcmpi(mismatch, '')
+        toString{end+1} = ['Images do not have matching: ' mismatch];
+        set(handles.infoToLbl, 'String', toString);
+        set(handles.copyBtn, 'Enable', 'off');
+    else
+        set(handles.copyBtn, 'Enable', 'on');
+    end
 end
+
+if fromImageSelected == 1 && isempty(fromROIs)
+    fromString{end+1} = 'This image has no ROIs';
+    set(handles.infoFromLbl, 'String', fromString);
+    set(handles.copyBtn, 'Enable', 'off');
+    return
+end
+
+
+
 

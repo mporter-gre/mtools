@@ -34,22 +34,26 @@ for thisShape = 1:numShapes
             newShape = createRectangle(oldShape.getX.getValue, oldShape.getY.getValue, oldShape.getWidth.getValue, oldShape.getHeight.getValue);
             
         case 'ellipse'
-            newShape = createEllipse(oldShape.getCx.getValue, oldShape.Cy.getValue, oldShape.Rx.getValue, oldShape.Ry.getValue);
+            newShape = createEllipse(oldShape.getCx.getValue, oldShape.getCy.getValue, oldShape.getRx.getValue, oldShape.getRy.getValue);
             
         case 'line'
-            newShape = createEllipse([oldShape.getX1.getValue, oldShape.X2.getValue], [oldShape.Y1.getValue, oldShape.Y2.getValue]);
+            newShape = createLine([oldShape.getX1.getValue, oldShape.getX2.getValue], [oldShape.getY1.getValue, oldShape.getY2.getValue]);
             
         case 'point'
-            newShape = createEllipse(oldShape.getCx.getValue, oldShape.Cy.getValue);
+            newShape = createPoint(oldShape.getCx.getValue, oldShape.getCy.getValue);
     end
     
     Z = oldShape.getTheZ.getValue;
-    C = oldShape.getTheC.getValue;
+    %C = oldShape.getTheC.getValue;
     T = oldShape.getTheT.getValue;
     
-    newShape.setTheZ(Z);
-    newShape.setTheC(C);
-    newShape.setTheT(T);
+    textVal = oldShape.getTextValue;
+    if ~isempty(textVal)
+        newShape.setTextValue(textVal);
+    end
+    newShape.setTheZ(rint(Z));
+    %newShape.setTheC(C);
+    newShape.setTheT(rint(T));
     
     ROI.addShape(newShape);
     
