@@ -1060,8 +1060,8 @@ end
 
 
 
-rect(1) = xRange(1)-2;
-rect(2) = yRange(1)-2;
+rect(1) = ceil(xRange(1))-2;
+rect(2) = ceil(yRange(1))-2;
 rect(3) = length(xRange);
 rect(4) = length(yRange);
 
