@@ -119,7 +119,7 @@ for thisImage = 1:numImages
             dataOut1 = [];
             dataOut2 = [];
             dataAroundOut2 = [];
-            dataOut1 = [dataOut1 {roiShapes{thisImage}{thisROI}.origName roiShapes{thisImage}{thisROI}.name datasetNames{thisImage} num2str(thisROI) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} objectCounter{thisImage}{thisROI}{thisT}.numObjects numSegPixels{thisImage}{thisROI}(thisT)}];
+            dataOut1 = [dataOut1 {roiShapes{thisImage}{thisROI}.origName roiShapes{thisImage}{thisROI}.name datasetNames{thisImage} num2str(roiShapes{thisImage}{thisROI}.ROIId) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} objectCounter{thisImage}{thisROI}{thisT}.numObjects numSegPixels{thisImage}{thisROI}(thisT)}];
             if numMeasureChannels > 0
                 for thisChannel = 1:numMeasureChannels
                     dataOut2 = [dataOut2 {data{thisImage}{thisROI}{thisT}{thisChannel}.sumPix data{thisImage}{thisROI}{thisT}{thisChannel}.meanPix data{thisImage}{thisROI}{thisT}{thisChannel}.stdPix}];
@@ -197,7 +197,7 @@ for thisImage = 1:numImages
                                 continue;
                             end
                         end
-                        objectDataOut1 = [objectDataOut1 {roiShapes{thisImage}{thisROI}.origName datasetNames{thisImage} num2str(thisROI) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} numSegObjectPixels}];
+                        objectDataOut1 = [objectDataOut1 {roiShapes{thisImage}{thisROI}.origName datasetNames{thisImage} num2str(roiShapes{thisImage}{thisROI}.ROIId) num2str(timePoints(thisT)) channelLabels{thisImage}{segChannel} numSegObjectPixels}];
                         for thisChannel = 1:numMeasureChannels
                             objectDataOut1 = [objectDataOut1 {objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.sumPix objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.meanPix objectData{thisImage}{thisROI}{thisT}{thisObject}{thisChannel}.stdPix}];
                         end

@@ -34,6 +34,9 @@ if strcmpi(sorting, 'byZ')
     end
     sortedShapes.shapeType = roiShapes.shapeType;
     sortedShapes.numShapes = roiShapes.numShapes;
+    if isfield(roiShapes, 'ROIId')
+        sortedShapes.ROIId = roiShapes.ROIId;
+    end
 end
 
 if strcmpi(sorting, 'byT')
@@ -49,6 +52,9 @@ if strcmpi(sorting, 'byT')
     end
     sortedShapes.shapeType = roiShapes.shapeType;
     sortedShapes.numShapes = roiShapes.numShapes;
+    if isfield(roiShapes, 'ROIId')
+        sortedShapes.ROIId = roiShapes.ROIId;
+    end
 end
 
 if strcmpi(sorting, 'byTbyZ')
@@ -65,6 +71,9 @@ if strcmpi(sorting, 'byTbyZ')
     end
     sortedShapes.shapeType = roiShapes.shapeType;
     sortedShapes.numShapes = roiShapes.numShapes;
+    if isfield(roiShapes, 'ROIId')
+        sortedShapes.ROIId = roiShapes.ROIId;
+    end
 end
 
 if strcmpi(sorting, 'byZbyT')
@@ -81,5 +90,8 @@ if strcmpi(sorting, 'byZbyT')
     end
     sortedShapes.shapeType = roiShapes.shapeType;
     sortedShapes.numShapes = roiShapes.numShapes;
+    if isfield(roiShapes, 'ROIId')
+        sortedShapes.ROIId = roiShapes.ROIId;
+    end
 end
 
