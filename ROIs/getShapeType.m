@@ -42,4 +42,7 @@ switch shapeClass
         
     case{'omero.model.TextI'}
         shapeType = 'text';
+        
+    case{'omero.model.MaskI'}
+        shapeType = 'mask';
 end
