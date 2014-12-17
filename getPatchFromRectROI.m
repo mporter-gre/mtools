@@ -1,4 +1,5 @@
 function patch = getPatchFromRectROI(session, imageId, roi, c)
+%patch = getPatchFromRectROI(session, imageId, roi, c)
 
 numShapes = roi.numShapes;
 patch = [];
