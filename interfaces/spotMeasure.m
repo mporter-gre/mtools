@@ -175,7 +175,7 @@ for thisImage = 1:numImages
 end
 close(progBar);
 
-writeDataOut(dataOut, dsId, imageNames);
+writeDataOut(dataOut, roiShapes, dsId, imageNames);
 
 
 % --- Executes on selection change in channelSelect.
@@ -220,12 +220,12 @@ for thisDs = 1:numDs
 end
 
 
-function writeDataOut(dataOut, dsId, imageNames)
+function writeDataOut(dataOut, roiShapes, dsId, imageNames)
 
 global session
 
 numImages = length(imageNames);
-dataFinal = {};
+dataFinal = {'Image name', 'Dataset', 'ROI ID', 'Spot size'};
 
 for thisImage = 1:numImages
     numROIs = length(dataOut{thisImage});
@@ -238,7 +238,8 @@ for thisImage = 1:numImages
         for thisSpot = 1:numSpots
             dataFinal{end+1,1} = imageNames{thisImage};
             dataFinal{end,2} = datasetName;
-            dataFinal{end,3} = sizesThisROI(thisSpot);
+            dataFinal{end,3} = roiShapes{thisImage}{thisROI}.ROIId;
+            dataFinal{end,4} = sizesThisROI(thisSpot);
         end
     end
 end
