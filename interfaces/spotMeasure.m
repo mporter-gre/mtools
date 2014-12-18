@@ -22,7 +22,7 @@ function varargout = spotMeasure(varargin)
 
 % Edit the above text to modify the response to help spotMeasure
 
-% Last Modified by GUIDE v2.5 17-Dec-2014 15:09:16
+% Last Modified by GUIDE v2.5 18-Dec-2014 12:18:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -106,7 +106,6 @@ for thisImage = 1:numImages
     channelLabels{thisImage} = getChannelsFromPixels(pixels{thisImage});
 end
 
-
 set(handles.measureBtn, 'Enable', 'on');
 setappdata(handles.spotMeasure, 'imageIds', imageIds);
 setappdata(handles.spotMeasure, 'imageNames', imageNames);
@@ -114,6 +113,8 @@ setappdata(handles.spotMeasure, 'roiShapes', roiShapes);
 setappdata(handles.spotMeasure, 'channelLabels', channelLabels);
 setappdata(handles.spotMeasure, 'pixels', pixels);
 setappdata(handles.spotMeasure, 'datasetNames', datasetNames);
+
+populateChannelSelect(handles);
 
 guidata(hObject, handles);
 
@@ -127,14 +128,14 @@ function minSizeTxt_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of minSizeTxt as text
 %        str2double(get(hObject,'String')) returns contents of minSizeTxt as a double
 
-minSize = round(str2double(get(handles.hObject, 'String')));
+minSize = round(str2double(get(hObject, 'String')));
 
 if ~isnumeric(minSize)
     msgbox('The minimum object size must be a whole number');
     return;
 end
 
-setappdata(hanels.spotMeasure, 'minSize', minSize);
+setappdata(handles.spotMeasure, 'minSize', minSize);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -160,7 +161,9 @@ function measureBtn_Callback(hObject, eventdata, handles)
 imageIds = getappdata(handles.spotMeasure, 'imageIds');
 imageNames = getappdata(handles.spotMeasure, 'imageNames');
 roiShapes = getappdata(handles.spotMeasure, 'roiShapes');
+channels = get(handles.channelSelect, 'String');
 c = get(handles.channelSelect, 'Value');
+segChannel = channels{c};
 selectedDsIds = getappdata(handles.spotMeasure, 'selectedDsIds');
 minSize = getappdata(handles.spotMeasure, 'minSize');
 numImages = length(imageIds);
@@ -175,7 +178,7 @@ for thisImage = 1:numImages
 end
 close(progBar);
 
-writeDataOut(dataOut, roiShapes, dsId, imageNames);
+writeDataOut(dataOut, roiShapes, dsId, imageNames, segChannel);
 
 
 % --- Executes on selection change in channelSelect.
@@ -220,12 +223,12 @@ for thisDs = 1:numDs
 end
 
 
-function writeDataOut(dataOut, roiShapes, dsId, imageNames)
+function writeDataOut(dataOut, roiShapes, dsId, imageNames, segChannel)
 
 global session
 
 numImages = length(imageNames);
-dataFinal = {'Image name', 'Dataset', 'ROI ID', 'Spot size'};
+dataFinal = {'Image name', 'Dataset', 'ROI ID', ['Spot size ch. ' segChannel]};
 
 for thisImage = 1:numImages
     numROIs = length(dataOut{thisImage});
@@ -251,11 +254,15 @@ xlswrite([filePath fileName], dataFinal);
 
 
 
+function populateChannelSelect(handles)
 
+global session
 
+imageIds = getappdata(handles.spotMeasure, 'imageIds');
 
+theImage = getImages(session, imageIds(1));
+pixels = theImage.getPrimaryPixels;
+channelLabels = getChannelsFromPixels(pixels);
 
-
-
-
-
+set(handles.channelSelect, 'String', channelLabels);
+set(handles.channelSelect, 'Enable', 'on');
