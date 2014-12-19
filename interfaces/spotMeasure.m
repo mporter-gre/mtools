@@ -22,7 +22,7 @@ function varargout = spotMeasure(varargin)
 
 % Edit the above text to modify the response to help spotMeasure
 
-% Last Modified by GUIDE v2.5 18-Dec-2014 12:18:54
+% Last Modified by GUIDE v2.5 19-Dec-2014 12:45:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes spotMeasure wait for user response (see UIRESUME)
-% uiwait(handles.spotMeasure);
+uiwait(handles.spotMeasure);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -70,7 +70,7 @@ function varargout = spotMeasure_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = handles.output;
+%varargout{1} = handles.output;
 
 
 % --- Executes on button press in chooseDatasetsBtn.
@@ -158,6 +158,7 @@ function measureBtn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+saveMasks = get(handles.saveMasksChk, 'Value');
 imageIds = getappdata(handles.spotMeasure, 'imageIds');
 imageNames = getappdata(handles.spotMeasure, 'imageNames');
 roiShapes = getappdata(handles.spotMeasure, 'roiShapes');
@@ -174,7 +175,7 @@ for thisImage = 1:numImages
     imageId = imageIds(thisImage);
     imageName = imageNames{thisImage};
     dsId(thisImage) = matchDatasetAndImage(imageId, selectedDsIds);
-    dataOut{thisImage} = measureSpotsInROI(imageId, imageName, dsId(thisImage), minSize, c-1);
+    dataOut{thisImage} = measureSpotsInROI(imageId, imageName, dsId(thisImage), minSize, c-1, saveMasks);
 end
 close(progBar);
 
@@ -251,6 +252,8 @@ end
 
 xlswrite([filePath fileName], dataFinal);
 
+msgBox('Data saved');
+
 
 
 
@@ -266,3 +269,12 @@ channelLabels = getChannelsFromPixels(pixels);
 
 set(handles.channelSelect, 'String', channelLabels);
 set(handles.channelSelect, 'Enable', 'on');
+
+
+% --- Executes on button press in saveMasksChk.
+function saveMasksChk_Callback(hObject, eventdata, handles)
+% hObject    handle to saveMasksChk (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of saveMasksChk

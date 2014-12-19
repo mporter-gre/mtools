@@ -22,7 +22,7 @@ function varargout = ImageAnalysisLogin(varargin)
 
 % Edit the above text to modify the response to help ImageAnalysisLogin
 
-% Last Modified by GUIDE v2.5 08-Dec-2014 14:38:23
+% Last Modified by GUIDE v2.5 19-Dec-2014 12:54:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -505,4 +505,22 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 copyROIs(handles);
+set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
+
+
+% --- Executes on button press in spotMeasureBtn.
+function spotMeasureBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to spotMeasureBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+set(hObject, 'enable', 'off');
+success = logIn(handles);
+set(hObject, 'enable', 'on');
+if success == 0
+    return;
+end
+set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
+spotMeasure(handles);
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');

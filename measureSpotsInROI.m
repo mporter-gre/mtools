@@ -1,4 +1,4 @@
-function dataOut = measureSpotsInROI(imageId, imageName, dsId, minSize, c)
+function dataOut = measureSpotsInROI(imageId, imageName, dsId, minSize, c, saveMasks)
 %dataOut = measureSpotsInROI(imageId, c);
 
 global session;
@@ -27,11 +27,11 @@ for thisROI = 1:numROIs
     
     for thisSpot = 1:numSpots
         if props{thisROI}(thisSpot).Area < minSize
-            segStackBWL{thisROI}(segStackBWL{thisROI}==thisSpot) = 0;
             segStack{thisROI}(segStackBWL{thisROI}==thisSpot) = 0;
         end
     end
         
+    segStackBWL{thisROI} = bwlabeln(segStack{thisROI});
     props{thisROI} = regionprops(segStackBWL{thisROI}, 'Area');
     
     %Try to make a mask ROI in OMERO
@@ -49,8 +49,10 @@ for thisROI = 1:numROIs
 end
 
 %Move this all to another function when it's working...
-maskImg = createMaskImageFromROIPatches(segStack, rois, 1024, 1024, 18);
-saveMaskImage(maskImg, [imageName '_masks'], dsId);
+if saveMasks == 1
+    maskImg = createMaskImageFromROIPatches(segStack, rois, 1024, 1024, 18);
+    saveMaskImage(maskImg, [imageName '_masks'], dsId);
+end
 
 
 dataOut = props;
