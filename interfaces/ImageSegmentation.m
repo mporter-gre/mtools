@@ -709,10 +709,13 @@ featherSize = str2double(get(handles.featherText, 'String'));
 minSize = str2double(get(handles.minSizeText, 'String'));
 groupObjects = get(handles.groupObjectsRadio, 'Value');
 useOtsu = get(handles.otsuThresholdRadio, 'Value');
+useSpots = get(handles.spotSegRadio, 'Value');
 useAbsolute = get(handles.absoluteThresholdRadio, 'Value');
 useSigma = get(handles.sigmaThresholdRadio, 'Value');
 if useOtsu == 1
     selectedSegType = 'Otsu';
+elseif useSpotSeg == 1
+   selectedSegType = 'Spots';
 elseif useAbsolute == 1
     selectedSegType = 'Absolute';
 elseif useSigma == 1
@@ -787,6 +790,17 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3D(patches, featherSize, 0, minSize);
         sigmaMultiplier = getSigmaMultiplier(handles, patches);
         set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
+    elseif useSpots == 1
+        segPatches{selectedROI}{selectedChannel+1} = spotSeg3D(patches);
+        segPatches = filterSpotSize(segPatches, minSize);
+        if groupObjects == 1
+            segPatches = bwlabeln(segPatches);
+        end
+        if featherSize > 0
+            se = strel('diamond', featherSize);
+            segPatches = imdilate(segPatches, se);
+        end
+        lowestValue = min(reshape(patches(segPatches>0), [], 1));
     elseif useAbsolute == 1
         threshold = str2double(get(handles.thresholdText, 'String'));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});

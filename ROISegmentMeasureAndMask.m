@@ -75,6 +75,16 @@ for thisROI = 1:numROI
         patchMax = max(reshape(patches{segChannel}, 1, []));
         if strcmpi(selectedSegType, 'Otsu')
             [patchMasks lowestValue] = seg3D(patches{segChannel}, featherSize, groupObjects, minSize); %The 3D segmentation
+        elseif strcmpi(selectedSegType, 'Spots')
+            patchMasks = spotSeg3D(patches{segChannel});
+            patchMasks = filterSpotSize(patchMasks, minSize);
+            if groupObjects == 1
+                patchMasks = bwlabeln(patchMasks);
+            end
+            if featherSize > 0
+                se = strel('diamond', featherSize);
+                patchMasks = imdilate(patchMasks, se);
+            end
         elseif strcmpi(selectedSegType, 'Absolute')
             [patchMasks lowestValue] = seg3DThresh(patches{segChannel}, featherSize, groupObjects, threshold, minSize, patchMax);
         elseif strcmpi(selectedSegType, 'Sigma')
