@@ -513,7 +513,8 @@ imageId = getappdata(handles.boxIt, 'imageId');
 dsId = getappdata(handles.boxIt, 'datasetId');
 datasetId = java.util.ArrayList;
 datasetId.add(java.lang.Long(dsId));
-%%datasetContainer = omero.api.ContainerClass.Dataset;
+datasetContainer = omero.api.ContainerClass.Dataset;
+
 images = getImages(session, 'dataset', dsId);
 numImages = length(images);
 for thisImage = 1:numImages
@@ -1236,7 +1237,7 @@ projectId = getappdata(handles.boxIt, 'projectId');
 dsId = getappdata(handles.boxIt, 'datasetId');
 datasetId = java.util.ArrayList;
 datasetId.add(java.lang.Long(dsId));
-%datasetContainer = omero.api.ContainerClass.Dataset;
+datasetContainer = omero.api.ContainerClass.Dataset;
 
 %An ArrayList of images in the current dataset is retrieved from the OMERO 
 %server.
@@ -1300,7 +1301,7 @@ projectId = getappdata(handles.boxIt, 'projectId');
 dsId = getappdata(handles.boxIt, 'datasetId');
 datasetId = java.util.ArrayList;
 datasetId.add(java.lang.Long(dsId));
-%datasetContainer = omero.api.ContainerClass.Dataset;
+datasetContainer = omero.api.ContainerClass.Dataset;
 
 %An ArrayList of images in the current dataset is retrieved from the OMERO 
 %server.
