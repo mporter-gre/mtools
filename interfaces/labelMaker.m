@@ -52,7 +52,6 @@ function labelMaker_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to labelmaker (see VARARGIN)
 
-global gateway;
 warning off MATLAB:xlswrite:NoCOMServer
 %Set up the play and pause buttons
 startImage = imread('startImageImage.jpg', 'jpg');
@@ -688,7 +687,7 @@ if modified == 1
         return;
     end
 end
-gatewayDisconnect;
+
 delete(hObject);
 
 
@@ -898,7 +897,7 @@ function openPointsItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway
+global session
 
 modified = getappdata(handles.labelMaker, 'modified');
 if modified == 1
@@ -913,7 +912,7 @@ if fileName == 0
     return;
 end
 vars = load([filePath fileName]);
-theImage = gateway.getImage(vars.imageId);
+theImage = getImages(session, vars.imageId);
 setappdata(handles.labelMaker, 'points', vars.points);
 setappdata(handles.labelMaker, 'projectId', vars.projectId);
 setappdata(handles.labelMaker, 'datasetId', vars.datasetId);
@@ -1023,7 +1022,6 @@ setappdata(handles.labelMaker, 'labelsName', labelsName);
 
 function getMetadata(handles)
 
-global gateway
 global session
 
 theImage = getappdata(handles.labelMaker, 'theImage');
