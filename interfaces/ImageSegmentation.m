@@ -714,7 +714,7 @@ useAbsolute = get(handles.absoluteThresholdRadio, 'Value');
 useSigma = get(handles.sigmaThresholdRadio, 'Value');
 if useOtsu == 1
     selectedSegType = 'Otsu';
-elseif useSpotSeg == 1
+elseif useSpots == 1
    selectedSegType = 'Spots';
 elseif useAbsolute == 1
     selectedSegType = 'Absolute';
