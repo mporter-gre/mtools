@@ -175,7 +175,11 @@ for thisImage = 1:numImages
     imageId = imageIds(thisImage);
     imageName = imageNames{thisImage};
     dsId(thisImage) = matchDatasetAndImage(imageId, selectedDsIds);
-    dataOut{thisImage} = measureSpotsInROI(imageId, imageName, dsId(thisImage), minSize, c-1, saveMasks);
+    try
+        dataOut{thisImage} = measureSpotsInROI(imageId, imageName, dsId(thisImage), minSize, c-1, saveMasks);
+    catch
+        dataOut{thisImage} = [];
+    end
 end
 close(progBar);
 
@@ -252,7 +256,7 @@ end
 
 xlswrite([filePath fileName], dataFinal);
 
-msgBox('Data saved');
+msgbox('Data saved');
 
 
 

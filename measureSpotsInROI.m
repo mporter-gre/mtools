@@ -5,6 +5,12 @@ global session;
 %iUpdate = session.getUpdateService();
 
 rois = getROIsFromImageId(imageId);
+theImage = getImages(session, imageId);
+pixels = theImage.getPrimaryPixels;
+sizeX = pixels.getSizeX.getValue;
+sizeY = pixels.getSizeY.getValue;
+sizeZ = pixels.getSizeZ.getValue;
+
 
 numROIs = length(rois);
 if numROIs == 0
@@ -50,7 +56,7 @@ end
 
 %Move this all to another function when it's working...
 if saveMasks == 1
-    maskImg = createMaskImageFromROIPatches(segStack, rois, 1024, 1024, 18);
+    maskImg = createMaskImageFromROIPatches(segStack, rois, sizeX, sizeY, sizeZ);
     saveMaskImage(maskImg, [imageName '_masks'], dsId);
 end
 
