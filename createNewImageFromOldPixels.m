@@ -37,14 +37,15 @@ sizeY = oldPixels.getSizeY.getValue;
 sizeT = oldPixels.getSizeT.getValue;
 sizeZ = oldPixels.getSizeZ.getValue;
 try
-    physSizeX = oldPixels.getPhysicalSizeX.getValue;
-    physSizeY = oldPixels.getPhysicalSizeY.getValue;
-    physSizeZ = oldPixels.getPhysicalSizeZ.getValue;
+    physSizeX = oldPixels.getPhysicalSizeX;
+    physSizeY = oldPixels.getPhysicalSizeY;
+    physSizeZ = oldPixels.getPhysicalSizeZ;
 catch
-    physSizeX = 1;
-    physSizeY = 1;
-    physSizeZ = 1;
+    physSizeX = omero.model.LengthI(1, omero.model.enums.UnitsLength.MICROMETER);
+    physSizeY = omero.model.LengthI(1, omero.model.enums.UnitsLength.MICROMETER);
+    physSizeZ = omero.model.LengthI(1, omero.model.enums.UnitsLength.MICROMETER);
 end
+
 oldPixelsDescription = session.getPixelsService.retrievePixDescription(oldPixelsId);
 oldPixelsType = oldPixels.getPixelsType.getValue.getValue;
 oldPixelsType = char(oldPixelsType);
@@ -67,9 +68,9 @@ newImage.setName(omero.rtypes.rstring(imageName));
 newImage.setDescription(omero.rtypes.rstring('Created using omeroJava'));
 newImage.setAcquisitionDate(timeStamp);
 
-newPixels.setPhysicalSizeX(omero.rtypes.rdouble(physSizeX));
-newPixels.setPhysicalSizeY(omero.rtypes.rdouble(physSizeY));
-newPixels.setPhysicalSizeZ(omero.rtypes.rdouble(physSizeZ));
+newPixels.setPhysicalSizeX(physSizeX);
+newPixels.setPhysicalSizeY(physSizeY);
+newPixels.setPhysicalSizeZ(physSizeZ);
 newPixels.setPixelsType(omeroPixelsType);
 newPixels.setSizeX(omero.rtypes.rint(sizeX));
 newPixels.setSizeY(omero.rtypes.rint(sizeY));
@@ -114,9 +115,11 @@ for thisChannel = 1:length(channelList)
     end
     channel.setStatsInfo(statsInfo);
     try
-        logicalChannel.setEmissionWave(omero.rtypes.rint(channelList{thisChannel}{1}));
+        lengthObj = omero.model.LengthI(channelList{thisChannel}{1}, omero.model.enums.UnitsLength.NANOMETER);
+        logicalChannel.setEmissionWave(lengthObj);
     catch
-        logicalChannel.setEmissionWave(omero.rtypes.rint(channelList{thisChannel}));
+        lengthObj = omero.model.LengthI(channelList{thisChannel}, omero.model.enums.UnitsLength.NANOMETER);
+        logicalChannel.setEmissionWave(lengthObj);
     end
     newPixels.addChannel(channel);
 end
