@@ -233,7 +233,7 @@ if saveMasks == 1
     %Now load the rendersettings for the new image and apply the settings.
     renderingEngine = session.createRenderingEngine;
     renderingEngine.lookupPixels(newPixelsId);
-    renderingEngine.resetDefaults;
+    renderingEngine.resetDefaultSettings(1);
     renderingEngine.lookupRenderingDef(newPixelsId);
     renderingEngine.load();
     for thisC = 1:numC
