@@ -170,7 +170,7 @@ if saveMasks == 1
                             end
                         end
                             if thisC > numC   %Make the channel to number these events on the image itself.
-                                if ~ismember(thisT, extraTBefore{thisROI}) && ~ismember(thisT, extraTAfter{thisROI}) %Don't put the event number on leading or trailing frames to the ROI.
+                                if ~ismember(thisT-1, extraTBefore{thisROI}) && ~ismember(thisT-1, extraTAfter{thisROI}) %Don't put the event number on leading or trailing frames to the ROI.
                                     ROIText = num2str(thisROI);
                                     lenLabel = length(ROIText);
                                     spacer = 0;
