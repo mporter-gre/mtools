@@ -21,11 +21,11 @@ function roiShapes = getROIsFromImageId(imageId)
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 global session
-global roiService
+%global roiService
 
-if ~isjava(roiService)
+%if ~isjava(roiService)
     roiService = session.getRoiService;
-end
+%end
 
 roiResult = roiService.findByImage(imageId, []);
 rois = roiResult.rois;

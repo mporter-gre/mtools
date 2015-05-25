@@ -27,14 +27,14 @@ imPlane = [];
 for thisZ = 1:numZ
     imPlane = [imPlane stackIn(:,:,thisZ)];
 end
-imPlane = medfilt2(imPlane);
-imPlane = imPlane.^2;
+%imPlane = medfilt2(imPlane);
+%imPlane = imPlane.^2;
 
-imPlaneFilt = medfilt2(imPlane);
+%imPlaneFilt = medfilt2(imPlane);
 
 %Make a LoG filter and convolve with the image, preserving dimensions
-logFilter = fspecial('log', [10 10], 0.5);
-imPlaneFiltConv = conv2(imPlaneFilt, logFilter, 'same');
+logFilter = fspecial('disk', 3);
+imPlaneFiltConv = conv2(imPlane, logFilter, 'same');
 
 %Put the stack back together for seg3D
 xStart = 1;
