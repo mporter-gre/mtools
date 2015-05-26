@@ -22,7 +22,7 @@ function varargout = boxIt(varargin)
 
 % Edit the above text to modify the response to help boxit
 
-% Last Modified by GUIDE v2.5 23-Aug-2013 15:53:50
+% Last Modified by GUIDE v2.5 25-May-2015 14:45:09
 
 
 % Begin initialization code - DO NOT EDIT
@@ -84,6 +84,7 @@ setappdata(handles.boxIt, 'recentreROI', 0);
 setappdata(handles.boxIt, 'numT', 1);
 setappdata(handles.boxIt, 'numZ', 1);
 setappdata(handles.boxIt, 'zHeight', 0);
+setappdata(handles.boxIt, 'thresh', 0);
 setappdata(handles.boxIt, 'modified', 0);
 setappdata(handles.boxIt, 'currDir', pwd);
 setappdata(handles.boxIt, 'zoomLevel', 1);
@@ -98,6 +99,7 @@ setappdata(handles.boxIt, 'labelsPath', []);
 setappdata(handles.boxIt, 'labelsName', []);
 setappdata(handles.boxIt, 'flattenZ', 0);
 setappdata(handles.boxIt, 'flattenT', 0);
+setappdata(handles.boxIt, 'segmented', 0);
 setappdata(handles.boxIt, 'cancelledOpenImage', 0);
 setappdata(handles.boxIt, 'savePath', sysUserHome);
 setappdata(handles.boxIt, 'sysUserHome', sysUserHome);
@@ -636,18 +638,57 @@ function autoDrawButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 setappdata(handles.boxIt, 'autodraw', 1);
+segmented = getappdata(handles.boxIt, 'segmented');
 imageSize = getappdata(handles.boxIt, 'imageSize');
 plane = getappdata(handles.boxIt, 'currentPlane');
+ROIs = getappdata(handles.boxIt, 'ROIs');
+thisT = get(handles.tSlider, 'Value');
+
 minObjectSize = str2double(get(handles.minObjectSizeText, 'String'));
 
-segPlane = seg3D(double(plane),0,0,minObjectSize);
-segProps = regionprops(segPlane, 'BoundingBox');
-numProps = length(segProps);
-
-for thisProp = 1:numProps
-    boundingBox = ceil(segProps(thisProp).BoundingBox);
-    setappdata(handles.boxIt, 'rect', boundingBox);
-    segmentPatch(handles);
+if segmented == 1
+    segProps = regionprops(bwlabeln(plane), 'BoundingBox');
+    numProps = length(segProps);
+    for thisProp = 1:numProps
+        numROIs = length(ROIs);
+        if length(segProps(thisProp).BoundingBox) > 4
+            rect(1) = ceil(segProps(thisProp).BoundingBox(1));
+            rect(2) = ceil(segProps(thisProp).BoundingBox(2));
+            rect(3) = ceil(segProps(thisProp).BoundingBox(4));
+            rect(4) = ceil(segProps(thisProp).BoundingBox(5));
+            zRange = ceil(segProps(thisProp).BoundingBox(3)):ceil(segProps(thisProp).BoundingBox(3))+ceil(segProps(thisProp).BoundingBox(6))-1;
+            ROIs{end+1}.zRange = zRange;
+            ROIs{end}.numShapes = length(zRange);
+        else
+            rect(1) = ceil(segProps(thisProp).BoundingBox(1));
+            rect(2) = ceil(segProps(thisProp).BoundingBox(2));
+            rect(3) = ceil(segProps(thisProp).BoundingBox(3));
+            rect(4) = ceil(segProps(thisProp).BoundingBox(4));
+            ROIs{end+1}.zRange = 1;
+            ROIs{end}.numShapes = 1;
+        end
+        
+        
+        ROIs{end}.rect = rect;
+        %ROIs{end}.zRange = zRange;
+        
+        ROIs{end}.t = thisT;
+        ROIs{end}.id = numROIs + 1;
+        ROIs{end}.ROIId = 0;
+        setappdata(handles.boxIt, 'ROIs', ROIs);
+        redrawROIs(handles);
+    end
+    
+else   
+    segPlane = seg3D(double(plane),0,0,minObjectSize);
+    segProps = regionprops(segPlane, 'BoundingBox');
+    numProps = length(segProps);
+    
+    for thisProp = 1:numProps
+        boundingBox = ceil(segProps(thisProp).BoundingBox);
+        setappdata(handles.boxIt, 'rect', boundingBox);
+        segmentPatch(handles);
+    end
 end
 setappdata(handles.boxIt, 'autodraw', 0);
 setappdata(handles.boxIt, 'modified', 1);
@@ -951,6 +992,8 @@ thisZ = round(get(handles.zSlider, 'Value'));
 thisT = round(get(handles.tSlider, 'Value'));
 numZ = getappdata(handles.boxIt, 'numZ');
 autodraw = getappdata(handles.boxIt, 'autodraw');
+toThresh = get(handles.threshCheck, 'Value');
+thresh = getappdata(handles.boxIt, 'thresh');
 minObjectSize = str2double(get(handles.minObjectSizeText, 'String'));
 numROIs = length(ROIs);
 zInHand = size(plane, 3);
@@ -1003,6 +1046,10 @@ for z = minZ:maxZ
     zCounter = zCounter + 1;
 end
 patchSize = size(patch);
+if toThresh == 1
+    thresh = str2double(thresh);
+    patch(patch<thresh) = thresh;
+end
 if autodraw == 1
     [maskStack minValue] = seg3D(patch, 0, 0, minObjectSize);
 else
@@ -1084,6 +1131,10 @@ thisZ = round(get(handles.zSlider, 'Value'));
 thisT = round(get(handles.tSlider, 'Value'));
 for thisROI = 1:numROIs
     rect = ROIs{thisROI}.rect;
+    if length(rect) > 4
+        rect(6) = [];
+        rect(3) = [];
+    end
     zRange = ROIs{thisROI}.zRange;
     t = ROIs{thisROI}.t;
     if ismember(thisZ, zRange) && t == thisT
@@ -1344,3 +1395,80 @@ setappdata(handles.boxIt, 'imageId', newImageId);
 %The next image in the datasetis loaded into the Box It window.
 loadNewImage(handles);
 
+
+
+% --- Executes on button press in threshCheck.
+function threshCheck_Callback(hObject, eventdata, handles)
+% hObject    handle to threshCheck (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of threshCheck
+
+if get(hObject, 'Value') == 1
+    set(handles.threshText, 'Enable', 'on');
+else
+    set(handles.threshText, 'Enable', 'off');
+end
+
+
+
+function threshText_Callback(hObject, eventdata, handles)
+% hObject    handle to threshText (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of threshText as text
+%        str2double(get(hObject,'String')) returns contents of threshText as a double
+
+thresh = get(hObject, 'String');
+if isnan(str2double(thresh)) || isempty(thresh);
+    oldThresh = getappdata(handles.boxIt, 'thresh');
+    set(hObject, 'String', thresh);
+else
+    setappdata(handles.boxIt, 'thresh', thresh);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function threshText_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to threshText (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in segBtn.
+function segBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to segBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+plane = double(getappdata(handles.boxIt, 'currentPlane'));
+numZ = getappdata(handles.boxIt, 'numZ');
+toThresh = get(handles.threshCheck, 'Value');
+thresh = getappdata(handles.boxIt, 'thresh');
+minObjectSize = str2double(get(handles.minObjectSizeText, 'String'));
+zInHand = size(plane, 3);
+
+if zInHand < numZ
+    getImagePlane(handles);
+    plane = double(getappdata(handles.boxIt, 'currentPlane'));
+end
+
+if toThresh == 1
+    thresh = str2double(thresh);
+    plane(plane<thresh) = thresh;
+end
+    
+plane = seg3D(plane,0,0,minObjectSize);
+
+setappdata(handles.boxIt, 'currentPlane', plane);
+setappdata(handles.boxIt, 'segmented', 1);
+
+redrawImage(handles);
