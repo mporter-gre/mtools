@@ -80,7 +80,7 @@ function varargout = ImageAnalysisLogin_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-gatewayDisconnect;
+
 varargout{1} = handles.output;
 
 
@@ -232,8 +232,7 @@ if success == 0
     return;
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-eventTimerLaunchpad(handles, credentials)
+eventTimer;
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
@@ -257,8 +256,7 @@ if success == 0
     return;
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
-credentials = getappdata(handles.ImageAnalysisLoginWindow, 'credentials');
-FRAPLaunchpad(handles, credentials);
+FRAPChooser;
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
 
 
@@ -342,8 +340,6 @@ function success = logIn(handles)
 
 global client;
 global session;
-global gateway;
-global clientAlive;
 
 credentials{1} = get(handles.usernameText, 'String');
 credentials{2} = getappdata(handles.ImageAnalysisLoginWindow, 'passData');
@@ -365,11 +361,16 @@ try
         success = true;
         selectUserDefaultGroup(credentials{1}, handles, 'ImageAnalysisLoginWindow');
     else
-        experimenter = char(session.getAdminService.getExperimenter(0).getOmeName.getValue.getBytes)';
+        try
+            experimenter = char(session.getAdminService.getExperimenter(0).getOmeName.getValue.getBytes)';
+        catch
+            session = client.createSession;
+            experimenter = char(session.getAdminService.getExperimenter(0).getOmeName.getValue.getBytes)';
+        end
         if strcmp(experimenter, credentials{1})
             success = true;
         else
-            userLogoutOmero;
+            gatewayDisconnect;
             success = logIn(handles);
         end
     end
@@ -523,4 +524,5 @@ if success == 0
 end
 set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 spotMeasure(handles);
+gatewayDisconnect;
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');

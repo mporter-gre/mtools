@@ -688,6 +688,7 @@ if modified == 1
     end
 end
 
+gatewayDisconnect;
 delete(hObject);
 
 

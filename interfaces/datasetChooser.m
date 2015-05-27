@@ -385,7 +385,7 @@ else
         groupUserNamesIds{end,2} = num2str(thisUser.getId.getValue);
     end
     groupUserNamesIds = sortrows(groupUserNamesIds);
-    numUsers = length(groupUserNamesIds);
+    [numUsers, ~] = size(groupUserNamesIds);
     groupUserNames = {};
     groupUserIds = [];
     for thisUser = 1:numUsers

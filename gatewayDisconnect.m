@@ -22,24 +22,29 @@ function gatewayDisconnect
 
 global client;
 global session;
-global gateway;
-global clientAlive;
 
-try
-    clientAlive.stop;
-catch
-    %If the client is no longer alive then there's nothing to close.
-    return;
+
+if isjava(client)
+    client.closeSession;
 end
-try
-    gateway.close;
-    session.close;
-catch
-    disp('Gateway not closed this time');
-end
-clear global clientAlive;
-clear global gateway;
+% % global gateway;
+% % global clientAlive;
+% 
+% % try
+% %     clientAlive.stop;
+% % catch
+% %     %If the client is no longer alive then there's nothing to close.
+% %     return;
+% % end
+% % try
+% %     gateway.close;
+% %     session.close;
+% % catch
+% %     disp('Gateway not closed this time');
+% % end
+% % clear global clientAlive;
+% % clear global gateway;
 clear global session;
 clear global client;
-
-end
+% 
+% end

@@ -22,7 +22,6 @@ function roiShapes = eventTimerAndCrop(theImage, imageId, origImageName, roiShap
 %Process the ROI file for cropping the images and passing the ROI's back to
 %selectROIFiles.m
 
-global gateway;
 global session;
 global progBar;
 

@@ -124,6 +124,7 @@ close(handles.bugCounterMain);
 
 function closeReqFCN(hObject, eventdata, handles)
 
+gatewayDisconnect;
 uiresume;
 delete(gcf);
 

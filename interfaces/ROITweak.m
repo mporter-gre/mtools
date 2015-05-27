@@ -199,6 +199,7 @@ alertStr{2}(end) = num2str(5);
 set(handles.alertText, 'String', alertStr);
 set(handles.alertText, 'Visible', 'off');
 setappdata(handles.ROITweak, 'trapPointer', 0);
+uiwait;
     
     
 
@@ -1038,8 +1039,8 @@ function saveItem_Callback(hObject, eventdata, handles)
 
 global session
 global iUpdate
-global roiService
 
+roiService = session.getRoiService;
 ROIsToUpdate = getappdata(handles.ROITweak, 'ROIsToUpdate');
 if isempty(ROIsToUpdate)
     return;

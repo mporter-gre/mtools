@@ -19,6 +19,10 @@ function FRAPLaunchpad(handles, credentials)
 
 [images imageIds imageNames roiShapes datasetNames pixels] = FRAPChooser;
 
+if isempty(images)
+    return;
+end
+
 numImages = length(imageIds);
 progBar = waitbar(0, 'Analysing...');
 for thisImage = 1:numImages
@@ -28,6 +32,7 @@ end
 close(progBar);
 
 writeDataOut(roiShapes, indices, datasetNames);
+gatewayDisconnect
 
 
 function writeDataOut(roiShapes, indices, datasetNames)

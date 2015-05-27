@@ -1,6 +1,9 @@
 function eventTimerLaunchpad(handles, credentials)
 global progBar;
 [images imageIds imageNames roiShapes datasetNames pixels channelLabels saveMasks frames] = eventTimer;
+if isempty(images)
+    return;
+end
 
 numImages = length(imageIds);
 for thisImage = 1:numImages
