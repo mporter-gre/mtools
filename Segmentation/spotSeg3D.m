@@ -68,3 +68,5 @@ for thisZ = 1:numZ
     xEnd = xEnd + sizeX;
 end
 
+segStack = bwlabeln(segStack);
+

@@ -792,15 +792,15 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
         set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
     elseif useSpots == 1
         segPatches{selectedROI}{selectedChannel+1} = spotSeg3D(patches);
-        segPatches = filterSpotSize(segPatches, minSize);
+        segPatches{selectedROI}{selectedChannel+1} = filterSpotSize(segPatches{selectedROI}{selectedChannel+1}, minSize);
         if groupObjects == 1
-            segPatches = bwlabeln(segPatches);
+            segPatches{selectedROI}{selectedChannel+1} = bwlabeln(segPatches{selectedROI}{selectedChannel+1});
         end
         if featherSize > 0
             se = strel('diamond', featherSize);
-            segPatches = imdilate(segPatches, se);
+            segPatches{selectedROI}{selectedChannel+1} = imdilate(segPatches{selectedROI}{selectedChannel+1}, se);
         end
-        lowestValue = min(reshape(patches(segPatches>0), [], 1));
+        lowestValue(selectedROI,selectedChannel+1) = min(reshape(patches(segPatches{selectedROI}{selectedChannel+1}>0), [], 1));
     elseif useAbsolute == 1
         threshold = str2double(get(handles.thresholdText, 'String'));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});
