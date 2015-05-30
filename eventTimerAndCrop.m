@@ -105,6 +105,7 @@ for thisROI = 1:numROI
 end
 
 %If the user has chosen so, save the mask to the server.
+
 if saveMasks == 1
     store = session.createRawPixelsStore();
     currPlane = 0;
@@ -112,13 +113,13 @@ if saveMasks == 1
     for thisROI = 1:numROI
         for thisT = 1:numT(thisROI)
             for thisZ = 1:numZ(thisROI)
-                X = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getX.getValue + 1; 
-                Y = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getY.getValue + 1; 
+                X = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getX.getValue + 1;
+                Y = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getY.getValue + 1;
                 width = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getWidth.getValue;
                 height = roiShapes{thisROI}.(['shape' num2str(thisT*thisZ)]).getHeight.getValue;
                 ROIMaxX = X+width;
                 ROIMaxY = Y+height;
-
+                
                 if X < 1
                     X = 1;
                 end
@@ -136,8 +137,8 @@ if saveMasks == 1
             end
         end
     end
-
-
+    
+    
     %Create the new Image on the server so we can upload planes to it.
     %channelLabels = getChannelLabelsFromPixels(pixels);
     channelLabels{end+1} = 1000;
@@ -146,7 +147,7 @@ if saveMasks == 1
     newPixels = newImage.getPrimaryPixels;
     newPixelsId = newPixels.getId.getValue;
     store.setPixelsId(newPixelsId, false);
-
+    
     %Make the full image from the ROI patches and send it to the server each
     %completed T at a time.
     pixelsType = char(pixels.getPixelsType().getValue().getValue());
@@ -162,41 +163,41 @@ if saveMasks == 1
                         ROIZ = find(actualZ{thisROI}== thisZ-1);
                         ROIT = find(setdiff(actualT{thisROI}, extraT{thisROI})== thisT);
                         if isempty(ROIT)
-                                ROIT = 1;
+                            ROIT = 1;
                             if ismember(thisT, extraTAfter{thisROI})
                                 Tdiff = setdiff(actualT{thisROI}, extraT{thisROI});
                                 ROIT = length(Tdiff);
                             end
                         end
-                            if thisC > numC   %Make the channel to number these events on the image itself.
-                                if ~ismember(thisT-1, extraTBefore{thisROI}) && ~ismember(thisT-1, extraTAfter{thisROI}) %Don't put the event number on leading or trailing frames to the ROI.
-                                    ROIText = num2str(thisROI);
-                                    lenLabel = length(ROIText);
-                                    spacer = 0;
-                                    labelX = roiShapes{thisROI}.(['shape' num2str(ROIT*ROIZ)]).getX.getValue + 1;
-                                    if labelX <= 0
-                                        labelX = 1;
-                                    end
-                                    if labelX > (maxX - 14)
-                                        labelX = maxX - (lenLabel * 14);
-                                    end
-                                    labelY = roiShapes{thisROI}.(['shape' num2str(ROIT*ROIZ)]).getY.getValue + 1;
-                                    if labelY <= 0
-                                        labelY = 1;
-                                    end
-                                    if labelY > (maxY - 13)
-                                        labelY = maxY - 13;
-                                    end
-                                    for thisLabel = 1:lenLabel
-                                        labelPlane = numberOverlay(labelPlane, labelX+spacer, labelY, str2double(ROIText(thisLabel)));
-                                        spacer = spacer + 7;
-                                    end
-                                    newPlane = labelPlane;
+                        if thisC > numC   %Make the channel to number these events on the image itself.
+                            if ~ismember(thisT-1, extraTBefore{thisROI}) && ~ismember(thisT-1, extraTAfter{thisROI}) %Don't put the event number on leading or trailing frames to the ROI.
+                                ROIText = num2str(thisROI);
+                                lenLabel = length(ROIText);
+                                spacer = 0;
+                                labelX = roiShapes{thisROI}.(['shape' num2str(ROIT*ROIZ)]).getX.getValue + 1;
+                                if labelX <= 0
+                                    labelX = 1;
                                 end
-                            else  %Copy the intensity patch from the original image to the new plane;
-                                thisPlane = getPlane(session, imageId, thisZ-1, thisC-1, thisT-1);
-                                newPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X) = thisPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X);
+                                if labelX > (maxX - 14)
+                                    labelX = maxX - (lenLabel * 14);
+                                end
+                                labelY = roiShapes{thisROI}.(['shape' num2str(ROIT*ROIZ)]).getY.getValue + 1;
+                                if labelY <= 0
+                                    labelY = 1;
+                                end
+                                if labelY > (maxY - 13)
+                                    labelY = maxY - 13;
+                                end
+                                for thisLabel = 1:lenLabel
+                                    labelPlane = numberOverlay(labelPlane, labelX+spacer, labelY, str2double(ROIText(thisLabel)));
+                                    spacer = spacer + 7;
+                                end
+                                newPlane = labelPlane;
                             end
+                        else  %Copy the intensity patch from the original image to the new plane;
+                            thisPlane = getPlane(session, imageId, thisZ-1, thisC-1, thisT-1);
+                            newPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X) = thisPlane(indices{thisROI}{ROIT}{ROIZ}.Y,indices{thisROI}{ROIT}{ROIZ}.X);
+                        end
                         
                     end
                 end
@@ -216,7 +217,7 @@ if saveMasks == 1
     store.save();
     store.close();
     %Now make the channel to number these events on the image itself
-
+    
     %Set the new image's start and end display values the same as the original.
     %Start by getting the start and end values for each channel
     renderingEngine = session.createRenderingEngine;
@@ -228,7 +229,7 @@ if saveMasks == 1
         channelEnd(thisC) = renderingEngine.getChannelWindowEnd(thisC-1);
     end
     renderingEngine.close();
-
+    
     %Now load the rendersettings for the new image and apply the settings.
     renderingEngine = session.createRenderingEngine;
     renderingEngine.lookupPixels(newPixelsId);
@@ -259,5 +260,7 @@ if saveMasks == 1
     newLink.setParent(omero.model.DatasetI(datasetId, false));
     newLink.setChild(omero.model.ImageI(newImageId, false));
     session.getUpdateService().saveObject(newLink);
-
+    
 end
+
+

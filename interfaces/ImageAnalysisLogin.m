@@ -63,7 +63,8 @@ handles.conditionsFiles = '';
 handles.currDir = cd;
 set(handles.passwordText, 'KeyPressFcn', {@passKeyPress, handles});
 uicontrol(handles.usernameText);
-checkLoginHistory(handles)
+checkLoginHistory(handles);
+startDiary(handles);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -81,7 +82,8 @@ function varargout = ImageAnalysisLogin_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 
-varargout{1} = handles.output;
+
+%varargout{1} = handles.output;
 
 
 
@@ -390,6 +392,7 @@ end
 function closeReqFcn(hObject, eventdata, handles)
 
 gatewayDisconnect;
+diary off
 delete(handles.ImageAnalysisLoginWindow);
 
 
@@ -526,3 +529,21 @@ set(handles.ImageAnalysisLoginWindow, 'visible', 'off');
 spotMeasure(handles);
 gatewayDisconnect;
 set(handles.ImageAnalysisLoginWindow, 'visible', 'on');
+
+
+
+function startDiary(handles)
+
+if ispc
+    sysUserHome = getenv('userprofile');
+    logFile = [sysUserHome '\omero\mtoolsLog.log'];
+else
+    sysUserHome = getenv('HOME');
+    logFile = [sysUserHome '/omero/mtoolsLog.log'];
+end
+
+if exist(logFile, 'file') == 2
+    delete(logFile);
+end
+
+diary(logFile);
