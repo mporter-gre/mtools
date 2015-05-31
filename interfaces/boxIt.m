@@ -635,8 +635,9 @@ function autoDrawButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+progress = waitbar(0, 'Working...');
+
 setappdata(handles.boxIt, 'autodraw', 1);
-imageSize = getappdata(handles.boxIt, 'imageSize');
 plane = getappdata(handles.boxIt, 'currentPlane');
 minObjectSize = str2double(get(handles.minObjectSizeText, 'String'));
 
@@ -645,10 +646,24 @@ segProps = regionprops(segPlane, 'BoundingBox');
 numProps = length(segProps);
 
 for thisProp = 1:numProps
-    boundingBox = ceil(segProps(thisProp).BoundingBox);
-    setappdata(handles.boxIt, 'rect', boundingBox);
+    waitbar(thisProp/numProps, progress, 'Working...');
+    if length(segProps(thisProp).BoundingBox) > 4
+        rect(1) = ceil(segProps(thisProp).BoundingBox(1));
+        rect(2) = ceil(segProps(thisProp).BoundingBox(2));
+        rect(3) = ceil(segProps(thisProp).BoundingBox(4));
+        rect(4) = ceil(segProps(thisProp).BoundingBox(5));
+    else
+        rect(1) = ceil(segProps(thisProp).BoundingBox(1));
+        rect(2) = ceil(segProps(thisProp).BoundingBox(2));
+        rect(3) = ceil(segProps(thisProp).BoundingBox(3));
+        rect(4) = ceil(segProps(thisProp).BoundingBox(4));
+    end
+    
+    setappdata(handles.boxIt, 'rect', rect);
     segmentPatch(handles);
 end
+close(progress);
+redrawROIs(handles);
 setappdata(handles.boxIt, 'autodraw', 0);
 setappdata(handles.boxIt, 'modified', 1);
     
