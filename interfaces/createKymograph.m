@@ -52,7 +52,6 @@ function createKymograph_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to createkymograph (see VARARGIN)
 
-global gateway;
 global session;
 renderSettingsService = session.getRenderingSettingsService;
 %Set up the play and pause buttons
@@ -236,15 +235,19 @@ refreshDisplay(handles)
 setappdata(handles.CreateKymograph, 'stopRecording', 0);
 rectPos = getappdata(handles.CreateKymograph, 'rectPos');
 anchorPos = getappdata(handles.CreateKymograph, 'anchorPos');
+fullImageSize = size(getappdata(handles.CreateKymograph, 'renderedImage'));
+maxX = fullImageSize(2);
+maxY = fullImageSize(1);
 
 if strcmp(recordMode, 'clickMode')
     alertStr = [{'Click to move to'} {'next timepoint'} {'"Esc" to abort'}];
     set(handles.alertText, 'String', alertStr);
     set(handles.alertText, 'Enable', 'on');
 else
+    alertStr = [{'Position cursor.'} {'Playback in 5'} {'"Esc" to abort'}];
     for i = 5:-1:0
         pause(1);
-        alertStr = get(handles.alertText, 'String');
+        %alertStr = get(handles.alertText, 'String');
         alertStr{2}(end) = num2str(i);
         set(handles.alertText, 'String', alertStr);
     end
@@ -252,6 +255,8 @@ end
 %Make sure the window is activated
 %mouseClick;
 for thisT = includeROI
+    oldRectPos = rectPos{thisT};
+    oldAnchorPos = anchorPos{thisT};
     stopRecording = getappdata(handles.CreateKymograph, 'stopRecording');
     if stopRecording == 1
         set(handles.alertText, 'Visible', 'off');
@@ -284,7 +289,35 @@ for thisT = includeROI
         anchorPos{thisT}(1) = anchorPos{thisT}(1) + zoomMinMax(1);
         anchorPos{thisT}(2) = anchorPos{thisT}(2) + zoomMinMax(2);
     end
+    
+    %Make sure the rect is inside the image bounds
+    rectEndX = rectPos{thisT}(1) + rectPos{thisT}(3);
+    rectEndY = rectPos{thisT}(2) + rectPos{thisT}(4);
+    rectOffImage = 0;
+    if rectPos{thisT}(1) < 1
+        rectPos{thisT}(1) = 1;
+        rectOffImage = 1;
+    end
+    if rectPos{thisT}(2) < 1
+        rectPos{thisT}(2) = 1;
+        rectOffImage = 1;
+    end
+    if rectEndX > maxX
+        rectPos{thisT}(1) = maxX - rectPos{thisT}(3);
+        rectOffImage = 1;
+    end
+    if rectEndY > maxY
+        rectPos{thisT}(2) = maxY - rectPos{thisT}(4);
+        rectOffImage = 1;
+    end
+    if rectOffImage == 1
+        offset = [rectPos{thisT}(1)-oldRectPos(1) rectPos{thisT}(2)-oldRectPos(2)];
+        anchorPos{thisT} = [oldAnchorPos(1) + offset(1) oldAnchorPos(2) + offset(2)];
+    end
+    
+    
     setappdata(handles.CreateKymograph, 'rectPos', rectPos);
+    refreshDisplay(handles);
     redrawRect(handles);
     setappdata(handles.CreateKymograph, 'anchorPos', anchorPos);
     drawnow;
@@ -677,6 +710,10 @@ rectPos = getappdata(handles.CreateKymograph, 'rectPos');
 thisT = round(get(handles.tSlider, 'Value'));
 oldAnchorPos = anchorPos{thisT};
 zoomLevel = getappdata(handles.CreateKymograph, 'zoomLevel');
+fullImageSize = size(getappdata(handles.CreateKymograph, 'renderedImage'));
+maxX = fullImageSize(2);
+maxY = fullImageSize(1);
+
 if zoomLevel > 1
     zoomMinMax = getappdata(handles.CreateKymograph, 'zoomMinMax');
     pos(1) = pos(1) + zoomMinMax(1);
@@ -684,12 +721,42 @@ if zoomLevel > 1
 end
 anchorPos{thisT}(1) = pos(1);
 anchorPos{thisT}(2) = pos(2);
+oldAnchorOffset = [rectPos{thisT}(1) - oldAnchorPos(1) rectPos{thisT}(2) - oldAnchorPos(2)];
 offset = [pos(1)-oldAnchorPos(1) pos(2)-oldAnchorPos(2)];
+oldRectPos = rectPos{thisT};
 rectPos{thisT} = [rectPos{thisT}(1)+offset(1) rectPos{thisT}(2)+offset(2) rectPos{thisT}(3) rectPos{thisT}(4)];
+
+%Make sure the rect is inside the image bounds
+rectEndX = rectPos{thisT}(1) + rectPos{thisT}(3);
+rectEndY = rectPos{thisT}(2) + rectPos{thisT}(4);
+rectOffImage = 0;
+if rectPos{thisT}(1) < 1
+    rectPos{thisT}(1) = 1;
+    rectOffImage = 1;
+end
+if rectPos{thisT}(2) < 1
+    rectPos{thisT}(2) = 1;
+    rectOffImage = 1;
+end
+if rectEndX > maxX
+    rectPos{thisT}(1) = maxX - rectPos{thisT}(3);
+    rectOffImage = 1;
+end
+if rectEndY > maxY
+    rectPos{thisT}(2) = maxY - rectPos{thisT}(4);
+    rectOffImage = 1;
+end
+if rectOffImage == 1
+    offset = [rectPos{thisT}(1)-oldRectPos(1) rectPos{thisT}(2)-oldRectPos(2)];
+    anchorPos{thisT} = [oldAnchorPos(1) + offset(1) oldAnchorPos(2) + offset(2)];
+end
+
 alignUpdateOnAnchorMove(offset, handles);
 
 setappdata(handles.CreateKymograph, 'anchorPos', anchorPos);
 setappdata(handles.CreateKymograph, 'rectPos', rectPos);
+
+%refreshDisplay(handles);
 
 
 
@@ -976,8 +1043,9 @@ movingAnchor = getappdata(handles.CreateKymograph, 'movingAnchor');
 movingAlign = getappdata(handles.CreateKymograph, 'movingAlign');
 if movingAnchor == 1 || movingAlign == 1
 rotateImage(handles);
-redrawRect(handles);
-redrawAlign(handles);
+refreshDisplay(handles);
+% redrawRect(handles);
+% redrawAlign(handles);
 setappdata(handles.CreateKymograph, 'movingAnchor', 0);
 setappdata(handles.CreateKymograph, 'movingAlign', 0);
 end
@@ -1150,9 +1218,10 @@ if strcmp(recordMode, 'clickMode')
     set(handles.alertText, 'String', alertStr);
     set(handles.alertText, 'Enable', 'on');
 else
+    alertStr = [{'Position cursor.'} {'Playback in 5'} {'"Esc" to abort'}];
     for i = 5:-1:0
         pause(1);
-        alertStr = get(handles.alertText, 'String');
+        %alertStr = get(handles.alertText, 'String');
         alertStr{2}(end) = num2str(i);
         set(handles.alertText, 'String', alertStr);
     end
