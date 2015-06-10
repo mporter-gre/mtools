@@ -145,11 +145,28 @@ fullImageSize = size(getappdata(handles.CreateKymograph, 'renderedImage'));
 maxX = fullImageSize(2);
 maxY = fullImageSize(1);
 rectPos{thisT} = round(getrect(handles.imageAxes));
+
 zoomLevel = getappdata(handles.CreateKymograph, 'zoomLevel');
 if zoomLevel > 1
     zoomMinMax = getappdata(handles.CreateKymograph, 'zoomMinMax');
     rectPos{thisT}(1) = rectPos{thisT}(1) + zoomMinMax(1);
     rectPos{thisT}(2) = rectPos{thisT}(2) + zoomMinMax(2);
+end
+
+%Make sure the rect is inside the image bounds
+rectEndX = rectPos{thisT}(1) + rectPos{thisT}(3);
+rectEndY = rectPos{thisT}(2) + rectPos{thisT}(4);
+if rectPos{thisT}(1) < 1
+    rectPos{thisT}(1) = 1;
+end
+if rectPos{thisT}(2) < 1
+    rectPos{thisT}(2) = 1;
+end
+if rectEndX > maxX
+    rectPos{thisT}(3) = maxX - rectPos{thisT}(1);
+end
+if rectEndY > maxY
+    rectPos{thisT}(4) = maxY - rectPos{thisT}(2);
 end
 
 if rectPos{thisT}(1) > 0 && rectPos{thisT}(1) <= maxX && rectPos{thisT}(2) > 0 && rectPos{thisT}(2) <= maxY
