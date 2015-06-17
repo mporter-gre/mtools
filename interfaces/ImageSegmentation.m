@@ -184,6 +184,8 @@ segPatches = [];
 selectedImageIdx = get(hObject, 'Value');
 channelLabels = getappdata(handles.ImageSegmentation, 'channelLabels');
 handles.numChannels = length(channelLabels{selectedImageIdx});
+handles.selectedROI = 1;
+guidata(hObject, handles);
 roiShapes = getappdata(handles.ImageSegmentation, 'roiShapes');
 numROI = length(roiShapes{selectedImageIdx});
 for thisROI = 1:numROI
@@ -800,7 +802,11 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
             se = strel('diamond', featherSize);
             segPatches{selectedROI}{selectedChannel+1} = imdilate(segPatches{selectedROI}{selectedChannel+1}, se);
         end
-        lowestValue(selectedROI,selectedChannel+1) = min(reshape(patches(segPatches{selectedROI}{selectedChannel+1}>0), [], 1));
+        try
+            lowestValue(selectedROI,selectedChannel+1) = min(reshape(patches(segPatches{selectedROI}{selectedChannel+1}>0), [], 1));
+        catch
+            lowestValue(selectedROI,selectedChannel+1) = 0;
+        end
     elseif useAbsolute == 1
         threshold = str2double(get(handles.thresholdText, 'String'));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});
