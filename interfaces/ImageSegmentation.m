@@ -813,13 +813,16 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
         sigmaMultiplier = getSigmaMultiplier(handles, patches);
         set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
     elseif useSigma == 1
-        if handles.sigmaChanged == 1
-            sigmaMultiplier = getSigmaMultiplier(handles, patches);
-        else
-            sigmaMultiplier = str2double(get(handles.sigmaLabel, 'String'));
-        end
-        threshold = getSigmaThreshold(patches, sigmaMultiplier);
-        set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
+%         if handles.sigmaChanged == 1
+%             sigmaMultiplier = getSigmaMultiplier(handles, patches);
+%         else
+%             sigmaMultiplier = str2double(get(handles.sigmaLabel, 'String'));
+%         end
+        %threshold = getSigmaThreshold(patches, sigmaMultiplier);
+        patchesLinear = reshape(patches, [], 1);
+        [patchMean, patchStd] = normfit(patchesLinear);
+        threshold = patchMean + 2* patchStd;
+        %set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});
     end
     setappdata(handles.ImageSegmentation, 'segPatches', segPatches);

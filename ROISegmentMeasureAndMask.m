@@ -88,8 +88,11 @@ for thisROI = 1:numROI
         elseif strcmpi(selectedSegType, 'Absolute')
             [patchMasks lowestValue] = seg3DThresh(patches{segChannel}, featherSize, groupObjects, threshold, minSize, patchMax);
         elseif strcmpi(selectedSegType, 'Sigma')
-            sigmaMultiplier = threshold;
-            threshold = getSigmaThreshold(patches{segChannel}, sigmaMultiplier);
+            patchesLinear = reshape(patches{segChannel}, [], 1);
+            [patchMean, patchStd] = normfit(patchesLinear);
+            threshold = patchMean + 2* patchStd;
+            %sigmaMultiplier = threshold;
+            %threshold = getSigmaThreshold(patches{segChannel}, sigmaMultiplier);
             [patchMasks lowestValue] = seg3DThresh(patches{segChannel}, featherSize, groupObjects, threshold, minSize, patchMax);
         end
         
