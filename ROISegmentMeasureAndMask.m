@@ -29,6 +29,7 @@ maxY = pixels.getSizeY.getValue;
 fullZ = pixels.getSizeZ.getValue;
 fullT = pixels.getSizeT.getValue;
 imageId = pixels.getImage.getId.getValue;
+sigmaMultiplier = threshold;
 for thisFullT = 1:fullT
     fullMaskImg{thisFullT} = uint8(zeros(maxY,maxX,fullZ));
 end
@@ -90,7 +91,7 @@ for thisROI = 1:numROI
         elseif strcmpi(selectedSegType, 'Sigma')
             patchesLinear = reshape(patches{segChannel}, [], 1);
             [patchMean, patchStd] = normfit(patchesLinear);
-            threshold = patchMean + 2* patchStd;
+            threshold = patchMean + sigmaMultiplier * patchStd;
             %sigmaMultiplier = threshold;
             %threshold = getSigmaThreshold(patches{segChannel}, sigmaMultiplier);
             [patchMasks lowestValue] = seg3DThresh(patches{segChannel}, featherSize, groupObjects, threshold, minSize, patchMax);

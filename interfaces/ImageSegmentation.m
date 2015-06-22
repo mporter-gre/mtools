@@ -22,7 +22,7 @@ function varargout = ImageSegmentation(varargin)
 
 % Edit the above text to modify the response to help ImageSegmentation
 
-% Last Modified by GUIDE v2.5 17-Jun-2013 12:01:58
+% Last Modified by GUIDE v2.5 22-Jun-2015 14:32:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,6 +65,7 @@ handles.selectDatasetsImage = importdata('selectDatasets.jpg');
 setappdata(handles.ImageSegmentation, 'patchMax', patchMax);
 setappdata(handles.ImageSegmentation, 'lowestValue', lowestValue);
 setappdata(handles.ImageSegmentation, 'segmentationType', 'Otsu');
+setappdata(handles.ImageSegmentation, 'sigmaMultiplier', 2);
 
 handles.parentHandles = varargin{1};
 handles.credentials = varargin{2};
@@ -150,7 +151,9 @@ if strcmpi(varargout{9}, 'Otsu')
 elseif strcmpi(varargout{9}, 'Absolute')
     varargout{10} = str2double(get(handles.thresholdText, 'String'));
 elseif strcmpi(varargout{9}, 'Sigma')
-    varargout{10} = str2double(get(handles.sigmaLabel, 'String'));
+    %If the segmentation type is 'Sigma' then pass the sigmaMultiplier as a
+    %fake 'Threshold'. This is then handled in ROISegmentMeasureAndMask.m
+    varargout{10} = getappdata(handles.ImageSegmentation, 'sigmaMultiplier');
 end
 varargout{11} = getappdata(handles.ImageSegmentation, 'imageIds');
 varargout{12} = getappdata(handles.ImageSegmentation, 'imageNames');
@@ -408,8 +411,6 @@ if useOtsu == 1
     set(handles.absoluteThresholdRadio, 'Value', 1);
 end
 patches = getappdata(handles.ImageSegmentation, 'patches');
-sigmaMultiplier = getSigmaMultiplier(handles, patches);
-set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
 
 handles.sigmaChanged = 1;
 guidata(hObject, handles);
@@ -484,8 +485,6 @@ if useOtsu == 1
     set(handles.absoluteThresholdRadio, 'Value', 1);
 end
 patches = getappdata(handles.ImageSegmentation, 'patches');
-sigmaMultiplier = getSigmaMultiplier(handles, patches);
-set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
 handles.sigmaChanged = 1;
 guidata(hObject, handles);
 
@@ -790,8 +789,6 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
     %instead.
     if useOtsu == 1
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3D(patches, featherSize, 0, minSize);
-        sigmaMultiplier = getSigmaMultiplier(handles, patches);
-        set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
     elseif useSpots == 1
         segPatches{selectedROI}{selectedChannel+1} = spotSeg3D(patches);
         segPatches{selectedROI}{selectedChannel+1} = filterSpotSize(segPatches{selectedROI}{selectedChannel+1}, minSize);
@@ -810,8 +807,6 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
     elseif useAbsolute == 1
         threshold = str2double(get(handles.thresholdText, 'String'));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});
-        sigmaMultiplier = getSigmaMultiplier(handles, patches);
-        set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
     elseif useSigma == 1
 %         if handles.sigmaChanged == 1
 %             sigmaMultiplier = getSigmaMultiplier(handles, patches);
@@ -821,7 +816,8 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
         %threshold = getSigmaThreshold(patches, sigmaMultiplier);
         patchesLinear = reshape(patches, [], 1);
         [patchMean, patchStd] = normfit(patchesLinear);
-        threshold = patchMean + 2* patchStd;
+        sigmaMultiplier = getappdata(handles.ImageSegmentation, 'sigmaMultiplier');
+        threshold = patchMean + sigmaMultiplier * patchStd;
         %set(handles.sigmaLabel, 'String', num2str(sigmaMultiplier));
         [segPatches{selectedROI}{selectedChannel+1} lowestValue(selectedROI,selectedChannel+1)] = seg3DThresh(patches, featherSize, 0, threshold, minSize, patchMax{selectedROI}{selectedChannel+1});
     end
@@ -1197,6 +1193,37 @@ end
 % --- Executes during object creation, after setting all properties.
 function gapText_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to gapText (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function stDevText_Callback(hObject, eventdata, handles)
+% hObject    handle to stDevText (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of stDevText as text
+%        str2double(get(hObject,'String')) returns contents of stDevText as a double
+
+oldVal = getappdata(handles.ImageSegmentation, 'sigmaMultiplier');
+val = str2double(get(handles.stDevText, 'String'));
+if isnan(val)
+    set(handles.stDevText, 'String', oldVal);
+else
+    setappdata(handles.ImageSegmentation, 'sigmaMultiplier', val);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function stDevText_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to stDevText (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
