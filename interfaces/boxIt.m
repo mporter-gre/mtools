@@ -1175,7 +1175,7 @@ for thisROI = 1:numROIs
     ROIObj.setImage(theImage);
     numShapes = ROIs{thisROI}.numShapes;
     for thisShape = 1:numShapes
-        shapeObj = createRectObj(ROIs{thisROI}.rect(1), ROIs{thisROI}.rect(2), ROIs{thisROI}.zRange(thisShape)-1, 0, ROIs{thisROI}.rect(3), ROIs{thisROI}.rect(4));
+        shapeObj = createRectObj(ROIs{thisROI}.rect(1), ROIs{thisROI}.rect(2), ROIs{thisROI}.zRange(thisShape)-1, ROIs{thisROI}.t-1, ROIs{thisROI}.rect(3), ROIs{thisROI}.rect(4));
         ROIObj.addShapeData(shapeObj);
     end
     savedROI = iUpdate.saveAndReturnObject(ROIObj.asIObject);
