@@ -779,7 +779,7 @@ if isempty(segPatches{selectedROI}{selectedChannel+1})
     end
 
     patchMax = getappdata(handles.ImageSegmentation, 'patchMax');
-    if ROIZ > 1
+    if numROIZ > 1
         patchMax{selectedROI}{selectedChannel+1} = max(max(max(patches)));
     else
         patchMax{selectedROI}{selectedChannel+1} = max(max(patches));
