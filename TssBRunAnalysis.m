@@ -98,7 +98,7 @@ maxZ = floor(max(zEnds));
 
 %TssBSeg = fpBacteriaSeg3D(TssBStack);
 for thisZ = minZ:maxZ
-    TssBSeg(:,:,thisZ) = logical(LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 1000));
+    TssBSeg(:,:,thisZ) = logical(LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 100, 100000));
     %TssBSeg(:,:,thisZ) = logical(TssBSeg(:,:,thisZ) + LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 1000));
 end
 TssBSegBWL = bwlabeln(TssBSeg);
@@ -288,7 +288,7 @@ store.close();
 %Now set the render settings for each channel
 renderingEngine = session.createRenderingEngine;
 renderingEngine.lookupPixels(newPixelsId);
-renderingEngine.resetDefaults;
+renderingEngine.resetDefaultSettings(1);
 renderingEngine.lookupRenderingDef(newPixelsId);
 renderingEngine.load();
 
