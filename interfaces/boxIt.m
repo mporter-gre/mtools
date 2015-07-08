@@ -1033,9 +1033,9 @@ masksThisZ = masksThisZ(2:end);
 numMasksThisZ = length(masksThisZ);
 if numMasksThisZ > 1
     if zHeight ~= 0
-        boxItObjectChooser(handles, maskStackBWL(:,:,zHeight));
+        boxItObjectChooser(handles, maskStackBWL(:,:,zHeight), 'boxIt');
     else
-        boxItObjectChooser(handles, maskStackBWL(:,:,thisZ));
+        boxItObjectChooser(handles, maskStackBWL(:,:,thisZ), 'boxIt');
     end
     objectValue = getappdata(handles.boxIt, 'objectValue');
 else

@@ -56,6 +56,7 @@ function boxItObjectChooser_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 handles.parentHandles = varargin{1};
 displayImage = varargin{2};
+handles.parentHandleName = varargin{3};
 axes(handles.imageAxes);
 imageHandle = imshow(displayImage);
 set(imageHandle, 'ButtonDownFcn', {@image_ButtonDownFcn, handles});
@@ -93,5 +94,5 @@ objectValue = displayImage(y, x);
 if objectValue == 0
     return;
 end
-setappdata(handles.parentHandles.boxIt, 'objectValue', objectValue);
+setappdata(handles.parentHandles.([handles.parentHandleName]), 'objectValue', objectValue);
 close(handles.boxItObjectChooser);
