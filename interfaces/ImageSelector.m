@@ -254,6 +254,13 @@ global session
 projects = getProjects(session, [], false); %gateway.getProjects([],0);
 %projIter = projects.iterator;
 numProj = length(projects);
+
+if numProj == 0
+    set(handles.projectsSelect, 'String', 'No projects found');
+    set(handles.datasetsSelect, 'String', 'No projects found');
+    set(handles.imagesSelect, 'String', 'No projects found');
+    return;
+end
 projNameId{numProj,2} = [];
 projNameList{numProj} = [];
 projIdList = [];
