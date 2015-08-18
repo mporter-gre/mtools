@@ -42,6 +42,11 @@ while sectionsChosen == 0
     drawnow;
     uiwait(sectionFigure);
     stopZ = sectionClicked;
+    if startZ > stopZ
+        varZ = startZ;
+        startZ = stopZ;
+        stopZ = varZ;
+    end
     questionStr = ['Lowest Z = ', num2str(startZ), ', highest Z = ', num2str(stopZ), '?'];
     response = questdlg(questionStr, 'Correct Z-Sections?', 'Yes', 'No', 'Yes');
     if strcmp(response, 'Yes')
