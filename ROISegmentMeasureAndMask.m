@@ -270,13 +270,22 @@ for thisROI = 1:numROI
                 if groupObjects == 0 && annulusSize > 0
                     [row, col, objectValues] = find(unique(patchMasksBkg));
                     numObjects = length(objectValues);
-                    for thisObject = 1:numObjects
-                        objectIntensityVector = thisAroundROIIntensityShape{counter}(patchMasksBkgDil==objectValues(thisObject));
-                        objectDataAround{thisROI}{thisT}{counter}{thisObject}.sumPix = sum(objectIntensityVector);
-                        objectDataAround{thisROI}{thisT}{counter}{thisObject}.numPix = length(objectIntensityVector);
-                        objectDataAround{thisROI}{thisT}{counter}{thisObject}.meanPix = objectDataAround{thisROI}{thisT}{counter}{thisObject}.sumPix / objectDataAround{thisROI}{thisT}{counter}{thisObject}.numPix;
-                        objectDataAround{thisROI}{thisT}{counter}{thisObject}.stdPix = std(objectIntensityVector);
-                        objectDataAround{thisROI}{thisT}{counter}{thisObject}.channel = thisMeasureChannel;
+                    %If there are no segmented pixels per object enter zero.
+                    if isempty(objectValues)
+                        objectDataAround{thisROI}{thisT}{1}{counter}.sumPix = 0;
+                        objectDataAround{thisROI}{thisT}{1}{counter}.numPix = 0;
+                        objectDataAround{thisROI}{thisT}{1}{counter}.meanPix = 0;
+                        objectDataAround{thisROI}{thisT}{1}{counter}.stdPix = 0;
+                        objectDataAround{thisROI}{thisT}{1}{counter}.channel = thisMeasureChannel;
+                    else
+                        for thisObject = 1:numObjects
+                            objectIntensityVector = thisAroundROIIntensityShape{counter}(patchMasksBkgDil==objectValues(thisObject));
+                            objectDataAround{thisROI}{thisT}{counter}{thisObject}.sumPix = sum(objectIntensityVector);
+                            objectDataAround{thisROI}{thisT}{counter}{thisObject}.numPix = length(objectIntensityVector);
+                            objectDataAround{thisROI}{thisT}{counter}{thisObject}.meanPix = objectDataAround{thisROI}{thisT}{counter}{thisObject}.sumPix / objectDataAround{thisROI}{thisT}{counter}{thisObject}.numPix;
+                            objectDataAround{thisROI}{thisT}{counter}{thisObject}.stdPix = std(objectIntensityVector);
+                            objectDataAround{thisROI}{thisT}{counter}{thisObject}.channel = thisMeasureChannel;
+                        end
                     end
                 else
                     objectDataAround = [];
