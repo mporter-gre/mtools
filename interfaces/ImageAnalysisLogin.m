@@ -536,12 +536,17 @@ function startDiary(handles)
 
 if ispc
     sysUserHome = getenv('userprofile');
+    omeroDir = [sysUserHome '\omero'];
     logFile = [sysUserHome '\omero\mtoolsLog.log'];
 else
     sysUserHome = getenv('HOME');
+    omeroDir = [sysUserHome '/omero'];
     logFile = [sysUserHome '/omero/mtoolsLog.log'];
 end
 
+if ~isdir(omeroDir)
+    mkdir(omeroDir);
+end
 if exist(logFile, 'file') == 2
     delete(logFile);
 end
