@@ -98,7 +98,7 @@ maxZ = floor(max(zEnds));
 
 %TssBSeg = fpBacteriaSeg3D(TssBStack);
 for thisZ = minZ:maxZ
-    TssBSeg(:,:,thisZ) = logical(LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 100, 100000));
+    TssBSeg(:,:,thisZ) = logical(LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 30, 100000));
     %TssBSeg(:,:,thisZ) = logical(TssBSeg(:,:,thisZ) + LoGBlob(double(TssBStack(:,:,thisZ)), 7, 10, 1000));
 end
 TssBSegBWL = bwlabeln(TssBSeg);
