@@ -250,11 +250,15 @@ if getappdata(handles.labelMaker, 'setPoint') == 0
 end
 
 if zoomClick == 1
+    clearPointObjects(handles)
     zoomImage(handles);
     setappdata(handles.labelMaker, 'zoomClick', 0);
+    setappdata(handles.labelMaker, 'selectedPoint', []);
+    setappdata(handles.labelMaker, 'selectedOrigColour', []);
     refreshDisplay(handles);
     return;
 end
+
 
 function imageAnchor_ButtonUpFcn(hObject, eventdata, handles)
 
@@ -302,6 +306,7 @@ function playButton_Callback(hObject, eventdata, handles)
 
 numT = getappdata(handles.labelMaker, 'numT');
 firstT = round(get(handles.tSlider, 'Value'));
+
 if getappdata(handles.labelMaker, 'playing') == 1
     return;
 end
@@ -316,7 +321,6 @@ for thisT = firstT:numT
     set(handles.tLabel, 'String', ['T = ' num2str(thisT)]);
     thisZ = round(get(handles.zSlider, 'Value'));
     getPlanes(handles, thisZ-1, thisT-1)
-    %redrawImage(handles);
     refreshDisplay(handles);
     pause(0.05);
 end
@@ -407,10 +411,10 @@ setappdata(handles.labelMaker, 'newImageObj', []);
 setappdata(handles.labelMaker, 'newImageId', []);
 setappdata(handles.labelMaker, 'points', []);
 setappdata(handles.labelMaker, 'fileName', imageName);
+setappdata(handles.labelMaker, 'modified', 0);
 setappdata(handles.labelMaker, 'zoomLevel', 1);
 set(handles.zoomInButton, 'Enable', 'on');
 set(handles.zoomOutButton, 'Enable', 'on');
-setappdata(handles.labelMaker, 'modified', 0);
 redrawImage(handles);
 
 
@@ -501,8 +505,18 @@ labelColour = getappdata(handles.labelMaker, 'labelColour');
 projectId = getappdata(handles.labelMaker, 'projectId');
 datasetId = getappdata(handles.labelMaker, 'datasetId');
 imageId = getappdata(handles.labelMaker, 'imageId');
-
-[fileName filePath] = uiputfile('*.mat', 'Save labels');
+filePath = getappdata(handles.labelMaker, 'filePath');
+if isempty(filePath)
+    [fileName filePath] = uiputfile('*.mat', 'Save labels');
+    if fileName == 0
+        return;
+    end
+else
+    [fileName filePath] = uiputfile('*.mat', 'Save labels', filePath);
+    if fileName == 0
+        return;
+    end
+end
 
 if fileName == 0
     return;
@@ -705,6 +719,7 @@ if modified == 1
         return;
     end
 end
+
 gatewayDisconnect;
 delete(hObject);
 
@@ -769,41 +784,51 @@ setappdata(handles.labelMaker, 'points', points);
 
 
 
+
 function point_ButtonDownFcn(hObject, eventdata, handles)
 
-setappdata(handles.labelMaker, 'deleteLock', 1);
-setPoint = getappdata(handles.labelMaker, 'setPoint');
-if setPoint == 1
-    return;
-end
-deselectPoint(handles);
-thePoint = get(gcf, 'CurrentObject');
-points = getappdata(handles.labelMaker, 'points');
-numPoints = length(points);
-for thisPoint = 1:numPoints
-    if findobj(points{thisPoint}.PointHandle,'-depth',0) == thePoint
-        colour = points{thisPoint}.Colour;
+try
+    setappdata(handles.labelMaker, 'deleteLock', 1);
+    setPoint = getappdata(handles.labelMaker, 'setPoint');
+    if setPoint == 1
+        return;
     end
+    deselectPoint(handles);
+    thePoint = get(gcf, 'CurrentObject');
+    points = getappdata(handles.labelMaker, 'points');
+    numPoints = length(points);
+    for thisPoint = 1:numPoints
+        if findobj(points{thisPoint}.PointHandle,'-depth',0) == thePoint
+            colour = points{thisPoint}.Colour;
+            break;
+        end
+    end
+    api = iptgetapi(thePoint);
+    api.setColor('w');
+    set(handles.deletePointButton, 'Enable', 'on');
+    setappdata(handles.labelMaker, 'selectedPoint', thePoint);
+    setappdata(handles.labelMaker, 'selectedOrigColour', colour);
+catch
+    disp('point_ButtonDownFcn error caught');
 end
-api = iptgetapi(thePoint);
-api.setColor('w');
-set(handles.deletePointButton, 'Enable', 'on');
-setappdata(handles.labelMaker, 'selectedPoint', thePoint);
-setappdata(handles.labelMaker, 'selectedOrigColour', colour);
 
 
 function deselectPoint(handles)
 
-thePoint = getappdata(handles.labelMaker, 'selectedPoint');
-colour = getappdata(handles.labelMaker, 'selectedOrigColour');
-if isempty(thePoint)
-    return;
+try
+    thePoint = getappdata(handles.labelMaker, 'selectedPoint');
+    colour = getappdata(handles.labelMaker, 'selectedOrigColour');
+    if isempty(thePoint)
+        return;
+    end
+    api = iptgetapi(thePoint);
+    api.setColor(colour);
+    setappdata(handles.labelMaker, 'selectedPoint', []);
+    setappdata(handles.labelMaker, 'selectedOrigColour', []);
+    set(handles.deletePointButton, 'Enable', 'off');
+catch
+    disp('deselectPoint error caught');
 end
-api = iptgetapi(thePoint);
-api.setColor(colour);
-setappdata(handles.labelMaker, 'selectedPoint', []);
-setappdata(handles.labelMaker, 'selectedOrigColour', []);
-set(handles.deletePointButton, 'Enable', 'off');
 
 
 function deletePoint(handles)
@@ -840,7 +865,7 @@ if iscell(points)
         
     end
 else
-    newPoints = [];
+    newPoints = {};
 end
 
 api = iptgetapi(thePoint);
@@ -889,9 +914,9 @@ for thisPoint = 1:numPoints
     if ismember(thisPointZ, thisZ)
         if ismember(thisPointT, thisT)
             if zoomLevel > 1
-                if thisPointX < zoomMinMax(1) || thisPointY < zoomMinMax(2)
-                    continue;
-                end
+%                 if thisPointX < zoomMinMax(1) || thisPointY < zoomMinMax(2)
+%                     continue;
+%                 end
                 thisPointX = (thisPointX-zoomMinMax(1));
                 thisPointY = (thisPointY-zoomMinMax(2));
             end
@@ -936,6 +961,8 @@ function openPointsItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global session
+
 modified = getappdata(handles.labelMaker, 'modified');
 if modified == 1
     answer = questdlg([{'The current set of points has been modified.'} {'Discard changes and open a new points file?'}], 'Discard Changes?', 'Yes', 'No', 'No');
@@ -949,7 +976,7 @@ if fileName == 0
     return;
 end
 vars = load([filePath fileName]);
-theImage = gateway.getImage(vars.imageId);
+theImage = getImages(session, vars.imageId);
 setappdata(handles.labelMaker, 'points', vars.points);
 setappdata(handles.labelMaker, 'projectId', vars.projectId);
 setappdata(handles.labelMaker, 'datasetId', vars.datasetId);
@@ -1161,7 +1188,8 @@ imageName = getappdata(handles.labelMaker, 'imageName');
 summaryByImage = pointsSummaryByImage(points, imageName);
 summaryByT = pointsSummaryByT(points, imageName, handles);
 summaryByZ = pointsSummaryByZ(points, imageName, handles);
-[fileName filePath] = uiputfile('*.xls', 'Save data');
+filePath = getappdata(handles.labelMaker, 'filePath');
+[fileName filePath] = uiputfile('*.xls', 'Save data', filePath);
 if fileName == 0
     return;
 end
@@ -1193,8 +1221,6 @@ function batchAnalysisItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global gateway;
-
 warning('off', 'MATLAB:xlswrite:AddSheet');
 setappdata(handles.labelMaker, 'conditions', []);
 setappdata(handles.labelMaker, 'conditionsPaths', []);
@@ -1205,6 +1231,7 @@ batchChooser(handles);
 conditions = getappdata(handles.labelMaker, 'conditions');
 conditionsPaths = getappdata(handles.labelMaker, 'conditionsPaths');
 conditionsFiles = getappdata(handles.labelMaker, 'conditionsFiles');
+filePath = getappdata(handles.labelMaker, 'filePath');
 analyseIndividualFiles = getappdata(handles.labelMaker, 'analyseIndividualFiles');
 numConditions = length(conditions);
 numSteps = 1;
@@ -1219,7 +1246,7 @@ end
 if isempty(conditions)
     return;
 end
-[fileName filePath] = uiputfile('*.xls', 'Save batch data');
+[fileName filePath] = uiputfile('*.xls', 'Save batch data', filePath);
 if fileName == 0
     return;
 end
@@ -1232,11 +1259,12 @@ for thisCondition = 1:numConditions
         thisStep = thisStep + 1;
         [points{thisCondition}{thisFile} imageId{thisCondition}{thisFile}] = getPointsAndImageId([conditionsPaths{thisCondition} conditionsFiles{thisCondition}{thisFile}]);
         if analyseIndividualFiles == 1
-            imageObj = gateway.getImage(imageId{thisCondition}{thisFile});
-            imageNameFull = char(imageObj.getName.getValue.getBytes');
-            imageNameScanned = textscan(imageNameFull, '%s', 'Delimiter', '/');
-            imageNameNoPaths = imageNameScanned{1}{end};
-            [imageName remain] = strtok(imageNameNoPaths, '.');
+%             imageObj = gateway.getImage(imageId{thisCondition}{thisFile});
+%             imageNameFull = char(imageObj.getName.getValue.getBytes');
+%             imageNameScanned = textscan(imageNameFull, '%s', 'Delimiter', '/');
+%             imageNameNoPaths = imageNameScanned{1}{end};
+%             [imageName remain] = strtok(imageNameNoPaths, '.');
+            imageName = conditionsFiles{thisCondition}{thisFile}(1:end-4);
             imageNameXls = [imageName '.xls'];
             summaryByImage = pointsSummaryByImage(points{thisCondition}{thisFile}, imageName);
             summaryByT = pointsSummaryByT(points{thisCondition}{thisFile}, imageName, handles);
@@ -1711,6 +1739,10 @@ function zoomOutButton_Callback(hObject, eventdata, handles)
 
 setappdata(handles.labelMaker, 'zoomLevel', 1);
 setappdata(handles.labelMaker, 'zoomMinMax', []);
+setappdata(handles.labelMaker, 'zoomClick', 0);
+setappdata(handles.labelMaker, 'selectedPoint', []);
+setappdata(handles.labelMaker, 'selectedOrigColour', []);
+clearPointObjects(handles);
 refreshDisplay(handles);
 
 
@@ -1784,3 +1816,15 @@ if zoomClick == 1
     setappdata(handles.labelMaker, 'zoomMinMax', [minZoomX minZoomY maxZoomX maxZoomY]);
 end
 
+
+
+function clearPointObjects(handles)
+
+points = getappdata(handles.labelMaker, 'points');
+numPoints = length(points);
+
+for thisPoint = 1:numPoints
+    pointHandle = points{thisPoint}.PointHandle;
+    api = iptgetapi(pointHandle);
+    api.delete();
+end
