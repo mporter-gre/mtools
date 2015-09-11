@@ -405,7 +405,11 @@ if newImageId == imageId
 end
 setappdata(handles.labelMaker, 'theImage', newImageObj);
 setappdata(handles.labelMaker, 'imageId', newImageId);
-getMetadata(handles);
+answer = getMetadata(handles);
+if strcmp(answer, 'return')
+    warndlg({'Error. It is likely this image has not been rendered yet.';'Please view image in OMERO.insight or OMERO.web first'});
+    return;
+end
 imageName = getappdata(handles.labelMaker, 'imageName');
 setappdata(handles.labelMaker, 'newImageObj', []);
 setappdata(handles.labelMaker, 'newImageId', []);
@@ -1084,7 +1088,7 @@ setappdata(handles.labelMaker, 'labelsName', labelsName);
 
 
 
-function getMetadata(handles)
+function answer = getMetadata(handles)
 
 global session
 
@@ -1102,9 +1106,27 @@ numZ = pixels.getSizeZ.getValue;
 sizeX = pixels.getSizeX.getValue;
 sizeY = pixels.getSizeY.getValue;
 renderingSettings = session.getRenderingSettingsService.getRenderingSettings(pixelsId);
+if isempty(renderingSettings)
+    answer = 'return';
+    return;
+end
 defaultT = renderingSettings.getDefaultT.getValue + 1;
 defaultZ = renderingSettings.getDefaultZ.getValue + 1;
 imageName = char(theImage.getName.getValue.getBytes');
+
+renderingEngine = session.createRenderingEngine;
+renderingEngine.lookupPixels(pixelsId);
+renderingEngine.lookupRenderingDef(pixelsId);
+renderingEngine.load();
+pyramid = renderingEngine.requiresPixelsPyramid();
+
+if pyramid
+    answer = questdlg({'Warning: This is a VERY LARGE image.';'This may take a long time to download';'Do you wish to continue?'}, 'Large Image', 'Yes', 'No', 'No');
+    if strcmpi(answer, 'No')
+        answer = 'return';
+        return;
+    end
+end
 
 setappdata(handles.labelMaker, 'imageId', imageId);
 setappdata(handles.labelMaker, 'imageName', imageName);
@@ -1118,6 +1140,7 @@ setappdata(handles.labelMaker, 'defaultZ', defaultZ);
 setappdata(handles.labelMaker, 'zoomLevel', 1);
 setappdata(handles.labelMaker, 'zoomROIMinMax', []);
 setappdata(handles.labelMaker, 'sizeXY', [sizeX sizeY]);
+setappdata(handles.labelMaker, 'pyramid', pyramid);
 
 
 set(handles.imageNameLabel, 'String', imageName);
@@ -1128,6 +1151,7 @@ set(handles.tLabel, 'String', ['T = ' num2str(defaultT)]);
 set(handles.zSlider, 'Value', defaultZ);
 set(handles.zLabel, 'String', ['Z = ' num2str(defaultZ)]);
 getPlanes(handles, defaultZ-1, defaultT-1);
+answer = 'go';
 
 
 % --------------------------------------------------------------------
