@@ -1122,7 +1122,7 @@ pyramid = renderingEngine.requiresPixelsPyramid();
 
 if pyramid
     answer = questdlg({'Warning: This is a VERY LARGE image.';'This may take a long time to download';'Do you wish to continue?'}, 'Large Image', 'Yes', 'No', 'No');
-    if strcmpi(answer, 'No')
+    if strcmpi(answer, 'No') || strcmpi(answer, '')
         answer = 'return';
         return;
     end
