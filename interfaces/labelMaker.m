@@ -1027,6 +1027,7 @@ setappdata(handles.labelMaker, 'labelsName', labelsName);
 setappdata(handles.labelMaker, 'points', []);
 set(handles.labelSelect, 'Value', 1);
 set(handles.labelSelect, 'String', vars.labelText);
+set(handles.labelSelect, 'ForegroundColor', vars.labelColour);
 refreshDisplay(handles);
 
 
