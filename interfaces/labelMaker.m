@@ -135,6 +135,7 @@ z = round(get(handles.zSlider, 'Value'));
 t = round(get(hObject, 'Value'));
 set(handles.tLabel, 'String', ['T = ' num2str(t)]);
 getPlanes(handles, z-1, t-1);
+clearPointObjects(handles);
 refreshDisplay(handles);
 
 
@@ -221,6 +222,7 @@ z = round(get(hObject, 'Value'));
 t = round(get(handles.tSlider, 'Value'));
 set(handles.zLabel, 'String', ['Z = ' num2str(z)]);
 getPlanes(handles, z-1, t-1);
+clearPointObjects(handles);
 refreshDisplay(handles);
 
 
@@ -435,6 +437,7 @@ refreshDisplay(handles);
 
 function refreshDisplay(handles)
 
+clearPointObjects(handles);
 redrawImage(handles);
 redrawPoints(handles);
 
@@ -1850,6 +1853,13 @@ numPoints = length(points);
 
 for thisPoint = 1:numPoints
     pointHandle = points{thisPoint}.PointHandle;
+    if isempty(pointHandle)
+        continue;
+    end
     api = iptgetapi(pointHandle);
     api.delete();
+    points{thisPoint}.PointHandle = [];
 end
+
+setappdata(handles.labelMaker, 'points', points);
+setappdata(handles.labelMaker, 'selectedPoint', []);
