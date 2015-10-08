@@ -348,7 +348,10 @@ if strcmp(currentKey, 'escape')
     setappdata(handles.labelMaker, 'stopRecording', 1);
 end
 if strcmp(currentKey, 'f5')
-    refreshDisplay(handles);
+    imageId = getappdata(handles.labelMaker, 'imageId');
+    if ~isempty(imageId)
+        refreshDisplay(handles);
+    end
 end
 if strcmp(currentKey, 'delete')
     deletePoint(handles);
@@ -437,7 +440,11 @@ refreshDisplay(handles);
 
 function refreshDisplay(handles)
 
+z = round(get(handles.zSlider, 'Value'));
+t = round(get(handles.tSlider, 'Value'));
+
 clearPointObjects(handles);
+getPlanes(handles, z-1, t-1);
 redrawImage(handles);
 redrawPoints(handles);
 
