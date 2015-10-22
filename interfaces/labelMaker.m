@@ -481,12 +481,12 @@ fileName = getappdata(handles.labelMaker, 'fileName');
 if ~strcmpi(fileName(end-3:end), '.mat')
     fileName = [fileName '.mat'];
 end
-if isempty(fileName) || isempty(filePath);
-    [fileName filePath] = uiputfile('*.mat', 'Save labels', [filePath fileName]);
-    if fileName == 0
-        return;
-    end
+
+[fileName filePath] = uiputfile('*.mat', 'Save labels', [filePath fileName]);
+if fileName == 0
+    return;
 end
+
 labelText = getappdata(handles.labelMaker, 'labelText');
 labelColour = getappdata(handles.labelMaker, 'labelColour');
 projectId = getappdata(handles.labelMaker, 'projectId');
