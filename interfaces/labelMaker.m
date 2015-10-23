@@ -497,7 +497,7 @@ save([filePath fileName], 'points', 'projectId', 'datasetId', 'imageId', 'labelT
 setappdata(handles.labelMaker, 'filePath', filePath);
 setappdata(handles.labelMaker, 'fileName', fileName);
 setappdata(handles.labelMaker, 'modified', 0);
-msgbox('Points saved', 'Saved');
+msgbox('Points saved', 'Saved', 'modal');
 
 
 
@@ -540,6 +540,7 @@ save([filePath fileName], 'points', 'points', 'projectId', 'datasetId', 'imageId
 setappdata(handles.labelMaker, 'filePath', filePath);
 setappdata(handles.labelMaker, 'fileName', fileName);
 setappdata(handles.labelMaker, 'modified', 0);
+msgbox('Points saved', 'Saved', 'modal');
 
 
 
@@ -1069,6 +1070,7 @@ end
 save([labelsPath labelsName], 'labelText', 'labelColour', 'labelDefFile')
 setappdata(handles.labelMaker, 'labelsPath', labelsPath);
 setappdata(handles.labelMaker, 'labelsName', labelsName);
+msgbox('Label definitions saved', 'Saved', 'modal');
 
 
 
@@ -1096,6 +1098,7 @@ end
 save([labelsPath labelsName], 'labelText', 'labelColour')
 setappdata(handles.labelMaker, 'labelsPath', labelsPath);
 setappdata(handles.labelMaker, 'labelsName', labelsName);
+msgbox('Label definitions saved', 'Saved', 'modal');
 
 
 
