@@ -22,7 +22,7 @@ function varargout = labelMaker(varargin)
 
 % Edit the above text to modify the response to help labelmaker
 
-% Last Modified by GUIDE v2.5 01-Sep-2015 19:54:28
+% Last Modified by GUIDE v2.5 01-Sep-2015 21:36:47
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,11 +60,15 @@ pauseIcon = imread('pauseButton.png', 'png');
 arrowIcon = imread('arrowButton.png', 'png');
 crosshairIcon = imread('crosshairButton.png', 'png');
 deletePointIcon = imread('deletePointButton.png', 'png');
+zoomInIcon = imread('zoomInButton.png', 'png');
+zoomOutIcon = imread('zoomOutButton.png', 'png');
 set(handles.playButton,'CDATA',playIcon);
 set(handles.pauseButton,'CDATA',pauseIcon);
 set(handles.arrowButton,'CDATA',arrowIcon);
 set(handles.crosshairButton,'CDATA',crosshairIcon);
 set(handles.deletePointButton,'CDATA',deletePointIcon);
+set(handles.zoomInButton,'CDATA',zoomInIcon);
+set(handles.zoomOutButton,'CDATA',zoomOutIcon);
 
 set(handles.labelMaker, 'WindowButtonUpFcn', {@imageAnchor_ButtonUpFcn, handles});
 axes(handles.imageAxes);
@@ -131,6 +135,7 @@ z = round(get(handles.zSlider, 'Value'));
 t = round(get(hObject, 'Value'));
 set(handles.tLabel, 'String', ['T = ' num2str(t)]);
 getPlanes(handles, z-1, t-1);
+clearPointObjects(handles);
 refreshDisplay(handles);
 
 
@@ -152,12 +157,18 @@ global session;
 
 imageId = getappdata(handles.labelMaker, 'imageId');
 pixels = getappdata(handles.labelMaker, 'pixels');
+zoomLevel = getappdata(handles.labelMaker, 'zoomLevel');
+zoomMinMax = getappdata(handles.labelMaker, 'zoomMinMax');
 numC = getappdata(handles.labelMaker, 'numC');
 for thisC = 1:numC
     plane(:,:,thisC) = getPlane(session, imageId, z, thisC-1, t);
 end
 renderedImage = createRenderedImage(plane, pixels);
 imageSize = size(renderedImage);
+if zoomLevel > 1
+    zoomImage = renderedImage(zoomMinMax(2):zoomMinMax(4), zoomMinMax(1):zoomMinMax(3),:);
+    setappdata(handles.labelMaker, 'zoomImage', zoomImage);
+end
 setappdata(handles.labelMaker, 'renderedImage', renderedImage);
 setappdata(handles.labelMaker, 'imageSize', imageSize);
 
@@ -211,6 +222,7 @@ z = round(get(hObject, 'Value'));
 t = round(get(handles.tSlider, 'Value'));
 set(handles.zLabel, 'String', ['Z = ' num2str(z)]);
 getPlanes(handles, z-1, t-1);
+clearPointObjects(handles);
 refreshDisplay(handles);
 
 
@@ -229,6 +241,8 @@ end
 
 function imageAnchor_ButtonDownFcn(hObject, eventdata, handles)
 
+zoomClick = getappdata(handles.labelMaker, 'zoomClick');
+
 pointer = get(gcf, 'Pointer');
 if getappdata(handles.labelMaker, 'setPoint') == 1 && strcmp(pointer, 'crosshair')
     setPoint(handles);
@@ -237,6 +251,17 @@ if getappdata(handles.labelMaker, 'setPoint') == 0
     deselectPoint(handles);
 end
 
+if zoomClick == 1
+    clearPointObjects(handles)
+    zoomImage(handles);
+    setappdata(handles.labelMaker, 'zoomClick', 0);
+    setappdata(handles.labelMaker, 'selectedPoint', []);
+    setappdata(handles.labelMaker, 'selectedOrigColour', []);
+    refreshDisplay(handles);
+    return;
+end
+
+
 function imageAnchor_ButtonUpFcn(hObject, eventdata, handles)
 
 setappdata(handles.labelMaker, 'deleteLock', 0);
@@ -244,11 +269,17 @@ setappdata(handles.labelMaker, 'deleteLock', 0);
 
 function redrawImage(handles)
 
-displayImage = getappdata(handles.labelMaker, 'renderedImage');
+zoomLevel = getappdata(handles.labelMaker, 'zoomLevel');
+
+if zoomLevel > 1
+    displayImage = getappdata(handles.labelMaker, 'zoomImage');
+else
+    displayImage = getappdata(handles.labelMaker, 'renderedImage');
+end
+
 handles.imageHandle = imshow(displayImage);
 set(handles.imageHandle, 'ButtonDownFcn', {@imageAnchor_ButtonDownFcn, handles});
 setappdata(handles.labelMaker, 'thisImageHandle', handles.imageHandle);
-
 
 
 
@@ -317,7 +348,10 @@ if strcmp(currentKey, 'escape')
     setappdata(handles.labelMaker, 'stopRecording', 1);
 end
 if strcmp(currentKey, 'f5')
-    refreshDisplay(handles);
+    imageId = getappdata(handles.labelMaker, 'imageId');
+    if ~isempty(imageId)
+        refreshDisplay(handles);
+    end
 end
 if strcmp(currentKey, 'delete')
     deletePoint(handles);
@@ -376,13 +410,20 @@ if newImageId == imageId
 end
 setappdata(handles.labelMaker, 'theImage', newImageObj);
 setappdata(handles.labelMaker, 'imageId', newImageId);
-getMetadata(handles);
+answer = getMetadata(handles);
+if strcmp(answer, 'return')
+    warndlg({'Error. It is likely this image has not been rendered yet.';'Please view image in OMERO.insight or OMERO.web first'});
+    return;
+end
 imageName = getappdata(handles.labelMaker, 'imageName');
 setappdata(handles.labelMaker, 'newImageObj', []);
 setappdata(handles.labelMaker, 'newImageId', []);
 setappdata(handles.labelMaker, 'points', []);
 setappdata(handles.labelMaker, 'fileName', imageName);
 setappdata(handles.labelMaker, 'modified', 0);
+setappdata(handles.labelMaker, 'zoomLevel', 1);
+set(handles.zoomInButton, 'Enable', 'on');
+set(handles.zoomOutButton, 'Enable', 'on');
 redrawImage(handles);
 
 
@@ -399,6 +440,11 @@ refreshDisplay(handles);
 
 function refreshDisplay(handles)
 
+z = round(get(handles.zSlider, 'Value'));
+t = round(get(handles.tSlider, 'Value'));
+
+clearPointObjects(handles);
+getPlanes(handles, z-1, t-1);
 redrawImage(handles);
 redrawPoints(handles);
 
@@ -435,12 +481,12 @@ fileName = getappdata(handles.labelMaker, 'fileName');
 if ~strcmpi(fileName(end-3:end), '.mat')
     fileName = [fileName '.mat'];
 end
-if isempty(fileName) || isempty(filePath);
-    [fileName filePath] = uiputfile('*.mat', 'Save labels', [filePath fileName]);
-    if fileName == 0
-        return;
-    end
+
+[fileName filePath] = uiputfile('*.mat', 'Save labels', [filePath fileName]);
+if fileName == 0
+    return;
 end
+
 labelText = getappdata(handles.labelMaker, 'labelText');
 labelColour = getappdata(handles.labelMaker, 'labelColour');
 projectId = getappdata(handles.labelMaker, 'projectId');
@@ -451,7 +497,7 @@ save([filePath fileName], 'points', 'projectId', 'datasetId', 'imageId', 'labelT
 setappdata(handles.labelMaker, 'filePath', filePath);
 setappdata(handles.labelMaker, 'fileName', fileName);
 setappdata(handles.labelMaker, 'modified', 0);
-msgbox('Points saved', 'Saved');
+msgbox('Points saved', 'Saved', 'modal');
 
 
 
@@ -494,6 +540,7 @@ save([filePath fileName], 'points', 'points', 'projectId', 'datasetId', 'imageId
 setappdata(handles.labelMaker, 'filePath', filePath);
 setappdata(handles.labelMaker, 'fileName', fileName);
 setappdata(handles.labelMaker, 'modified', 0);
+msgbox('Points saved', 'Saved', 'modal');
 
 
 
@@ -698,6 +745,8 @@ points = getappdata(handles.labelMaker, 'points');
 labelColour = getappdata(handles.labelMaker, 'labelColour');
 currentPoint = getappdata(handles.labelMaker, 'currentPoint');
 labelString = get(handles.labelSelect, 'String');
+zoomMinMax = getappdata(handles.labelMaker, 'zoomMinMax');
+zoomLevel = getappdata(handles.labelMaker, 'zoomLevel');
 if strcmp(labelString, 'Add a label')
     errordlg('You must add a label before setting points.', 'No labels');
     setappdata(handles.labelMaker, 'setPoint', 0);
@@ -708,19 +757,28 @@ label = labelString{labelIdx};
 colour = labelColour{labelIdx};
 thisZ = round(get(handles.zSlider, 'Value'));
 thisT = round(get(handles.tSlider, 'Value'));
+
+if zoomLevel > 1
+    thisPointX = currentPoint(1) + zoomMinMax(1);
+    thisPointY = currentPoint(3) + zoomMinMax(2);
+else
+    thisPointX = currentPoint(1);
+    thisPointY = currentPoint(3);
+end
+
 if iscell(points)
     currPoint = length(points)+1;
     thePoint = impoint(gca,currentPoint(1), currentPoint(3));
     set(handles.imageHandle, 'ButtonDownFcn', {@imageAnchor_ButtonDownFcn, handles});
     points{currPoint}.label = label;
-    points{currPoint}.Position = [currentPoint(1) currentPoint(3) thisZ thisT];
+    points{currPoint}.Position = [thisPointX thisPointY thisZ thisT];
     points{currPoint}.PointHandle = thePoint;
     points{currPoint}.Colour = colour;
 else
     thePoint = impoint(gca,currentPoint(1), currentPoint(3));
     set(handles.imageHandle, 'ButtonDownFcn', {@imageAnchor_ButtonDownFcn, handles});
     points{1}.label = label;
-    points{1}.Position = [currentPoint(1) currentPoint(3) thisZ thisT];
+    points{1}.Position = [thisPointX thisPointY thisZ thisT];
     points{1}.PointHandle = thePoint;
     points{1}.Colour = colour;
 end
@@ -741,41 +799,51 @@ setappdata(handles.labelMaker, 'points', points);
 
 
 
+
 function point_ButtonDownFcn(hObject, eventdata, handles)
 
-setappdata(handles.labelMaker, 'deleteLock', 1);
-setPoint = getappdata(handles.labelMaker, 'setPoint');
-if setPoint == 1
-    return;
-end
-deselectPoint(handles);
-thePoint = get(gcf, 'CurrentObject');
-points = getappdata(handles.labelMaker, 'points');
-numPoints = length(points);
-for thisPoint = 1:numPoints
-    if findobj(points{thisPoint}.PointHandle,'-depth',0) == thePoint
-        colour = points{thisPoint}.Colour;
+try
+    setappdata(handles.labelMaker, 'deleteLock', 1);
+    setPoint = getappdata(handles.labelMaker, 'setPoint');
+    if setPoint == 1
+        return;
     end
+    deselectPoint(handles);
+    thePoint = get(gcf, 'CurrentObject');
+    points = getappdata(handles.labelMaker, 'points');
+    numPoints = length(points);
+    for thisPoint = 1:numPoints
+        if findobj(points{thisPoint}.PointHandle,'-depth',0) == thePoint
+            colour = points{thisPoint}.Colour;
+            break;
+        end
+    end
+    api = iptgetapi(thePoint);
+    api.setColor('w');
+    set(handles.deletePointButton, 'Enable', 'on');
+    setappdata(handles.labelMaker, 'selectedPoint', thePoint);
+    setappdata(handles.labelMaker, 'selectedOrigColour', colour);
+catch
+    disp('point_ButtonDownFcn error caught');
 end
-api = iptgetapi(thePoint);
-api.setColor('w');
-set(handles.deletePointButton, 'Enable', 'on');
-setappdata(handles.labelMaker, 'selectedPoint', thePoint);
-setappdata(handles.labelMaker, 'selectedOrigColour', colour);
 
 
 function deselectPoint(handles)
 
-thePoint = getappdata(handles.labelMaker, 'selectedPoint');
-colour = getappdata(handles.labelMaker, 'selectedOrigColour');
-if isempty(thePoint)
-    return;
+try
+    thePoint = getappdata(handles.labelMaker, 'selectedPoint');
+    colour = getappdata(handles.labelMaker, 'selectedOrigColour');
+    if isempty(thePoint)
+        return;
+    end
+    api = iptgetapi(thePoint);
+    api.setColor(colour);
+    setappdata(handles.labelMaker, 'selectedPoint', []);
+    setappdata(handles.labelMaker, 'selectedOrigColour', []);
+    set(handles.deletePointButton, 'Enable', 'off');
+catch
+    disp('deselectPoint error caught');
 end
-api = iptgetapi(thePoint);
-api.setColor(colour);
-setappdata(handles.labelMaker, 'selectedPoint', []);
-setappdata(handles.labelMaker, 'selectedOrigColour', []);
-set(handles.deletePointButton, 'Enable', 'off');
 
 
 function deletePoint(handles)
@@ -812,7 +880,7 @@ if iscell(points)
         
     end
 else
-    newPoints = [];
+    newPoints = {};
 end
 
 api = iptgetapi(thePoint);
@@ -834,6 +902,9 @@ flattenT = getappdata(handles.labelMaker, 'flattenT');
 numZ = getappdata(handles.labelMaker, 'numZ');
 numT = getappdata(handles.labelMaker, 'numT');
 points = getappdata(handles.labelMaker, 'points');
+zoomLevel = getappdata(handles.labelMaker, 'zoomLevel');
+zoomMinMax = getappdata(handles.labelMaker, 'zoomMinMax'); %[minZoomX minZoomY maxZoomX maxZoomY]);
+sizeXY = getappdata(handles.labelMaker, 'sizeXY');
 if isempty(points)
     return;
 end
@@ -857,6 +928,13 @@ for thisPoint = 1:numPoints
     
     if ismember(thisPointZ, thisZ)
         if ismember(thisPointT, thisT)
+            if zoomLevel > 1
+%                 if thisPointX < zoomMinMax(1) || thisPointY < zoomMinMax(2)
+%                     continue;
+%                 end
+                thisPointX = (thisPointX-zoomMinMax(1));
+                thisPointY = (thisPointY-zoomMinMax(2));
+            end
             thePoint = impoint(gca, thisPointX, thisPointY);
             thePointHandle = findobj(thePoint,'-depth',0);
             api = iptgetapi(thePoint);
@@ -960,6 +1038,7 @@ setappdata(handles.labelMaker, 'labelsName', labelsName);
 setappdata(handles.labelMaker, 'points', []);
 set(handles.labelSelect, 'Value', 1);
 set(handles.labelSelect, 'String', vars.labelText);
+set(handles.labelSelect, 'ForegroundColor', vars.labelColour);
 refreshDisplay(handles);
 
 
@@ -991,6 +1070,7 @@ end
 save([labelsPath labelsName], 'labelText', 'labelColour', 'labelDefFile')
 setappdata(handles.labelMaker, 'labelsPath', labelsPath);
 setappdata(handles.labelMaker, 'labelsName', labelsName);
+msgbox('Label definitions saved', 'Saved', 'modal');
 
 
 
@@ -1018,10 +1098,11 @@ end
 save([labelsPath labelsName], 'labelText', 'labelColour')
 setappdata(handles.labelMaker, 'labelsPath', labelsPath);
 setappdata(handles.labelMaker, 'labelsName', labelsName);
+msgbox('Label definitions saved', 'Saved', 'modal');
 
 
 
-function getMetadata(handles)
+function answer = getMetadata(handles)
 
 global session
 
@@ -1039,9 +1120,27 @@ numZ = pixels.getSizeZ.getValue;
 sizeX = pixels.getSizeX.getValue;
 sizeY = pixels.getSizeY.getValue;
 renderingSettings = session.getRenderingSettingsService.getRenderingSettings(pixelsId);
+if isempty(renderingSettings)
+    answer = 'return';
+    return;
+end
 defaultT = renderingSettings.getDefaultT.getValue + 1;
 defaultZ = renderingSettings.getDefaultZ.getValue + 1;
 imageName = char(theImage.getName.getValue.getBytes');
+
+renderingEngine = session.createRenderingEngine;
+renderingEngine.lookupPixels(pixelsId);
+renderingEngine.lookupRenderingDef(pixelsId);
+renderingEngine.load();
+pyramid = renderingEngine.requiresPixelsPyramid();
+
+if pyramid
+    answer = questdlg({'Warning: This is a VERY LARGE image.';'This may take a long time to download';'Do you wish to continue?'}, 'Large Image', 'Yes', 'No', 'No');
+    if strcmpi(answer, 'No') || strcmpi(answer, '')
+        answer = 'return';
+        return;
+    end
+end
 
 setappdata(handles.labelMaker, 'imageId', imageId);
 setappdata(handles.labelMaker, 'imageName', imageName);
@@ -1055,6 +1154,7 @@ setappdata(handles.labelMaker, 'defaultZ', defaultZ);
 setappdata(handles.labelMaker, 'zoomLevel', 1);
 setappdata(handles.labelMaker, 'zoomROIMinMax', []);
 setappdata(handles.labelMaker, 'sizeXY', [sizeX sizeY]);
+setappdata(handles.labelMaker, 'pyramid', pyramid);
 
 
 set(handles.imageNameLabel, 'String', imageName);
@@ -1065,6 +1165,7 @@ set(handles.tLabel, 'String', ['T = ' num2str(defaultT)]);
 set(handles.zSlider, 'Value', defaultZ);
 set(handles.zLabel, 'String', ['Z = ' num2str(defaultZ)]);
 getPlanes(handles, defaultZ-1, defaultT-1);
+answer = 'go';
 
 
 % --------------------------------------------------------------------
@@ -1656,9 +1757,119 @@ function zoomInButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+zoomLevel = getappdata(handles.labelMaker, 'zoomLevel');
+zoomLevel = zoomLevel + 1;
+
+if zoomLevel > 3 
+    return;
+else
+    setappdata(handles.labelMaker, 'zoomClick', 1);
+    setappdata(handles.labelMaker, 'setPoint', 0);
+    setappdata(handles.labelMaker, 'zoomLevel', zoomLevel);
+end
+
 
 % --- Executes on button press in zoomOutButton.
 function zoomOutButton_Callback(hObject, eventdata, handles)
 % hObject    handle to zoomOutButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+setappdata(handles.labelMaker, 'zoomLevel', 1);
+setappdata(handles.labelMaker, 'zoomMinMax', []);
+setappdata(handles.labelMaker, 'zoomClick', 0);
+setappdata(handles.labelMaker, 'selectedPoint', []);
+setappdata(handles.labelMaker, 'selectedOrigColour', []);
+clearPointObjects(handles);
+refreshDisplay(handles);
+
+
+function zoomImage(handles)
+
+zoomLevel = getappdata(handles.labelMaker, 'zoomLevel');
+zoomMinMax = getappdata(handles.labelMaker, 'zoomMinMax');
+renderedImage = getappdata(handles.labelMaker, 'renderedImage');
+zoomClick = getappdata(handles.labelMaker, 'zoomClick');
+
+if zoomClick == 1   
+    currentPoint = get(gca, 'CurrentPoint');
+
+    if ~isempty(zoomMinMax)
+        minZoomX = zoomMinMax(1);
+        minZoomY = zoomMinMax(2);
+    else
+        minZoomX = 0;
+        minZoomY = 0;
+    end
+    ROIx = currentPoint(1) + minZoomX;
+    ROIy = currentPoint(3) + minZoomY;
+    [imageHeight, imageWidth, imageRGB] = size(renderedImage);
+    maxZoomX = round(ROIx + (imageWidth/(2*zoomLevel)));
+    maxZoomY = round(ROIy + (imageHeight/(2*zoomLevel)));
+    minZoomX = round(ROIx - (imageWidth/(2*zoomLevel)));
+    minZoomY = round(ROIy - (imageHeight/(2*zoomLevel)));
+    cx = currentPoint(1);
+    cy = currentPoint(3);
+
+
+
+    if maxZoomX > imageWidth
+        xDiff = maxZoomX - imageWidth;
+        cx = cx + xDiff;
+        maxZoomX = imageWidth;
+        minZoomX = round(maxZoomX-(imageWidth/(zoomLevel)));
+    end
+    if maxZoomY > imageHeight
+        yDiff = maxZoomY - imageHeight;
+        cy = cy + yDiff;
+        maxZoomY = imageHeight;
+        minZoomY = round(maxZoomY-(imageHeight/(zoomLevel)));
+    end
+    if minZoomX <= 0
+        cx = cx + minZoomX;
+        minZoomX = 1;
+        maxZoomX = round(minZoomX+(imageWidth/(zoomLevel)));
+    end
+    if minZoomY <= 0
+        cy = cy + minZoomY;
+        minZoomY = 1;
+        maxZoomY = round(minZoomY+(imageHeight/(zoomLevel)));
+    end
+else
+    minZoomX = zoomMinMax(1);
+    minZoomY = zoomMinMax(2);
+    maxZoomX = zoomMinMax(3);
+    maxZoomY = zoomMinMax(4);
+end
+    
+
+zoomImage = renderedImage(minZoomY:maxZoomY, minZoomX:maxZoomX,:);
+handles.imageHandle = imshow(zoomImage);
+set(handles.imageHandle, 'ButtonDownFcn', {@imageAnchor_ButtonDownFcn, handles});
+setappdata(handles.labelMaker, 'zoomImage', zoomImage);
+setappdata(handles.labelMaker, 'thisImageHandle', handles.imageHandle);
+if zoomClick == 1
+    setappdata(handles.labelMaker, 'zoomROICentre', [cx cy]);
+    setappdata(handles.labelMaker, 'zoomCentre', currentPoint);
+    setappdata(handles.labelMaker, 'zoomMinMax', [minZoomX minZoomY maxZoomX maxZoomY]);
+end
+
+
+
+function clearPointObjects(handles)
+
+points = getappdata(handles.labelMaker, 'points');
+numPoints = length(points);
+
+for thisPoint = 1:numPoints
+    pointHandle = points{thisPoint}.PointHandle;
+    if isempty(pointHandle)
+        continue;
+    end
+    api = iptgetapi(pointHandle);
+    api.delete();
+    points{thisPoint}.PointHandle = [];
+end
+
+setappdata(handles.labelMaker, 'points', points);
+setappdata(handles.labelMaker, 'selectedPoint', []);
