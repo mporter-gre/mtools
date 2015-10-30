@@ -18,7 +18,7 @@ function ellipseObj = createEllipseObj(x, y, z, c, t, radX, radY, transform)
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-ellipseObj = pojos.EllipseData;
+ellipseObj = omero.gateway.model.EllipseData;
 ellipseObj.setX(x);
 ellipseObj.setY(y);
 ellipseObj.setTheZ(z);

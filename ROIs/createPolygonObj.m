@@ -18,7 +18,7 @@ function polygonObj = createPolygonObj(points, z, c, t, transform)
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-polygonObj = pojos.PolygonData;
+polygonObj = omero.gateway.model.PolygonData;
 polygonObj.setPoints(points);
 polygonObj.setTheZ(z);
 polygonObj.setTheC(c);

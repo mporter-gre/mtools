@@ -18,7 +18,7 @@ function rectObj = createRectObj(x, y, z, t, width, height)
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-rectObj = pojos.RectangleData;
+rectObj = omero.gateway.model.RectangleData;
 rectObj.setX(x);
 rectObj.setY(y);
 rectObj.setZ(z);
