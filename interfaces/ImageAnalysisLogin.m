@@ -361,7 +361,7 @@ try
         userLoginOmero(credentials{1}, credentials{2}, credentials{3}, credentials{4});
         saveHistory(credentials);
         success = true;
-        selectUserDefaultGroup(credentials{1}, handles, 'ImageAnalysisLoginWindow');
+        selectUserDefaultGroup({credentials{1}}, handles, 'ImageAnalysisLoginWindow');
     else
         try
             experimenter = char(session.getAdminService.getExperimenter(0).getOmeName.getValue.getBytes)';
