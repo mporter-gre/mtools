@@ -25,7 +25,7 @@ switch shapeClass
     case {'omero.model.EllipseI'}
         shapeType = 'ellipse';
     
-    case {'omero.model.RectI'}
+    case {'omero.model.RectangleI'}
         shapeType = 'rect';
     
     case{'omero.model.PolylineI'}
