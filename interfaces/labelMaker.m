@@ -699,8 +699,10 @@ copyPoints = [];
 for thisPoint = 1:numPoints
     if strcmpi(points{thisPoint}.label, labelSelectString{labelIdx});
         thePoint = points{thisPoint}.PointHandle;
-        api = iptgetapi(thePoint);
-        api.delete();
+        if ~isempty(thePoint)
+            api = iptgetapi(thePoint);
+            api.delete();
+        end
     else
         copyPoints = [copyPoints thisPoint];
     end

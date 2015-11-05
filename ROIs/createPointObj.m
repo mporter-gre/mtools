@@ -18,7 +18,7 @@ function pointObj = createPointObj(x, y, z, c, t, transform)
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-pointObj = pojos.PointData;
+pointObj = omero.gateway.model.PointData;
 pointObj.setX(x);
 pointObj.setY(y);
 pointObj.setZ(z);

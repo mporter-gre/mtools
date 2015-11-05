@@ -21,7 +21,7 @@ function roiObj = buildROIObj(roiShapes)
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 numShapes = roiShapes.numShapes;
-roiObj = pojos.ROIData;
+roiObj = omero.gateway.model.ROIData;
 for thisShape = 1:numShapes
     shapeObj = roiShapes.(['shape' num2str(thisShape)]);
     roiObj.addShapeData(shapeObj);

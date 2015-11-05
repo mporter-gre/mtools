@@ -18,7 +18,7 @@ function lineObj = createLineObj(points, z, c, t, transform)
 % with this program; if not, write to the Free Software Foundation, Inc.,
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-lineObj = pojos.LineData;
+lineObj = omero.gateway.model.LineData;
 lineObj.setPoints(points);
 lineObj.setTheZ(z);
 lineObj.setTheC(c);

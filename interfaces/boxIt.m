@@ -1171,7 +1171,7 @@ for thisROI = 1:numROIs
     if ROIs{thisROI}.ROIId > 0 %Don't re-save ROIs. If it has a server id then skip it out.
         continue;
     end
-    ROIObj = pojos.ROIData;
+    ROIObj = omero.gateway.model.ROIData;
     ROIObj.setImage(theImage);
     numShapes = ROIs{thisROI}.numShapes;
     for thisShape = 1:numShapes
