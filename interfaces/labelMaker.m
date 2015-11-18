@@ -1243,12 +1243,12 @@ end
 try
     xlswrite([filePath fileName], summaryByT, 'Summary by T');
 catch
-    manualCSV(summaryByImage, filePath, [fileName '_summaryByT']);
+    manualCSV(summaryByT, filePath, [fileName '_summaryByT']);
 end
 try
     xlswrite([filePath fileName], summaryByZ, 'Summary by Z');
 catch
-    manualCSV(summaryByImage, filePath, [fileName '_summaryByZ']);
+    manualCSV(summaryByZ, filePath, [fileName '_summaryByZ']);
 end
 
 
