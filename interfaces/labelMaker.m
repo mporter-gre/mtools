@@ -1261,6 +1261,8 @@ function batchAnalysisItem_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global session
+
 warning('off', 'MATLAB:xlswrite:AddSheet');
 setappdata(handles.labelMaker, 'conditions', []);
 setappdata(handles.labelMaker, 'conditionsPaths', []);
@@ -1287,6 +1289,7 @@ if isempty(conditions)
     return;
 end
 [fileName filePath] = uiputfile('*.xls', 'Save batch data', filePath);
+setappdata(handles.labelMaker, 'filePath', filePath);
 if fileName == 0
     return;
 end
@@ -1298,6 +1301,11 @@ for thisCondition = 1:numConditions
         waitbar(thisStep/(numSteps+1));
         thisStep = thisStep + 1;
         [points{thisCondition}{thisFile} imageId{thisCondition}{thisFile}] = getPointsAndImageId([conditionsPaths{thisCondition} conditionsFiles{thisCondition}{thisFile}]);
+        theImage = getImages(session, imageId{thisCondition}{thisFile});
+        pixels = theImage.getPrimaryPixels;
+        numT = pixels.getSizeT.getValue;
+        numZ = pixels.getSizeZ.getValue;
+        
         if analyseIndividualFiles == 1
 %             imageObj = gateway.getImage(imageId{thisCondition}{thisFile});
 %             imageNameFull = char(imageObj.getName.getValue.getBytes');
@@ -1307,8 +1315,8 @@ for thisCondition = 1:numConditions
             imageName = conditionsFiles{thisCondition}{thisFile}(1:end-4);
             imageNameXls = [imageName '.xls'];
             summaryByImage = pointsSummaryByImage(points{thisCondition}{thisFile}, imageName);
-            summaryByT = pointsSummaryByT(points{thisCondition}{thisFile}, imageName, handles);
-            summaryByZ = pointsSummaryByZ(points{thisCondition}{thisFile}, imageName, handles);
+            summaryByT = pointsSummaryByT(points{thisCondition}{thisFile}, imageName, handles, numT);
+            summaryByZ = pointsSummaryByZ(points{thisCondition}{thisFile}, imageName, handles, numZ);
             try
                 xlswrite([filePath imageNameXls], summaryByImage, 'Summary by Image');
             catch
@@ -1319,12 +1327,12 @@ for thisCondition = 1:numConditions
             try
                 xlswrite([filePath imageNameXls], summaryByT, 'Summary by T');
             catch
-                manualCSV(summaryByImage, filePath, [imageName '_summaryByT']);
+                manualCSV(summaryByT, filePath, [imageName '_summaryByT']);
             end
             try
                 xlswrite([filePath imageNameXls], summaryByZ, 'Summary by Z');
             catch
-                manualCSV(summaryByImage, filePath, [imageName '_summaryByZ']);
+                manualCSV(summaryByZ, filePath, [imageName '_summaryByZ']);
             end
         end
     end
@@ -1338,17 +1346,17 @@ try
     xlswrite([filePath fileName], batchSummary, 'Batch Summary');
 catch
     [fileName remain] = strtok(fileName, '.');
-    manualCSV(summaryByImage, filePath, [fileName 'batchSummary']);
+    manualCSV(batchSummary, filePath, [fileName 'batchSummary']);
 end
 try
     xlswrite([filePath fileName], batchSummaryByT, 'Batch Summary By T');
 catch
-    manualCSV(summaryByImage, filePath, [fileName 'batchSummaryByT']);
+    manualCSV(batchSummaryByT, filePath, [fileName 'batchSummaryByT']);
 end
 try
     xlswrite([filePath fileName], batchSummaryByZ, 'Batch Summary By Z');
 catch
-    manualCSV(summaryByImage, filePath, [fileName 'batchSummaryByZ']);
+    manualCSV(batchSummaryByZ, filePath, [fileName 'batchSummaryByZ']);
 end
 close(waitbarHandle);
 warndlg('Analysis complete', 'Complete');
@@ -1393,10 +1401,9 @@ imageSummary = [titleLine; labelLine; counterLine; percentLine];
 
 
 
-function summaryByT = pointsSummaryByT(points, imageName, handles)
+function summaryByT = pointsSummaryByT(points, imageName, handles, numT)
 
 numPoints = length(points);
-numT = getappdata(handles.labelMaker, 'numT');
 
 for thisPoint = 1:numPoints
     labels{thisPoint} = points{thisPoint}.label;
@@ -1443,10 +1450,9 @@ summaryByT = [titleLine; labelLine; counterBlock];
 
 
 
-function summaryByZ = pointsSummaryByZ(points, imageName, handles)
+function summaryByZ = pointsSummaryByZ(points, imageName, handles, numZ)
 
 numPoints = length(points);
-numZ = getappdata(handles.labelMaker, 'numZ');
 
 for thisPoint = 1:numPoints
     labels{thisPoint} = points{thisPoint}.label;

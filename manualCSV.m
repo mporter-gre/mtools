@@ -20,7 +20,7 @@ function manualCSV(data, filePath, fileName)
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 %Ensure the .csv extension.
-[fileName remain] = strtok(fileName, '.');
+%[fileName remain] = strtok(fileName, '.');
 filePathName = [filePath fileName '.csv'];
 
 %Make sure the data are all strings.
@@ -34,7 +34,7 @@ for thisRow = 1:rows
 end
 
 %Write out data to file
-fid = fopen(filePathName, 'w');
+fid = fopen(filePathName, 'a');
 for thisRow = 1:rows
     for thisCol = 1:cols
         fprintf(fid, '%s', data{thisRow, thisCol});
