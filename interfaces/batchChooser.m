@@ -55,6 +55,8 @@ function batchChooser_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for batchChooser
 handles.output = hObject;
 handles.parentHandles = varargin{1};
+filePath = getappdata(handles.parentHandles.labelMaker, 'filePath');
+setappdata(handles.batchChooser, 'filePath', filePath);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -106,13 +108,14 @@ function addLabelsButton_Callback(hObject, eventdata, handles)
 conditions = getappdata(handles.batchChooser, 'conditions');
 conditionsPaths = getappdata(handles.batchChooser, 'conditionsPaths');
 conditionsFiles = getappdata(handles.batchChooser, 'conditionsFiles');
+filePath = getappdata(handles.batchChooser, 'filePath');
 conditionText = get(handles.conditionText, 'String');
 
 if isempty(conditionText)
     uicontrol(handles.conditionText);
     return;
 end
-[fileNames filePath] = uigetfile('*.mat', ['Choose label files for ', conditionText], 'MultiSelect', 'on');
+[fileNames filePath] = uigetfile('*.mat', ['Choose label files for ', conditionText], 'MultiSelect', 'on', filePath);
 
 conditions{end+1} = conditionText;
 conditionsPaths{end+1} = filePath;
@@ -132,6 +135,7 @@ set(handles.conditionText, 'String', '');
 uicontrol(handles.conditionText);
 setappdata(handles.batchChooser, 'conditionsPaths', conditionsPaths);
 setappdata(handles.batchChooser, 'conditionsFiles', conditionsFiles);
+setappdata(handles.batchChooser, 'filePath', filePath);
 
 
     
@@ -169,10 +173,12 @@ function analyseButton_Callback(hObject, eventdata, handles)
 conditions = getappdata(handles.batchChooser, 'conditions');
 conditionsPaths = getappdata(handles.batchChooser, 'conditionsPaths');
 conditionsFiles = getappdata(handles.batchChooser, 'conditionsFiles');
+filePath = getappdata(handles.batchChooser, 'filePath');
 
 setappdata(handles.parentHandles.labelMaker, 'conditions', conditions);
 setappdata(handles.parentHandles.labelMaker, 'conditionsPaths', conditionsPaths);
 setappdata(handles.parentHandles.labelMaker, 'conditionsFiles', conditionsFiles);
+setappdata(handles.parentHandles.labelMaker, 'filePath', filePath);
 if get(handles.individualFilesCheck, 'Value') == 1
     setappdata(handles.parentHandles.labelMaker, 'analyseIndividualFiles', 1);
 else
