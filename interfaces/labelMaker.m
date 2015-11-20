@@ -1225,9 +1225,13 @@ if isempty(points)
     return;
 end
 imageName = getappdata(handles.labelMaker, 'imageName');
+theImage = getappdata(handles.labelMaker, 'theImage');
+pixels = theImage.getPrimaryPixels;
+numT = pixels.getSizeT.getValue;
+numZ = pixels.getSizeZ.getValue;
 summaryByImage = pointsSummaryByImage(points, imageName);
-summaryByT = pointsSummaryByT(points, imageName, handles);
-summaryByZ = pointsSummaryByZ(points, imageName, handles);
+summaryByT = pointsSummaryByT(points, imageName, handles, numT);
+summaryByZ = pointsSummaryByZ(points, imageName, handles, numZ);
 filePath = getappdata(handles.labelMaker, 'filePath');
 [fileName filePath] = uiputfile('*.xls', 'Save data', filePath);
 if fileName == 0
