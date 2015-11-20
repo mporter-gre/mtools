@@ -22,7 +22,7 @@ function varargout = labelMaker(varargin)
 
 % Edit the above text to modify the response to help labelmaker
 
-% Last Modified by GUIDE v2.5 01-Sep-2015 21:36:47
+% Last Modified by GUIDE v2.5 20-Nov-2015 14:48:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1255,6 +1255,10 @@ catch
     manualCSV(summaryByZ, filePath, [fileName '_summaryByZ']);
 end
 
+refreshDisplay(handles);
+warndlg('Analysis complete', 'Complete', 'modal');
+
+
 
 
 
@@ -1363,7 +1367,9 @@ catch
     manualCSV(batchSummaryByZ, filePath, [fileName 'batchSummaryByZ']);
 end
 close(waitbarHandle);
-warndlg('Analysis complete', 'Complete');
+refreshDisplay(handles);
+warndlg('Analysis complete', 'Complete', 'modal');
+
 
 
 
