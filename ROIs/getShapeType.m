@@ -27,7 +27,10 @@ switch shapeClass
     
     case {'omero.model.RectangleI'}
         shapeType = 'rect';
-    
+        
+    case {'omero.model.RectI'}
+        shapeType = 'rect';
+        
     case{'omero.model.PolylineI'}
         shapeType = 'polyLine';
         
