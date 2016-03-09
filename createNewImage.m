@@ -42,9 +42,15 @@ end
 dimOrder = omero.model.DimensionOrderI;
 dimOrder.setValue(omero.rtypes.rstring('XYZCT'));
 
-newPixels.setPhysicalSizeX(omero.rtypes.rdouble(physSizeX));
-newPixels.setPhysicalSizeY(omero.rtypes.rdouble(physSizeY));
-newPixels.setPhysicalSizeZ(omero.rtypes.rdouble(physSizeZ));
+
+micronUnit = omero.model.enums.UnitsLength.MICROMETER;
+
+lenObjX = omero.model.LengthI(physSizeX, micronUnit);
+lenObjY = omero.model.LengthI(physSizeY, micronUnit);
+lenObjZ = omero.model.LengthI(physSizeZ, micronUnit);
+newPixels.setPhysicalSizeX(lenObjX);
+newPixels.setPhysicalSizeY(lenObjY);
+newPixels.setPhysicalSizeZ(lenObjZ);
 newPixels.setPixelsType(omeroPixelsType);
 newPixels.setSizeX(omero.rtypes.rint(sizeX));
 newPixels.setSizeY(omero.rtypes.rint(sizeY));
@@ -80,7 +86,9 @@ for thisChannel = 1:length(channelList)
     end
 
     channel.setStatsInfo(statsInfo);
-    logicalChannel.setEmissionWave(omero.rtypes.rint(channelList{thisChannel}));
+    nanometreUnit = omero.model.enums.UnitsLength.NANOMETER;
+    wavelengthObj = omero.model.LengthI(channelList{thisChannel}, nanometreUnit);
+    logicalChannel.setEmissionWave(wavelengthObj);
     channel.setLogicalChannel(logicalChannel);
     %javaChannelList.add(channel);
     newPixels.addChannel(channel);
