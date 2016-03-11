@@ -18,7 +18,7 @@ function intensityMeasureLaunchpad(handles, credentials)
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 try
-    [segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds, imageNames, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize] = ImageSegmentation(handles, credentials);
+    [segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds, imageNames, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize, datasetIds] = ImageSegmentation(handles, credentials);
 catch ME
     disp(ME.message)
     return;
@@ -32,11 +32,11 @@ for thisImage = 1:numImages
 end
 close(progBar);
 
-writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize);
+writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize, datasetIds);
 
 
 
-function writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize)
+function writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize, datasetIds)
 
 %Find the maximum number of channels needing written out.
 

@@ -170,6 +170,8 @@ else
     varargout{18} = 0;
 end
 
+varargout{19} = getappdata(handles.ImageSegmentation, 'selectedDsIds');
+
 
 close(hObject)
 drawnow;
