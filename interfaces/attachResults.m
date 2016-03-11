@@ -63,6 +63,7 @@ numProj = length(projList);
 numDs = length(dsList);
 projPanel = handles.projPanel;
 dsPanel = handles.dsPanel;
+%%%%Change this to work out the projects list from the dsList/Ids
 setappdata(handles.attachResults, 'chkCounter', 0);
 setappdata(handles.attachResults, 'numProj', numProj);
 setappdata(handles.attachResults, 'numDs', numDs);

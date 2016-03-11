@@ -262,6 +262,8 @@ try
     if groupObjects == 0
         xlswrite([savePath saveFile], objectDataOut, 'Data by Object');
     end
+    %Make the dsList structure, remove projList
+    attachResults(projList, dsList, saveFile, savePath);
 catch
     %If the xlswriter fails (no MSOffice installed, e.g.) then manually
     %create a .csv file. Turn every cell to string to make it easier. Do
