@@ -22,7 +22,7 @@ function varargout = attachResults(varargin)
 
 % Edit the above text to modify the response to help attachResults
 
-% Last Modified by GUIDE v2.5 11-Mar-2016 15:00:58
+% Last Modified by GUIDE v2.5 25-Mar-2016 14:48:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,34 +55,47 @@ function attachResults_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for attachResults
 handles.output = hObject;
 
-projList = varargin{1};
-dsList = varargin{2};
-fileNames = varargin{3};
-filePath = varargin{4};
-numProj = length(projList);
-numDs = length(dsList);
+dsList = varargin{1};
+fileNames = varargin{2};
+filePath = varargin{3};
+projList = getProjectIdsFromDatasetIds(dsList);
+numProjRtnd = size(projList,1);
+possIdx = 1:numProjRtnd;
+[~, idx] = unique([projList{:,1}], 'stable');
+idxDel = setdiff(possIdx, idx);
+projList(idxDel,:) = [];
+numProj = size(projList,1);
+numDs = size(dsList,1);
 projPanel = handles.projPanel;
 dsPanel = handles.dsPanel;
 %%%%Change this to work out the projects list from the dsList/Ids
+
 setappdata(handles.attachResults, 'chkCounter', 0);
 setappdata(handles.attachResults, 'numProj', numProj);
 setappdata(handles.attachResults, 'numDs', numDs);
 setappdata(handles.attachResults, 'fileNames', fileNames);
 setappdata(handles.attachResults, 'filePath', filePath);
-set(handles.projSlider, 'Min', 1);
-set(handles.projSlider, 'Max', numProj);
-set(handles.projSlider, 'Value', numProj);
-set(handles.projSlider, 'SliderStep', [1/numProj , 10/numProj]);
-set(handles.dsSlider, 'Min', 1);
-set(handles.dsSlider, 'Max', numDs);
-set(handles.dsSlider, 'Value', numDs);
-set(handles.dsSlider, 'SliderStep', [1/numDs , 10/numDs]);
+setappdata(handles.attachResults, 'projList', projList);
+setappdata(handles.attachResults, 'dsList', dsList);
+
+if numProj > 8
+    set(handles.projSlider, 'Min', 1);
+    set(handles.projSlider, 'Max', numProj);
+    set(handles.projSlider, 'Value', numProj);
+    set(handles.projSlider, 'SliderStep', [1/numProj , 10/numProj]);
+end
+if numDs > 8
+    set(handles.dsSlider, 'Min', 1);
+    set(handles.dsSlider, 'Max', numDs);
+    set(handles.dsSlider, 'Value', numDs);
+    set(handles.dsSlider, 'SliderStep', [1/numDs , 10/numDs]);
+end
 
 %Build the checkboxes for projects and datasets
 uiStepY = 1.846;
 topPos = 13.077;
 for thisProj = 1:numProj
-    handles.(['projChk' num2str(thisProj)]) = uicontrol(projPanel, 'Style', 'Checkbox', 'String', projList{thisProj,1}, 'Units', 'characters', 'Position', [2.6, topPos, 38, 1.846], 'Callback', {@checkbox_Callback, handles}, 'TooltipString', projList{thisProj,1});
+    handles.(['projChk' num2str(thisProj)]) = uicontrol(projPanel, 'Style', 'Checkbox', 'String', projList{thisProj,2}, 'Units', 'characters', 'Position', [2.6, topPos, 38, 1.846], 'Callback', {@checkbox_Callback, handles}, 'TooltipString', projList{thisProj,2});
     if thisProj > 8
         set(handles.(['projChk' num2str(thisProj)]), 'Visible', 'off');
     end
@@ -120,7 +133,7 @@ function varargout = attachResults_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-%varargout{1} = handles.output;
+varargout{1} = 0;
 
 
 % --- Executes on button press in attachBtn.
@@ -129,12 +142,37 @@ function attachBtn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global session
+
+
 numProj = getappdata(handles.attachResults, 'numProj');
 numDs = getappdata(handles.attachResults, 'numDs');
+projList = getappdata(handles.attachResults, 'projList');
+dsList = getappdata(handles.attachResults, 'dsList');
 fileNames = getappdata(handles.attachResults, 'fileNames');
 filePath = getappdata(handles.attachResults, 'filePath');
+numFiles = size(fileNames, 2);
 
-numFiles = length(fileNames);
+for thisFile = 1:numFiles
+    thisFilePath = [filePath fileNames{thisFile}];
+    fa = writeFileAnnotation(session, thisFilePath, 'Description', ['Results created with OMERO.mtools on ' date]);
+    
+    for thisProj = 1:numProj
+        val = get(handles.(['projChk' num2str(thisProj)]), 'Value');
+        if val == 1
+            projId = projList{thisProj, 1};
+            link = linkAnnotation(session, fa, 'project', projId);
+        end
+    end
+    for thisDs = 1:numDs
+        val = get(handles.(['dsChk' num2str(thisDs)]), 'Value');
+        if val == 1
+            dsId = dsList{thisDs, 2};
+            link = linkAnnotation(session, fa, 'dataset', dsId);
+        end
+    end
+end
+    
 
 
 % --- Executes on button press in cancelBtn.
@@ -142,6 +180,7 @@ function cancelBtn_Callback(hObject, eventdata, handles)
 % hObject    handle to cancelBtn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+attachResults_CloseRequestFcn('a','b',handles);
 
 
 function checkbox_Callback(hObject, callbackdata, handles)
@@ -260,3 +299,21 @@ for thisProj = 1:numProj
         topPos = topPos - uiStepY;
     end
 end
+
+
+
+% --- Executes when user attempts to close boxIt.
+function attachResults_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to attachResults (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+
+answer = questdlg([{'Are you sure you do not want to attach'} {'your results to a project or dataset?'}], 'Discard Changes?', 'Yes', 'No', 'No');
+if strcmp(answer, 'No')
+    return;
+end
+
+uiresume(handles.attachResults);
+delete(handles.attachResults);
