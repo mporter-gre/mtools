@@ -3,11 +3,11 @@ function projList = getProjectIdsFromDatasetIds(dsList)
 global session;
 
 queryService = session.getQueryService;
-numDs = size(dsList,1);
+numDs = length(dsList);
 projList = {};
 
 for thisDs = 1:numDs
-    qString = ['select link from ProjectDatasetLink as link where link.child.id = ' num2str(dsList{thisDs, 2})];
+    qString = ['select link from ProjectDatasetLink as link where link.child.id = ' num2str(dsList(thisDs))];
     result = queryService.findAllByQuery(qString, []);
     
     numProj = result.size;

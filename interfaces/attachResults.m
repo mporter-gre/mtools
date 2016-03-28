@@ -53,6 +53,7 @@ function attachResults_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to attachResults (see VARARGIN)
 
 % Choose default command line output for attachResults
+global session
 handles.output = hObject;
 
 dsList = varargin{1};
@@ -65,7 +66,7 @@ possIdx = 1:numProjRtnd;
 idxDel = setdiff(possIdx, idx);
 projList(idxDel,:) = [];
 numProj = size(projList,1);
-numDs = size(dsList,1);
+numDs = length(dsList);
 projPanel = handles.projPanel;
 dsPanel = handles.dsPanel;
 %%%%Change this to work out the projects list from the dsList/Ids
@@ -77,6 +78,7 @@ setappdata(handles.attachResults, 'fileNames', fileNames);
 setappdata(handles.attachResults, 'filePath', filePath);
 setappdata(handles.attachResults, 'projList', projList);
 setappdata(handles.attachResults, 'dsList', dsList);
+setappdata(handles.attachResults, 'allowClose', 0);
 
 if numProj > 8
     set(handles.projSlider, 'Min', 1);
@@ -104,7 +106,9 @@ end
 
 topPos = 13.077;
 for thisDs = 1:numDs
-    handles.(['dsChk' num2str(thisDs)]) = uicontrol(dsPanel, 'Style', 'Checkbox', 'String', dsList{thisDs,1}, 'Units', 'characters', 'Position', [2.6, topPos, 38, 1.846], 'Callback', {@checkbox_Callback, handles}, 'TooltipString', dsList{thisDs,1});
+    thisDsObj = getDatasets(session, dsList(thisDs));
+    thisDsName = char(thisDsObj.getName.getValue.getBytes');
+    handles.(['dsChk' num2str(thisDs)]) = uicontrol(dsPanel, 'Style', 'Checkbox', 'String', thisDsName, 'Units', 'characters', 'Position', [2.6, topPos, 38, 1.846], 'Callback', {@checkbox_Callback, handles}, 'TooltipString', thisDsName);
     if thisDs > 8
         set(handles.(['dsChk' num2str(thisDs)]), 'Visible', 'off');
     end
@@ -144,17 +148,23 @@ function attachBtn_Callback(hObject, eventdata, handles)
 
 global session
 
-
+set(hObject, 'Enable', 'off');
+set(handles.cancelBtn, 'Enable', 'off');
+drawnow;
 numProj = getappdata(handles.attachResults, 'numProj');
 numDs = getappdata(handles.attachResults, 'numDs');
 projList = getappdata(handles.attachResults, 'projList');
 dsList = getappdata(handles.attachResults, 'dsList');
 fileNames = getappdata(handles.attachResults, 'fileNames');
 filePath = getappdata(handles.attachResults, 'filePath');
-numFiles = size(fileNames, 2);
+numFiles = size(fileNames, 1);
 
 for thisFile = 1:numFiles
-    thisFilePath = [filePath fileNames{thisFile}];
+    if numFiles == 1
+        thisFilePath = [filePath fileNames];
+    else
+        thisFilePath = [filePath fileNames{thisFile}];
+    end
     fa = writeFileAnnotation(session, thisFilePath, 'Description', ['Results created with OMERO.mtools on ' date]);
     
     for thisProj = 1:numProj
@@ -167,11 +177,16 @@ for thisFile = 1:numFiles
     for thisDs = 1:numDs
         val = get(handles.(['dsChk' num2str(thisDs)]), 'Value');
         if val == 1
-            dsId = dsList{thisDs, 2};
+            dsId = dsList(thisDs);
             link = linkAnnotation(session, fa, 'dataset', dsId);
         end
     end
 end
+set(hObject, 'Enable', 'on');
+set(handles.cancelBtn, 'Enable', 'on');
+uiwait(msgbox('Results attached.', 'modal'));
+setappdata(handles.attachResults, 'allowClose', 1);
+attachResults_CloseRequestFcn(hObject, eventdata, handles);
     
 
 
@@ -310,9 +325,13 @@ function attachResults_CloseRequestFcn(hObject, eventdata, handles)
 
 % Hint: delete(hObject) closes the figure
 
-answer = questdlg([{'Are you sure you do not want to attach'} {'your results to a project or dataset?'}], 'Discard Changes?', 'Yes', 'No', 'No');
-if strcmp(answer, 'No')
-    return;
+allowClose = getappdata(handles.attachResults, 'allowClose');
+
+if allowClose == 0
+    answer = questdlg([{'Are you sure you do not want to attach'} {'your results to a project or dataset?'}], 'Discard Changes?', 'Yes', 'No', 'No');
+    if strcmp(answer, 'No')
+        return;
+    end
 end
 
 uiresume(handles.attachResults);

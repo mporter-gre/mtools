@@ -263,7 +263,7 @@ try
         xlswrite([savePath saveFile], objectDataOut, 'Data by Object');
     end
     %Make the dsList structure, remove projList
-    attachResults(dsList, saveFile, savePath);
+    attachResults(datasetIds, saveFile, savePath);
 catch
     %If the xlswriter fails (no MSOffice installed, e.g.) then manually
     %create a .csv file. Turn every cell to string to make it easier. Do
@@ -290,6 +290,8 @@ catch
         fprintf(fid, '%s\n', '');
     end
     fclose(fid);
+    saveFile = {};
+    saveFile{1} = saveROI;
     if groupObjects == 0
         [obRows obCols] = size(objectDataOut);
         for thisRow = 1:obRows
@@ -308,5 +310,7 @@ catch
             fprintf(fid, '%s\n', '');
         end
         fclose(fid);
+        saveFile{2} = saveObject;
     end
+    attachResults(datasetIds, saveFile, savePath);
 end
