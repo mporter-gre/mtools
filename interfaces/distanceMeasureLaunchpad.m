@@ -200,4 +200,5 @@ catch
         fprintf(fid, '%s\n', '');
     end
     fclose(fid);
+    attachResults(datasetIds, saveFile, savePath);
 end
