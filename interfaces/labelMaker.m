@@ -1319,6 +1319,7 @@ for thisCondition = 1:numConditions
         thisStep = thisStep + 1;
         [points{thisCondition}{thisFile} imageId{thisCondition}{thisFile}] = getPointsAndImageId([conditionsPaths{thisCondition} conditionsFiles{thisCondition}{thisFile}]);
         theImage = getImages(session, imageId{thisCondition}{thisFile});
+        imageId = theImage.getId.getValue;
         pixels = theImage.getPrimaryPixels;
         numT = pixels.getSizeT.getValue;
         numZ = pixels.getSizeZ.getValue;
@@ -1334,22 +1335,31 @@ for thisCondition = 1:numConditions
             summaryByImage = pointsSummaryByImage(points{thisCondition}{thisFile}, imageName);
             summaryByT = pointsSummaryByT(points{thisCondition}{thisFile}, imageName, handles, numT);
             summaryByZ = pointsSummaryByZ(points{thisCondition}{thisFile}, imageName, handles, numZ);
+            
+            answer = questdlg({'Do you also want to attach the individual'; 'files to their images on the server?'}, 'Attach Data', 'Yes', 'No', 'Yes');
+            
             try
                 xlswrite([filePath imageNameXls], summaryByImage, 'Summary by Image');
+                xlswrite([filePath imageNameXls], summaryByT, 'Summary by T');
+                xlswrite([filePath imageNameXls], summaryByZ, 'Summary by Z');
+                if strcmp(answer, 'Yes')
+                    fa = writeFileAnnotation(session, [filePath fileName], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    link = linkAnnotation(session, fa, 'image', imageId);
+                end
             catch
                 [fileName remain] = strtok(fileName, '.');
                 delete([filePath fileName]);
                 manualCSV(summaryByImage, filePath, [imageName '_SummaryByImage']);
-            end
-            try
-                xlswrite([filePath imageNameXls], summaryByT, 'Summary by T');
-            catch
                 manualCSV(summaryByT, filePath, [imageName '_summaryByT']);
-            end
-            try
-                xlswrite([filePath imageNameXls], summaryByZ, 'Summary by Z');
-            catch
                 manualCSV(summaryByZ, filePath, [imageName '_summaryByZ']);
+                if strcmp(answer, 'Yes')
+                    fa1 = writeFileAnnotation(session, [filePath fileName '_SummaryByImage.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    fa2 = writeFileAnnotation(session, [filePath fileName '_summaryByT.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    fa3 = writeFileAnnotation(session, [filePath fileName '_summaryByZ.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    link = linkAnnotation(session, fa1, 'image', imageId);
+                    link = linkAnnotation(session, fa2, 'image', imageId);
+                    link = linkAnnotation(session, fa3, 'image', imageId);
+                end
             end
         end
     end
@@ -1361,20 +1371,17 @@ batchSummaryByZ = batchPointsSummaryByZ(points, handles);
 waitbar(1);
 try
     xlswrite([filePath fileName], batchSummary, 'Batch Summary');
+    xlswrite([filePath fileName], batchSummaryByT, 'Batch Summary By T');
+    xlswrite([filePath fileName], batchSummaryByZ, 'Batch Summary By Z');
+    
+    attachResults(datasetIds, saveFile, savePath);
 catch
     [fileName remain] = strtok(fileName, '.');
     manualCSV(batchSummary, filePath, [fileName 'batchSummary']);
-end
-try
-    xlswrite([filePath fileName], batchSummaryByT, 'Batch Summary By T');
-catch
     manualCSV(batchSummaryByT, filePath, [fileName 'batchSummaryByT']);
-end
-try
-    xlswrite([filePath fileName], batchSummaryByZ, 'Batch Summary By Z');
-catch
     manualCSV(batchSummaryByZ, filePath, [fileName 'batchSummaryByZ']);
 end
+
 close(waitbarHandle);
 refreshDisplay(handles);
 warndlg('Analysis complete', 'Complete', 'modal');
