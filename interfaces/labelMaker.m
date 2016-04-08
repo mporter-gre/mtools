@@ -1239,7 +1239,7 @@ filePath = getappdata(handles.labelMaker, 'filePath');
 if fileName == 0
     return;
 end
-answer = questdlg({'Do you also want to attach the data'; 'to the image on the server?'}, 'Yes', 'No', 'Yes');
+answer = questdlg({'Do you also want to attach the data'; 'to the image on the server?'}, 'Attach Data', 'Yes', 'No', 'Yes');
 try
     xlswrite([filePath fileName], summaryByImage, 'Summary by Image');
     xlswrite([filePath fileName], summaryByT, 'Summary by T');
