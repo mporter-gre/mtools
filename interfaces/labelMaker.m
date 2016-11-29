@@ -443,10 +443,15 @@ function refreshDisplay(handles)
 z = round(get(handles.zSlider, 'Value'));
 t = round(get(handles.tSlider, 'Value'));
 
-clearPointObjects(handles);
-getPlanes(handles, z-1, t-1);
-redrawImage(handles);
-redrawPoints(handles);
+try
+    clearPointObjects(handles);
+    getPlanes(handles, z-1, t-1);
+    redrawImage(handles);
+    redrawPoints(handles);
+catch
+    %If there is no image loaded then just return
+    return;
+end
 
 
 
@@ -1265,7 +1270,7 @@ catch
 end
 
 refreshDisplay(handles);
-warndlg('Analysis complete', 'Complete', 'modal');
+msgbox('Analysis complete', 'Complete', 'modal');
 
 
 
@@ -1317,8 +1322,8 @@ for thisCondition = 1:numConditions
     for thisFile = 1:numFilesThisCondition
         waitbar(thisStep/(numSteps+1));
         thisStep = thisStep + 1;
-        [points{thisCondition}{thisFile} imageId{thisCondition}{thisFile}] = getPointsAndImageId([conditionsPaths{thisCondition} conditionsFiles{thisCondition}{thisFile}]);
-        theImage = getImages(session, imageId{thisCondition}{thisFile});
+        [points{thisCondition}{thisFile} imageIds{thisCondition}{thisFile}] = getPointsAndImageId([conditionsPaths{thisCondition} conditionsFiles{thisCondition}{thisFile}]);
+        theImage = getImages(session, imageIds{thisCondition}{thisFile});
         imageId = theImage.getId.getValue;
         pixels = theImage.getPrimaryPixels;
         numT = pixels.getSizeT.getValue;
@@ -1353,9 +1358,9 @@ for thisCondition = 1:numConditions
                 manualCSV(summaryByT, filePath, [imageName '_summaryByT']);
                 manualCSV(summaryByZ, filePath, [imageName '_summaryByZ']);
                 if strcmp(answer, 'Yes')
-                    fa1 = writeFileAnnotation(session, [filePath fileName '_SummaryByImage.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
-                    fa2 = writeFileAnnotation(session, [filePath fileName '_summaryByT.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
-                    fa3 = writeFileAnnotation(session, [filePath fileName '_summaryByZ.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    fa1 = writeFileAnnotation(session, [filePath imageName '_SummaryByImage.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    fa2 = writeFileAnnotation(session, [filePath imageName '_summaryByT.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    fa3 = writeFileAnnotation(session, [filePath imageName '_summaryByZ.csv'], 'Description', ['Results created with OMERO.mtools on ' date]);
                     link = linkAnnotation(session, fa1, 'image', imageId);
                     link = linkAnnotation(session, fa2, 'image', imageId);
                     link = linkAnnotation(session, fa3, 'image', imageId);
@@ -1373,13 +1378,16 @@ try
     xlswrite([filePath fileName], batchSummary, 'Batch Summary');
     xlswrite([filePath fileName], batchSummaryByT, 'Batch Summary By T');
     xlswrite([filePath fileName], batchSummaryByZ, 'Batch Summary By Z');
-    
+    dsList = getDatasetIdsFromImageIds(imageIds);
+    datasetIds = dsList(:,1);
     attachResults(datasetIds, saveFile, savePath);
 catch
     [fileName remain] = strtok(fileName, '.');
     manualCSV(batchSummary, filePath, [fileName 'batchSummary']);
     manualCSV(batchSummaryByT, filePath, [fileName 'batchSummaryByT']);
     manualCSV(batchSummaryByZ, filePath, [fileName 'batchSummaryByZ']);
+    saveFiles = {[fileName 'batchSummary.csv'] [fileName 'batchSummaryByT.csv'] [fileName 'batchSummaryByZ.csv']};
+    attachResults(datasetIds, saveFiles, savePath);
 end
 
 close(waitbarHandle);
