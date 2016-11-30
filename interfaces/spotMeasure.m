@@ -255,6 +255,7 @@ end
 [fileName, filePath] = uiputfile('*.xls', 'Choose a file name');
 
 xlswrite([filePath fileName], dataFinal);
+attachResults(datasetIds, fileName, filePath);
 
 msgbox('Data saved');
 

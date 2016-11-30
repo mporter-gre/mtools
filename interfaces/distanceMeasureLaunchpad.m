@@ -127,7 +127,7 @@ for thisImage = 1:numImages
 end
 
 disp('finished')
-writeDataOut(data, roiShapes, datasetNames);
+writeDataOut(data, roiShapes, datasetNames, selectedDsIds);
 
 
 % Update handles structure
@@ -148,7 +148,7 @@ function varargout = distanceMeasureLaunchpad_OutputFcn(hObject, eventdata, hand
 varargout{1} = handles.output;
 
 
-function writeDataOut(data, roiShapes, datasetNames)
+function writeDataOut(data, roiShapes, datasetNames, datasetIds)
 
 mainHeader = {'Original Image', 'Dataset', 'ROI number', 'Object 1 Channel', 'Object 2 Channel', 'Centroid 1 (xyz)', 'Centroid 2 (xyz)', 'Distance', 'Units'};
 emptyLine = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
@@ -174,6 +174,8 @@ end
 
 try
     xlswrite([savePath saveFile], dataOut);
+    %Make the dsList structure, remove projList
+    attachResults(datasetIds, saveFile, savePath);
 catch
     %If the xlswriter fails (no MSOffice installed, e.g.) then manually
     %create a .csv file. Turn every cell to string to make it easier.
@@ -198,4 +200,5 @@ catch
         fprintf(fid, '%s\n', '');
     end
     fclose(fid);
+    attachResults(datasetIds, saveFile, savePath);
 end

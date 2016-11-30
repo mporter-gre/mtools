@@ -150,7 +150,7 @@ for thisImage = 1:numImages
 end
 close(progBar);
 
-writeDataOut(roiShapes, indices, datasetNames);
+writeDataOut(roiShapes, indices, datasetNames, selectedDsIds);
 gatewayDisconnect
 delete(handles.FRAPChooser);
 
@@ -184,7 +184,7 @@ delete(handles.FRAPChooser);
 
 
 
-function writeDataOut(roiShapes, indices, datasetNames)
+function writeDataOut(roiShapes, indices, datasetNames, datasetIds)
 
 numImages = length(roiShapes);
 dataOut = [];
@@ -211,6 +211,7 @@ end
 try
     xlswrite([savePath saveFile], dataOut, 'Data All Timepoints');
     xlswrite([savePath saveFile], dataSummary, 'Data Summary');
+    attachResults(datasetIds, saveFile, savePath);
 catch
     %If the xlswriter fails (no MSOffice installed, e.g.) then manually
     %create a .csv file. Turn every cell to string to make it easier.
@@ -258,5 +259,6 @@ catch
         fprintf(fid, '%s\n', '');
     end
     fclose(fid);
+    attachResults(datasetIds, {saveFile, saveFileSummary}, savePath);
 
 end

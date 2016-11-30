@@ -51,11 +51,11 @@ else
     figure;
     
     if islogical(image)
-        for thisPlane = 1:numPlanes;
+        for thisPlane = 1:numPlanes
             subplot(subRows, subCols, thisPlane); imshow(image(:,:,thisPlane), [0 1]);
         end
     else
-        for thisPlane = 1:numPlanes;
+        for thisPlane = 1:numPlanes
             subplot(subRows, subCols, thisPlane); imshow(image(:,:,thisPlane), [0 ceil(max2(image(:,:,thisPlane)))]);
         end
     end

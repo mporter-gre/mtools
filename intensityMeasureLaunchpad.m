@@ -18,7 +18,7 @@ function intensityMeasureLaunchpad(handles, credentials)
 % 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 try
-    [segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds, imageNames, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize] = ImageSegmentation(handles, credentials);
+    [segChannel, measureChannels, measureAroundChannels, featherSize, saveMasks, verifyZ, groupObjects, minSize, selectedSegType, threshold, imageIds, imageNames, roiShapes, channelLabels, pixels, datasetNames, annulusSize, gapSize, datasetIds] = ImageSegmentation(handles, credentials);
 catch ME
     disp(ME.message)
     return;
@@ -32,11 +32,11 @@ for thisImage = 1:numImages
 end
 close(progBar);
 
-writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize);
+writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize, datasetIds);
 
 
 
-function writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize)
+function writeDataOut(data, dataAround, objectCounter, objectData, objectDataAround, segChannel, groupObjects, numSegPixels, roiShapes, datasetNames, imageNames, channelLabels, annulusSize, datasetIds)
 
 %Find the maximum number of channels needing written out.
 
@@ -262,6 +262,8 @@ try
     if groupObjects == 0
         xlswrite([savePath saveFile], objectDataOut, 'Data by Object');
     end
+    %Make the dsList structure, remove projList
+    attachResults(datasetIds, saveFile, savePath);
 catch
     %If the xlswriter fails (no MSOffice installed, e.g.) then manually
     %create a .csv file. Turn every cell to string to make it easier. Do
@@ -288,6 +290,8 @@ catch
         fprintf(fid, '%s\n', '');
     end
     fclose(fid);
+    saveFile = {};
+    saveFile{1} = saveROI;
     if groupObjects == 0
         [obRows obCols] = size(objectDataOut);
         for thisRow = 1:obRows
@@ -306,5 +310,7 @@ catch
             fprintf(fid, '%s\n', '');
         end
         fclose(fid);
+        saveFile{2} = saveObject;
     end
+    attachResults(datasetIds, saveFile, savePath);
 end

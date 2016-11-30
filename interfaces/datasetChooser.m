@@ -191,17 +191,26 @@ if isempty(dsIdList)
     return;
 end
 datasetListIdx = get(handles.datasetsList, 'Value');
-dsName = dsNameList{datasetListIdx};
-dsId = dsIdList(datasetListIdx);
-if ~isempty(selectedDsIds)
-    for thisId = 1:length(selectedDsIds)
-        if dsId == selectedDsIds(thisId)
-            return;
+
+numSelected = length(datasetListIdx);
+
+for thisSelection = 1:numSelected
+    breakout = 0;
+    dsName = dsNameList{datasetListIdx(thisSelection)};
+    dsId = dsIdList(datasetListIdx(thisSelection));
+    if ~isempty(selectedDsIds)
+        for thisId = 1:length(selectedDsIds)
+            if dsId == selectedDsIds(thisId)
+                breakout = 1;
+            end
+        end
+        if breakout == 1
+            break;
         end
     end
+    selectedDsNames{end+1} = dsName;
+    selectedDsIds(end+1) = dsId;
 end
-selectedDsNames{end+1} = dsName;
-selectedDsIds(end+1) = dsId;
 setappdata(handles.datasetChooser, 'selectedDsNames', selectedDsNames);
 setappdata(handles.datasetChooser, 'selectedDsIds', selectedDsIds);
 set(handles.selectedDatasetsList, 'String', selectedDsNames);

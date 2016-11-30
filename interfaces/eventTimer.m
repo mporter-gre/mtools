@@ -230,13 +230,13 @@ for thisImage = 1:numImages
         close(progBar);
     end
 end
-writeDataOut(roiShapes, datasetNames);
+writeDataOut(roiShapes, datasetNames, selectedDsIds);
 gatewayDisconnect;
 delete(handles.eventTimer);
 
 
 
-function writeDataOut(roiShapes, datasetNames)
+function writeDataOut(roiShapes, datasetNames, datasetIds)
 
 
 mainHeader = {'Original Image', 'Mask Image', 'Dataset', 'ROI', 'Event Duration'};
@@ -271,12 +271,14 @@ for thisImage = 1:numImages
 end
 
 [saveFile savePath] = uiputfile('*.xls','Save Results','/EventTimes.xls');
+
 if isnumeric(saveFile) && isnumeric(savePath)
     return;
 end
 
 try
     xlswrite([savePath saveFile], dataOut, 'Event Times');
+    attachResults(datasetIds, saveFile, savePath);
 catch
     %If the xlswriter fails (no MSOffice installed, e.g.) then manually
     %create a .csv file. Turn every cell to string to make it easier. 
@@ -301,6 +303,7 @@ catch
         fprintf(fid, '%s\n', '');
     end
     fclose(fid);
+    attachResults(datasetIds, saveFile, savePath);
 end
 
 
