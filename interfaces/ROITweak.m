@@ -1215,24 +1215,29 @@ for thisShape = 1:numShapes
     if shapeT == thisT-1 && shapeZ == thisZ-1
         cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue);
         cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue);
-        transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
-        if ~strcmp(transform, 'none')
-            if strncmp(transform, 'trans', 5)
-                closeBracket = findstr(transform, ')');
-                openBracket = findstr(transform, '(');
-                transformData = transform(openBracket+1:closeBracket-1);
-                spaceChar = findstr(transformData, ' ');
-                if isempty(spaceChar)
-                    firstTranslate = str2double(transformData(1:end));
-                    secondTranslate = 0;
-                else
-                    firstTranslate = str2double(transformData(1:spaceChar-1));
-                    secondTranslate = str2double(transformData(spaceChar+1:end));
-                end
-                cx = cx + firstTranslate;
-                cy = cy + secondTranslate;
-            else
-            end
+        %transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
+        tform = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform;
+        if ~isempty(tform)
+            tformMatrix = getTformMatrixFromTformObject(tform);
+            [cx, cy] = transformPointsForward(tformMatrix, cx, cy);
+            
+            
+%             if strncmp(transform, 'trans', 5)
+%                 closeBracket = findstr(transform, ')');
+%                 openBracket = findstr(transform, '(');
+%                 transformData = transform(openBracket+1:closeBracket-1);
+%                 spaceChar = findstr(transformData, ' ');
+%                 if isempty(spaceChar)
+%                     firstTranslate = str2double(transformData(1:end));
+%                     secondTranslate = 0;
+%                 else
+%                     firstTranslate = str2double(transformData(1:spaceChar-1));
+%                     secondTranslate = str2double(transformData(spaceChar+1:end));
+%                 end
+%                 cx = cx + firstTranslate;
+%                 cy = cy + secondTranslate;
+%             else
+%             end
         end
     end
 end
