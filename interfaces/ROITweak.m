@@ -413,6 +413,13 @@ for thisROI = 1:numROIs
                 cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue)+1;
                 rx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getRx.getValue);
                 ry = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getRy.getValue);
+                tform = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform;
+                if ~isempty(tform)
+                    tformMatrix = createTformMatrixFromTformObject(tform);
+                    affTform = affine2d(tformMatrix);
+                    [cx, cy] = transformPointsForward(affTform, cx, cy);
+                end
+                
                 %                 transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
                 %                 if ~strcmp(transform, 'none') || ~isempty(transform)
                 %                     if strncmp(transform, 'trans', 5)
@@ -476,6 +483,12 @@ for thisROI = 1:numROIs
                 y = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getY.getValue+1;
                 width = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getWidth.getValue;
                 height = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getHeight.getValue;
+                tform = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform;
+                if ~isempty(tform)
+                    tformMatrix = createTformMatrixFromTformObject(tform);
+                    affTform = affine2d(tformMatrix);
+                    [x, y] = transformPointsForward(affTform, x, y);
+                end
                 
             end
         end
@@ -505,7 +518,12 @@ for thisROI = 1:numROIs
             if shapeT == thisT-1 && shapeZ == thisZ-1
                 cx = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue+1;
                 cy = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue+1;
-                
+                tform = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform;
+                if ~isempty(tform)
+                    tformMatrix = createTformMatrixFromTformObject(tform);
+                    affTform = affine2d(tformMatrix);
+                    [cx, cy] = transformPointsForward(affTform, cx, cy);
+                end
             end
         end
         if zoomLevel ~=1
@@ -935,7 +953,7 @@ function recentreROIButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-set(gcf,'Pointer','fullcross');
+set(gcf,'Pointer','cross');
 setappdata(handles.ROITweak, 'recentreROI', 1);
 redrawImage(handles);
 
@@ -994,31 +1012,33 @@ for thisShape = 1:numShapes
         if strcmpi(thisShapeType, 'rect')
             cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getX.getValue);
             cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getY.getValue);
-            width = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getWidth.getValue;
-            height = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getHeight.getValue;
+            halfWidth = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getWidth.getValue / 2);
+            halfHeight = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getHeight.getValue / 2);
+            cx = cx + halfWidth;
+            cy = cy + halfHeight;
         else
             cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue);
             cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue);
         end
-        try
-            transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
-        catch
-            transform = 'none';
-        end
+        
         transX = currentPoint(1) - cx;
         transY = currentPoint(3) - cy;
-        updatedTransform = updateTransform(transform, 'translate', [], [], [], num2str(transX), num2str(transY));
+        
         break;
     end
 end
 
 
 %For server-side ROIs:
-updatedTransform = 'none';
-roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setTransform(omero.rtypes.rstring(updatedTransform))
-if strcmpi(thisShapeType, 'rect')
-    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setX(omero.rtypes.rdouble(zoomX + currentPoint(1)-1-round(width/2)));
-    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setY(omero.rtypes.rdouble(zoomY + currentPoint(3)-1-round(height/2)));
+
+tform = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform;
+
+if ~isempty(tform)
+    tform.setA02(omero.rtypes.rdouble(transX));
+    tform.setA12(omero.rtypes.rdouble(transY));
+elseif strcmpi(thisShapeType, 'rect')
+    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setX(omero.rtypes.rdouble(zoomX + currentPoint(1)-1-halfWidth));
+    roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setY(omero.rtypes.rdouble(zoomY + currentPoint(3)-1-halfHeight));
 else
     roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCx(omero.rtypes.rdouble(zoomX + currentPoint(1)-1));
     roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).setCy(omero.rtypes.rdouble(zoomY + currentPoint(3)-1));
@@ -1050,45 +1070,52 @@ imageId = getappdata(handles.ROITweak, 'imageId');
 roiShapes = getappdata(handles.ROITweak, 'roiShapes');
 roiResult = roiService.findByImage(imageId, []);
 rois = roiResult.rois;
-%roiResult = roiService.findByImage(imageId, []);
-%rois = roiResult.rois;
 
-% if ~isjava(roiService)
-%     roiService = session.getRoiService;
-% end
 if ~isjava(iUpdate)
     iUpdate = session.getUpdateService;
 end
 
 
-%numROI = length(roiShapes);
 for thisROI = ROIsToUpdate
-    thisROIId = roiShapes{thisROI}.ROIId;
-    wrongROI = 1;
-    while wrongROI == 1
-        roiObj = rois.get(thisROI-1);
-        roiObjId = roiObj.getId.getValue;
-        if roiObjId == thisROIId
-            roiObj.clearShapes();
-            wrongROI = 0;
-        end
-    end
-    wrongROI = 1;
-    %roiObjOldShapes = roiObj.copyShapes(); %This need to be a java list.
     numShapes = roiShapes{thisROI}.numShapes;
-    %roiShapes{thisROI} = rmfield(roiShapes{thisROI}, {'shapeType' 'numShapes'});
     for thisShape = 1:numShapes
-        if roiShapes{thisROI}.(['shape' num2str(thisShape)]).getStrokeWidth.getValue == 0
-            roiShapes{thisROI}.(['shape' num2str(thisShape)]).setStrokeWidth(omero.rtypes.rint(1));
+        tform = roiShapes{thisROI}.(['shape' num2str(thisShape)]).getTransform;
+        if ~isempty(tform)
+            tform = iUpdate.saveAndReturnObject(tform);
+            roiShapes{thisROI}.(['shape' num2str(thisShape)]).setTransform(tform);
+        else
+            roiShapes{thisROI}.(['shape' num2str(thisShape)]) = iUpdate.saveAndReturnObject(roiShapes{thisROI}.(['shape' num2str(thisShape)]));
         end
-        roiObj.addShape(roiShapes{thisROI}.(['shape' num2str(thisShape)]));
-        
-        %roiShapes = getROIsFromImageId(imageId);
-%         shapeObj = roiShapes{thisROI}.(['shape' num2str(thisShape)]);
-%         roiObj
-%         roiObj.setShape(shapeObj);
     end
-    iUpdate.saveAndReturnObject(roiObj);
+    
+    
+    
+%     thisROIId = roiShapes{thisROI}.ROIId;
+%     wrongROI = 1;
+%     while wrongROI == 1
+%         roiObj = rois.get(thisROI-1);
+%         roiObjId = roiObj.getId.getValue;
+%         if roiObjId == thisROIId
+%             %roiObj.clearShapes();
+%             wrongROI = 0;
+%         end
+%     end
+%     wrongROI = 1;
+%     %roiObjOldShapes = roiObj.copyShapes(); %This need to be a java list.
+%     numShapes = roiShapes{thisROI}.numShapes;
+%     %roiShapes{thisROI} = rmfield(roiShapes{thisROI}, {'shapeType' 'numShapes'});
+%     for thisShape = 1:numShapes
+%         if roiShapes{thisROI}.(['shape' num2str(thisShape)]).getStrokeWidth.getValue == 0
+%             roiShapes{thisROI}.(['shape' num2str(thisShape)]).setStrokeWidth(omero.rtypes.rint(1));
+%         end
+%         roiObj.addShape(roiShapes{thisROI}.(['shape' num2str(thisShape)]));
+%         
+%         %roiShapes = getROIsFromImageId(imageId);
+% %         shapeObj = roiShapes{thisROI}.(['shape' num2str(thisShape)]);
+% %         roiObj
+% %         roiObj.setShape(shapeObj);
+%     end
+%     iUpdate.saveAndReturnObject(roiObj);
 end
 roiShapes = getROIsFromImageId(imageId);
 setappdata(handles.ROITweak, 'roiShapes', roiShapes);
@@ -1213,13 +1240,19 @@ for thisShape = 1:numShapes
     shapeT = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheT.getValue;
     shapeZ = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTheZ.getValue;
     if shapeT == thisT-1 && shapeZ == thisZ-1
-        cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue);
-        cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue);
+        if strcmpi(ROIShapes{thisROIIdx}, 'rect')
+            cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getX.getValue);
+            cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getY.getValue);
+        else
+            cx = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCx.getValue);
+            cy = round(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getCy.getValue);
+        end
         %transform = char(roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform.getValue.getBytes');
         tform = roiShapes{thisROIIdx}.(['shape' num2str(thisShape)]).getTransform;
         if ~isempty(tform)
-            tformMatrix = getTformMatrixFromTformObject(tform);
-            [cx, cy] = transformPointsForward(tformMatrix, cx, cy);
+            tformMatrix = createTformMatrixFromTformObject(tform);
+            affTform = affine2d(tformMatrix);
+            [cx, cy] = transformPointsForward(affTform, cx, cy);
             
             
 %             if strncmp(transform, 'trans', 5)
