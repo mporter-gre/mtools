@@ -1061,6 +1061,7 @@ global session
 global iUpdate
 
 roiService = session.getRoiService;
+qService = session.getQueryService;
 ROIsToUpdate = getappdata(handles.ROITweak, 'ROIsToUpdate');
 if isempty(ROIsToUpdate)
     return;
@@ -1079,12 +1080,34 @@ end
 for thisROI = ROIsToUpdate
     numShapes = roiShapes{thisROI}.numShapes;
     for thisShape = 1:numShapes
-        tform = roiShapes{thisROI}.(['shape' num2str(thisShape)]).getTransform;
-        if ~isempty(tform)
-            tform = iUpdate.saveAndReturnObject(tform);
-            roiShapes{thisROI}.(['shape' num2str(thisShape)]).setTransform(tform);
+        mtShape = roiShapes{thisROI}.(['shape' num2str(thisShape)]);
+        shapeType = mtShape.getClass;
+        mtTform = roiShapes{thisROI}.(['shape' num2str(thisShape)]).getTransform;
+        shapeId = mtShape.getId.getValue;
+        dbShape = qService.findAllByQuery(['from Shape where id = ' num2str(shapeId)], []);
+        dbShape = dbShape.get(0);
+        if ~isempty(mtTform)
+            %tform = iUpdate.saveAndReturnObject(tform);
+            dbTform = dbShape.getTransform;
+            dbTform.setA02(mtTform.getA02);
+            dbTform.setA12(mtTform.getA12);
+            dbTform = iUpdate.saveAndReturnObject(dbTform);
+            roiShapes{thisROI}.(['shape' num2str(thisShape)]).setTransform(dbTform);
         else
-            roiShapes{thisROI}.(['shape' num2str(thisShape)]) = iUpdate.saveAndReturnObject(roiShapes{thisROI}.(['shape' num2str(thisShape)]));
+            %             mtShape = roiShapes{thisROI}.(['shape' num2str(thisShape)]);
+            %             shapeType = mtShape.shapeType;
+            shapeId = mtShape.getId.getValue;
+            dbShape = qService.findAllByQuery(['select shape from Shape as s where s.id = ' num2str(shapeId)], []);
+            
+            if strcmpi(shapeType, 'class omero.model.RectangleI')
+                dbShape.setX(mtShape.getX);
+                dbShape.setY(mtShape.getY);
+            else
+                dbShape.setCx(mtShape.getCx);
+                dbShape.setCy(mtShape.getCy);
+            end
+            
+            roiShapes{thisROI}.(['shape' num2str(thisShape)]) = iUpdate.saveAndReturnObject(dbShape);
         end
     end
     
