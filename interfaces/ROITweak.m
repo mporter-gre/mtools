@@ -1071,11 +1071,7 @@ imageId = getappdata(handles.ROITweak, 'imageId');
 roiShapes = getappdata(handles.ROITweak, 'roiShapes');
 roiResult = roiService.findByImage(imageId, []);
 rois = roiResult.rois;
-
-if ~isjava(iUpdate)
-    iUpdate = session.getUpdateService;
-end
-
+iUpdate = session.getUpdateService; %The global variable was throwing issues, when saving and Returning ROIs:Needs to be checked
 
 for thisROI = ROIsToUpdate
     numShapes = roiShapes{thisROI}.numShapes;
@@ -1096,17 +1092,11 @@ for thisROI = ROIsToUpdate
         else
             %             mtShape = roiShapes{thisROI}.(['shape' num2str(thisShape)]);
             %             shapeType = mtShape.shapeType;
-            shapeId = mtShape.getId.getValue;
-            dbShape = qService.findAllByQuery(['select shape from Shape as s where s.id = ' num2str(shapeId)], []);
-            
-            if strcmpi(shapeType, 'class omero.model.RectangleI')
-                dbShape.setX(mtShape.getX);
-                dbShape.setY(mtShape.getY);
-            else
-                dbShape.setCx(mtShape.getCx);
-                dbShape.setCy(mtShape.getCy);
-            end
-            
+%             shapeId = mtShape.getId.getValue;
+%             dbShape = qService.findAllByQuery(['select shape from Shape as s where s.id = ' num2str(shapeId)], []);
+
+            dbShape.setX(mtShape.getX);
+            dbShape.setY(mtShape.getY);
             roiShapes{thisROI}.(['shape' num2str(thisShape)]) = iUpdate.saveAndReturnObject(dbShape);
         end
     end
