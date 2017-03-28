@@ -1387,6 +1387,8 @@ catch
     manualCSV(batchSummaryByT, filePath, [fileName 'batchSummaryByT']);
     manualCSV(batchSummaryByZ, filePath, [fileName 'batchSummaryByZ']);
     saveFiles = {[fileName 'batchSummary.csv'] [fileName 'batchSummaryByT.csv'] [fileName 'batchSummaryByZ.csv']};
+    dsList = getDatasetIdsFromImageIds(imageIds);
+    datasetIds = dsList(:,1);
     attachResults(datasetIds, saveFiles, savePath);
 end
 
