@@ -1289,6 +1289,7 @@ warning('off', 'MATLAB:xlswrite:AddSheet');
 setappdata(handles.labelMaker, 'conditions', []);
 setappdata(handles.labelMaker, 'conditionsPaths', []);
 setappdata(handles.labelMaker, 'conditionsFiles', []);
+imageIdsFlat = [];
 
 batchChooser(handles);
 
@@ -1317,6 +1318,7 @@ if fileName == 0
 end
 waitbarHandle = waitbar(0,'Analysing...');
 thisStep = 1;
+answer = questdlg({'Do you also want to attach the individual'; 'files to their images on the server?'}, 'Attach Data', 'Yes', 'No', 'Yes');
 for thisCondition = 1:numConditions
     numFilesThisCondition = length(conditionsFiles{thisCondition});
     for thisFile = 1:numFilesThisCondition
@@ -1341,7 +1343,7 @@ for thisCondition = 1:numConditions
             summaryByT = pointsSummaryByT(points{thisCondition}{thisFile}, imageName, handles, numT);
             summaryByZ = pointsSummaryByZ(points{thisCondition}{thisFile}, imageName, handles, numZ);
             
-            answer = questdlg({'Do you also want to attach the individual'; 'files to their images on the server?'}, 'Attach Data', 'Yes', 'No', 'Yes');
+            
             
             try
                 xlswrite([filePath imageNameXls], summaryByImage, 'Summary by Image');
@@ -1366,6 +1368,7 @@ for thisCondition = 1:numConditions
                     link = linkAnnotation(session, fa3, 'image', imageId);
                 end
             end
+            imageIdsFlat(end+1) = imageIds{thisCondition}{thisFile};
         end
     end
 end
@@ -1378,8 +1381,8 @@ try
     xlswrite([filePath fileName], batchSummary, 'Batch Summary');
     xlswrite([filePath fileName], batchSummaryByT, 'Batch Summary By T');
     xlswrite([filePath fileName], batchSummaryByZ, 'Batch Summary By Z');
-    dsList = getDatasetIdsFromImageIds(imageIds);
-    datasetIds = dsList(:,1);
+    dsList = getDatasetIdsFromImageIds(imageIdsFlat);
+    datasetIds = unique(cell2mat(dsList(:,1)));
     attachResults(datasetIds, saveFile, savePath);
 catch
     [fileName remain] = strtok(fileName, '.');
@@ -1387,9 +1390,9 @@ catch
     manualCSV(batchSummaryByT, filePath, [fileName 'batchSummaryByT']);
     manualCSV(batchSummaryByZ, filePath, [fileName 'batchSummaryByZ']);
     saveFiles = {[fileName 'batchSummary.csv'] [fileName 'batchSummaryByT.csv'] [fileName 'batchSummaryByZ.csv']};
-    dsList = getDatasetIdsFromImageIds(imageIds);
-    datasetIds = dsList(:,1);
-    attachResults(datasetIds, saveFiles, savePath);
+    dsList = getDatasetIdsFromImageIds(imageIdsFlat);
+    datasetIds = unique(cell2mat(dsList(:,1)));
+    attachResults(datasetIds, saveFiles, filePath);
 end
 
 close(waitbarHandle);
