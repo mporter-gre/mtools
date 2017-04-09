@@ -1350,7 +1350,7 @@ for thisCondition = 1:numConditions
                 xlswrite([filePath imageNameXls], summaryByT, 'Summary by T');
                 xlswrite([filePath imageNameXls], summaryByZ, 'Summary by Z');
                 if strcmp(answer, 'Yes')
-                    fa = writeFileAnnotation(session, [filePath fileName], 'Description', ['Results created with OMERO.mtools on ' date]);
+                    fa = writeFileAnnotation(session, [filePath imageNameXls], 'Description', ['Results created with OMERO.mtools on ' date]);
                     link = linkAnnotation(session, fa, 'image', imageId);
                 end
             catch
