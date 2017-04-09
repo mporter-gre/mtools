@@ -1383,7 +1383,7 @@ try
     xlswrite([filePath fileName], batchSummaryByZ, 'Batch Summary By Z');
     dsList = getDatasetIdsFromImageIds(imageIdsFlat);
     datasetIds = unique(cell2mat(dsList(:,1)));
-    attachResults(datasetIds, saveFile, savePath);
+    attachResults(datasetIds, fileName, filePath);
 catch
     [fileName remain] = strtok(fileName, '.');
     manualCSV(batchSummary, filePath, [fileName 'batchSummary']);
