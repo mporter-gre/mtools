@@ -46,10 +46,22 @@ for thisShape = 1:numShapes
     Z = oldShape.getTheZ.getValue;
     %C = oldShape.getTheC.getValue;
     T = oldShape.getTheT.getValue;
+    tform = oldShape.getTransform;
     
     textVal = oldShape.getTextValue;
     if ~isempty(textVal)
         newShape.setTextValue(textVal);
+    end
+    %Copy the contents of the transform from the old shape, if any.
+    if ~isempty(tform)
+        newTform = omero.model.AffineTransformI;
+        newTform.setA00(tform.getA00);
+        newTform.setA10(tform.getA10);
+        newTform.setA01(tform.getA01);
+        newTform.setA11(tform.getA11);
+        newTform.setA02(tform.getA02);
+        newTform.setA12(tform.getA12);
+        newShape.setTransform(newTform);
     end
     newShape.setTheZ(rint(Z));
     %newShape.setTheC(C);

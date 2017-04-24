@@ -157,7 +157,11 @@ projList = getappdata(handles.attachResults, 'projList');
 dsList = getappdata(handles.attachResults, 'dsList');
 fileNames = getappdata(handles.attachResults, 'fileNames');
 filePath = getappdata(handles.attachResults, 'filePath');
-[numFiles, ~] = size(fileNames);
+if ischar(fileNames)
+    numFiles = 1;
+else
+    [~, numFiles] = size(fileNames);
+end
 
 for thisFile = 1:numFiles
     if numFiles == 1

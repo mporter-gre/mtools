@@ -7,7 +7,7 @@ numImages = length(imageIds);
 dsList = {};
 
 for thisImage = 1:numImages
-    qString = ['select link from DatasetImageLink as link where link.child.id = ' num2str(imageIds)];
+    qString = ['select link from DatasetImageLink as link where link.child.id = ' num2str(imageIds(thisImage))];
     result = queryService.findAllByQuery(qString, []);
     
     numDs = result.size;
