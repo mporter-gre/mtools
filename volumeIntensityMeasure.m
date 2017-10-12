@@ -54,7 +54,7 @@ if saveMasks == 1
     store = session.createRawPixelsStore();
     store.setPixelsId(newPixelsId, false);
 
-    set(ROIText, 'String', 'Sending mask image to server');
+    %set(ROIText, 'String', 'Sending mask image to server');
     drawnow;
 
     for thisT = 1:length(fullMaskImg)

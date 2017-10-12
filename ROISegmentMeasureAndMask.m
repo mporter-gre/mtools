@@ -65,7 +65,7 @@ for thisROI = 1:numROI
         roiShapesThisT{1}.numShapes = numZthisT - 1;
         roiShapesThisT{1}.shapeType = roiShapes{thisROI}.shapeType;
         [patches measureSegChannel] = cutPatchesFromROI(roiShapesThisT, segChannel, channelsToFetch, pixels, 1, zctStack, thisT); %The 1 at the end == thisROI in cutPatches...
-        set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
+        %set(ROIText, 'String', ['ROI ', num2str(thisROI), ' of ' num2str(numROI)]);
         drawnow;
         baseZ = roiShapes{thisROI}.shape1.getTheZ.getValue;
         numZ(thisROI) = length(roiShapesThisT{1}.numShapes);
@@ -113,7 +113,7 @@ for thisROI = 1:numROI
             startZ = 1;
             stopZ = 1;
         end
-        set(ROIText, 'String', 'Creating mask and calculating intensities...');
+        %set(ROIText, 'String', 'Creating mask and calculating intensities...');
         drawnow;
         roiShapes{thisROI}.startZ = startZ;
         roiShapes{thisROI}.stopZ = stopZ;

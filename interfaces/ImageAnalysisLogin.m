@@ -268,7 +268,7 @@ function passKeyPress(hObject, eventdata, handles)
 lastChar = eventdata.Character;
 lastKey = eventdata.Key;
 currPass = getappdata(handles.ImageAnalysisLoginWindow, 'passData');
-charset = char(33:126);
+charset = char(32:126);
 if lastChar
     if any(charset == lastChar)
         password = [currPass lastChar];

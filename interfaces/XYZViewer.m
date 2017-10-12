@@ -22,7 +22,7 @@ function varargout = XYZViewer(varargin)
 
 % Edit the above text to modify the response to help XYZViewer
 
-% Last Modified by GUIDE v2.5 09-Jun-2014 14:07:34
+% Last Modified by GUIDE v2.5 24-Aug-2017 16:26:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,6 +56,8 @@ function XYZViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 setappdata(handles.XYZViewer, 'cached', 0);
+setappdata(handles.XYZViewer, 'YZProjected', 0);
+setappdata(handles.XYZViewer, 'XZProjected', 0);
 
 XZImg = ones(60, 512);
 YZImg = ones(512,60);
@@ -180,12 +182,27 @@ x = getappdata(handles.XYZViewer, 'x');
 y = getappdata(handles.XYZViewer, 'y');
 z = getappdata(handles.XYZViewer, 'z');
 
+YZProjected = getappdata(handles.XYZViewer, 'YZProjected');
+XZProjected = getappdata(handles.XYZViewer, 'XZProjected');
+
 %grayImage = zeros(handles.sizeY, handles.sizeX, handles.numZ);
-for thisZ = 1:handles.numZ;
+
     %grayImage(:,:,thisZ) = rgb2gray(renderedImage{thisZ});
-    YZImage(:,thisZ,:) = renderedImage{thisZ}(:,x,:); %grayImage(:,x, thisZ);
-    XZImage(thisZ,:,:) = renderedImage{thisZ}(y,:,:); %grayImage(y,:, thisZ);
-end
+    if YZProjected == 0
+        for thisZ = 1:handles.numZ
+            YZImage(:,thisZ,:) = renderedImage{thisZ}(:,x,:); %grayImage(:,x, thisZ);
+        end
+    else
+        
+    end
+    if XZProjected == 0
+        for thisZ = 1:handles.numZ
+            XZImage(thisZ,:,:) = renderedImage{thisZ}(y,:,:); %grayImage(y,:, thisZ);
+        end
+    else
+        
+    end
+
 if size(YZImage(1,:,1)) < 60
     YZImage = imresize(YZImage, [512 60]);
 end
@@ -257,6 +274,8 @@ if strcmp(answer, 'Yes')
         tSlider_Callback(hObject, eventdata, handles)
     end
     setappdata(handles.XYZViewer, 'cached', 1);
+    set(handles.YZProjBtn, 'Enable', 'on');
+    set(handles.XZProjBtn, 'Enable', 'on');
 end
         
         
@@ -417,6 +436,26 @@ setappdata(handles.XYZViewer, 'transZ', transZ);
 if handles.numT == 1
     set(handles.tSlider, 'Enable', 'off');
 end
-
+set(handles.YZProjBtn, 'Enable', 'off');
+set(handles.XZProjBtn, 'Enable', 'off');
+setappdata(handles.XYZViewer, 'YZProjected', 0);
+setappdata(handles.XYZViewer, 'XZProjected', 0);
 guidata(hObject, handles);
 displayImages(handles);
+
+
+% --- Executes on button press in YZProjBtn.
+function YZProjBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to YZProjBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+renderedImage = getappdata(handles.XYZViewer, 'renderedImage');
+
+
+
+% --- Executes on button press in XZProjBtn.
+function XZProjBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to XZProjBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
