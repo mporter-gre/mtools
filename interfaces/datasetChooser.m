@@ -22,7 +22,7 @@ function varargout = datasetChooser(varargin)
 
 % Edit the above text to modify the response to help datasetChooser
 
-% Last Modified by GUIDE v2.5 17-Jan-2014 10:15:37
+% Last Modified by GUIDE v2.5 17-Nov-2017 12:03:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -410,4 +410,3 @@ else
     setappdata(handles.datasetChooser, 'groupUserIds', groupUserIds);
     setappdata(handles.datasetChooser, 'userIdToView', groupUserIds(userIdx));
 end
-
