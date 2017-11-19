@@ -1,9 +1,11 @@
 function newImage = createNewImage(session, imageName, channelList, pixelsType, physSizeX, physSizeY, physSizeZ, sizeX, sizeY, sizeZ, sizeT)
+%Example: newImage = createNewImage(session, 'phaseSeg', {525}, 'uint16', 0.46, 0.46, 1, 1392, 1040, 1, 10);
 %Matlab inplementation of createImage as found
 %http://trac.openmicroscopy.org.uk/omero/browser/trunk/components/common/sr
 %c/ome/api/IPixels.java
 %Also allows the choice of pixelsType which can set to 'uint8',
 %'uint16', 'single', 'double' etc...
+%The resulting image will be orphaned.
 %
 %Author Michael Porter
 
@@ -68,6 +70,9 @@ for thisChannel = 1:length(channelList)
     
     statsInfo = omero.model.StatsInfoI;
     switch pixelsType
+        case 'bit'
+            statsInfo.setGlobalMin(omero.rtypes.rdouble(0));
+            statsInfo.setGlobalMax(omero.rtypes.rdouble(1));
         case 'uint8'
             statsInfo.setGlobalMin(omero.rtypes.rdouble(0));
             statsInfo.setGlobalMax(omero.rtypes.rdouble(255));
