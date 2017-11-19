@@ -22,7 +22,7 @@ function varargout = recordCentreMode(varargin)
 
 % Edit the above text to modify the response to help recordCentreMode
 
-% Last Modified by GUIDE v2.5 12-Feb-2010 11:21:34
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:28:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -124,5 +124,3 @@ else
     setappdata(handles.parentHandles.(handles.parentHandleName), 'recordMode', recordMode);
 end
 delete(handles.recordCentreMode);
-
-

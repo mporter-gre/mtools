@@ -22,7 +22,7 @@ function varargout = eventTimer(varargin)
 
 % Edit the above text to modify the response to help eventTimer
 
-% Last Modified by GUIDE v2.5 02-Dec-2010 15:20:55
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:23:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -334,6 +334,3 @@ end
 % 
 % gatewayDisconnect;
 % uiresume;
-
-
-

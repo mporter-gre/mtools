@@ -22,7 +22,7 @@ function varargout = distanceChannelSelector(varargin)
 
 % Edit the above text to modify the response to help distanceChannelSelector
 
-% Last Modified by GUIDE v2.5 19-Aug-2009 14:33:50
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:22:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -163,5 +163,3 @@ handles.rememberScope = get(get(handles.rememberPanel, 'SelectedObject'), 'Tag')
 
 guidata(hObject, handles);
 uiresume;
-
-

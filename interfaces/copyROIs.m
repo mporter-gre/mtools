@@ -22,7 +22,7 @@ function varargout = copyROIs(varargin)
 
 % Edit the above text to modify the response to help copyROIs
 
-% Last Modified by GUIDE v2.5 05-Dec-2014 16:40:52
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:19:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -569,7 +569,3 @@ if fromImageSelected == 1 && isempty(fromROIs)
     set(handles.copyBtn, 'Enable', 'off');
     return
 end
-
-
-
-

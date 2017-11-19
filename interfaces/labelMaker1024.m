@@ -22,7 +22,7 @@ function varargout = labelMaker1024(varargin)
 
 % Edit the above text to modify the response to help labelmaker1024
 
-% Last Modified by GUIDE v2.5 03-Sep-2015 15:12:28
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:27:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;

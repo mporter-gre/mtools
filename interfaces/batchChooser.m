@@ -22,7 +22,7 @@ function varargout = batchChooser(varargin)
 
 % Edit the above text to modify the response to help batchChooser
 
-% Last Modified by GUIDE v2.5 10-Feb-2010 16:54:47
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:17:12
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -254,5 +254,3 @@ function individualFilesCheck_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of individualFilesCheck
-
-

@@ -22,7 +22,7 @@ function varargout = boxIt(varargin)
 
 % Edit the above text to modify the response to help boxit
 
-% Last Modified by GUIDE v2.5 23-Aug-2013 15:53:50
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:18:20
 
 
 % Begin initialization code - DO NOT EDIT
@@ -1358,4 +1358,3 @@ setappdata(handles.boxIt, 'imageId', newImageId);
 
 %The next image in the datasetis loaded into the Box It window.
 loadNewImage(handles);
-

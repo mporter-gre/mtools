@@ -22,7 +22,7 @@ function varargout = eventTimerChoices(varargin)
 
 % Edit the above text to modify the response to help eventTimerChoices
 
-% Last Modified by GUIDE v2.5 12-Oct-2009 17:09:32
+% Last Modified by GUIDE v2.5 19-Nov-2017 17:23:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -229,5 +229,3 @@ function afterText_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
