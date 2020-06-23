@@ -5,7 +5,7 @@ OMERO.mtools is a suite of tools written in Matlab aimed at streamlining common 
 
 Binaries of OMERO.mtools can be downloaded from [[2](https://downloads.openmicroscopy.org/mtools/)], matched to the relevant OMERO server version, for Windows and MacOS and usage instruction can be found here [[3](https://www.openmicroscopy.org/omero/features/analyze/)]. All the source code is in this repository and can be run in the Matlab interpreter or compiled using interfaces/ImageAnalysisLogin.m as the main file. The contents of the Associated Files folder should be added to the build. It requires a working OMERO.matlab toolkit [[4](https://www.openmicroscopy.org/omero/downloads/)] matching the version number of the relevant OMERO server in the Matlab Path and its java jars in the JavaClassPath.
 
-If OMERO.mtools is useful in your research, please cite this paper [[5](http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=3437820&tool=pmcentrez&rendertype=abstract)]. A bibliography of published research using OMERO.mtools can be found below.
+If OMERO.mtools is useful in your research, please cite this paper [[5](http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=3437820&tool=pmcentrez&rendertype=abstract)]. A list of published research using OMERO.mtools can be found below.
 
 [1] https://www.openmicroscopy.org/omero/
 
@@ -18,7 +18,7 @@ If OMERO.mtools is useful in your research, please cite this paper [[5](http://w
 [5] Allan, C., Burel, J.-M., Moore, J., Blackburn, C., Linkert, M., Loynton, S., et al. (2012) OMERO: flexible, model-driven data management for experimental biology. Nat Methods 9: 245–53 http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=3437820&tool=pmcentrez&rendertype=abstract.
 
 
-## Bibliography
+## Publications using OMERO.mtools
 
 Mariano, G., Trunk, K., Williams, D.J., Monlezun, L., Strahl, H., Pitt, S.J., and Coulthurst, S.J. (2019) A family of Type VI secretion system effector proteins that form ion-selective pores. Nat Commun 10 http://dx.doi.org/10.1038/s41467-019-13439-0.
 
