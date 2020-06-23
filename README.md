@@ -20,10 +20,14 @@ If OMERO.mtools is useful in your research, please cite this paper [[5](http://w
 
 ## Publications using OMERO.mtools
 
-Mariano, G., Trunk, K., Williams, D.J., Monlezun, L., Strahl, H., Pitt, S.J., and Coulthurst, S.J. (2019) A family of Type VI secretion system effector proteins that form ion-selective pores. Nat Commun 10 http://dx.doi.org/10.1038/s41467-019-13439-0.
+Mariano, G., Trunk, K., Williams, D.J., Monlezun, L., Strahl, H., Pitt, S.J., and Coulthurst, S.J. (2019) A family of Type VI secretion system effector proteins that form ion-selective pores. Nat Commun 10 
+
+Batie, M., Frost, J., Frost, M., Wilson, J.W., Schofield, P., and Rocha, S. (2019) Hypoxia induces rapid changes to histone methylation and reprograms chromatin. Science (80- ) 363: 1222–1226
 
 Ostrowski, A., Cianfanelli, F.R., Porter, M., Mariano, G., Peltier, J., Wong, J.J., et al. (2018) Killing with proficiency: Integrated post-translational regulation of an offensive Type VI secretion system. PLoS Pathog 14: 1–25.
 
-Schleicher, K., Porter, M., Have, S. ten, Sundaramoorthy, R., Porter, I.M., and Swedlow, J.R. (2017) The Ndc80 complex targets Bod1 to human mitotic kinetochores. Open Biol 7: 170099 https://royalsocietypublishing.org/doi/10.1098/rsob.170099.
+Batie, M., Druker, J., D’Ignazio, L., and Rocha, S. (2017) KDM2 Family Members are Regulated by HIF-1 in Hypoxia. Cells 6: 8
 
-Carvalhal, S., Ribeiro, S.A., Arocena, M., Kasciukovic, T., Temme, A., Koehler, K., et al. (2015) The nucleoporin ALADIN regulates Aurora A localization to ensure robust mitotic spindle formation. Mol Biol Cell 26: 3424–38 http://www.molbiolcell.org/content/26/19/3424.full.
+Schleicher, K., Porter, M., Have, S. ten, Sundaramoorthy, R., Porter, I.M., and Swedlow, J.R. (2017) The Ndc80 complex targets Bod1 to human mitotic kinetochores. Open Biol 7: 170099 
+
+Carvalhal, S., Ribeiro, S.A., Arocena, M., Kasciukovic, T., Temme, A., Koehler, K., et al. (2015) The nucleoporin ALADIN regulates Aurora A localization to ensure robust mitotic spindle formation. Mol Biol Cell 26: 3424–38 
